@@ -1,0 +1,25 @@
+.size-icon {
+  font-size: 16px;
+}
+
+.menu {
+  display: inline-block;
+  font-size: 22px;
+}
+
+/* Media query for medium screens and larger */
+@media (min-width: 768px) {
+  .menu {
+    display: none;
+  }
+  .container-full {
+    min-width: 80%;
+  }
+}
+
+@media (max-width: 768px) {
+  .container-mobile {
+    width: 95%;
+  }
+}
+
