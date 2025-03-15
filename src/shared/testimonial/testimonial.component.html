@@ -1,0 +1,14 @@
+@for (testimonial of testimonialList; track testimonial.id) {
+  <div id="item"
+       class="m-2 p-1 flex flex-col items-center justify-center border-2 rounded-3xl shadow-xl border-gray-200
+              w-full sm:w-[220px] md:w-[250px] lg:w-[250px] h-auto md:min-h-[220px] min-h-[180px] max-w-[90%] overflow-hidden">
+    <div class="flex flex-col justify-center gap-1 text-center p-2">
+      <div class="flex items-center justify-center">
+        <img [src]="testimonial.imageSrc" alt="User Avatar" class="w-12 h-12 rounded-full" loading="lazy">
+      </div>
+      <p class="text-xs md:text-lg font-semibold quicksand-regular">{{ testimonial.name }}</p>
+      <p class="text-content text-gray-700 text-xs md:text-md quicksand-regular">{{ testimonial.text }}</p>
+      <p class="text-gray-500 quicksand-regular text-xs md:text-md">{{ testimonial.username }}</p>
+    </div>
+  </div>
+}

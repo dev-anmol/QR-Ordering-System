@@ -1,0 +1,39 @@
+/* Reserve scrollbar space but keep it hidden */
+#item {
+  scrollbar-width: thin; /* For Firefox */
+  scrollbar-color: transparent transparent;
+}
+
+/* Hide scrollbar normally */
+#item::-webkit-scrollbar {
+  width: 6px; /* Keeps space reserved */
+  background-color: transparent;
+}
+
+/* Show scrollbar on hover */
+#item:hover::-webkit-scrollbar {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Style scrollbar track */
+#item::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Style scrollbar thumb */
+#item::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+/* Change thumb color on hover */
+#item:hover::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+p.text-content {
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Limits to 3 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
