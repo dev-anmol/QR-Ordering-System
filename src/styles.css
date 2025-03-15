@@ -6,6 +6,7 @@
     width: 80%;
   }
 }
+
 .bebas-neue-regular {
   font-family: "Bebas Neue", sans-serif;
   font-weight: 400;
@@ -13,6 +14,74 @@
   font-size: 32px;
 }
 
+.bebas-neue-heading {
+  font-family: "Bebas Neue", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 50px;
+}
+
+.bebas-neue-footer {
+  font-family: "Bebas Neue", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 35px;
+}
+
+
+.bebas-neue-mobile {
+  font-family: "Bebas Neue", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 48px;
+  line-height: 90%;
+}
+
+.bebas-neue-button {
+  font-family: "Bebas Neue", sans-serif;
+  font-weight: 400;
+  font-style: italic;
+  font-size: 18px;
+  text-transform: lowercase;
+}
+
+.merriweather-regular {
+  font-family: "Merriweather", serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
+  font-variation-settings: "wdth" 600;
+  letter-spacing: 1px;
+  line-height: 25px;
+}
+
+.merriweather-heading {
+  font-family: "Merriweather", serif;
+  font-optical-sizing: auto;
+  font-weight: 900;
+  font-style: normal;
+  font-variation-settings: "wdth" 600;
+  letter-spacing: 1px;
+  /*line-height: 25px;*/
+}
+
+.cookie-regular {
+  font-family: "Cookie", cursive;
+  /*font-weight: 200;*/
+  font-weight: lighter !important;
+  font-style: normal;
+}
+
+.quicksand-regular {
+  font-family: "Quicksand", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+}
 
 
 
+
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
