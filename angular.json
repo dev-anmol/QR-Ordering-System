@@ -75,6 +75,7 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
+            "baseHref": "/",
             "polyfills": [
               "zone.js",
               "zone.js/testing"
