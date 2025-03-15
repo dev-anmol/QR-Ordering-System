@@ -6,7 +6,6 @@ import {FooterComponent} from '../footer/footer.component';
 @Component({
   selector: 'app-menu-page',
   imports: [
-    HeaderComponent,
     FooterComponent,
   ],
   templateUrl: './menu-page.component.html',

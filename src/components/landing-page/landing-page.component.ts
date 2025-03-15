@@ -10,7 +10,6 @@ import {TestimonialsComponent} from "../testimonials/testimonials.component";
   selector: 'app-landing-page',
     imports: [
         FooterComponent,
-        HeaderComponent,
         HeroComponent,
         HeroSecondaryComponent,
         PricingComponent,
