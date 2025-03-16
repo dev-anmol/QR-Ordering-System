@@ -1,0 +1,74 @@
+.dialog-container{
+  overflow: hidden !important;
+}
+
+@keyframes borderLeftToRight {
+  0% {
+    transform: translateX(-100%);
+    opacity: 4;
+  }
+  50% {
+    opacity: 100;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 4;
+  }
+}
+
+@keyframes borderTopToBottom {
+  0% {
+    transform: translateY(-100%);
+    opacity: 4;
+  }
+  50% {
+    opacity: 100;
+  }
+  100% {
+    transform: translateY(100%);
+    opacity: 4;
+  }
+}
+
+@keyframes borderRightToLeft {
+  0% {
+    transform: translateX(100%);
+    opacity: 4;
+  }
+  50% {
+    opacity: 100;
+  }
+  100% {
+    transform: translateX(-100%);
+    opacity: 4;
+  }
+}
+
+@keyframes borderBottomToTop {
+  0% {
+    transform: translateY(100%);
+    opacity: 4;
+  }
+  50% {
+    opacity: 100;
+  }
+  100% {
+    transform: translateY(-100%);
+    opacity: 4;
+  }
+}
+.animate-border-left {
+  animation: borderLeftToRight 2s infinite ease-in-out;
+}
+
+.animate-border-top {
+  animation: borderTopToBottom 2s infinite ease-in-out;
+}
+
+.animate-border-right {
+  animation: borderRightToLeft 2s infinite ease-in-out;
+}
+
+.animate-border-bottom {
+  animation: borderBottomToTop 2s infinite ease-in-out;
+}

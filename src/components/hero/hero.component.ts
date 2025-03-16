@@ -1,4 +1,13 @@
-import {AfterViewInit, Component, ElementRef, OnInit, signal, ViewChild, WritableSignal} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  signal,
+  ViewChild,
+  WritableSignal
+} from '@angular/core';
 import gsap from 'gsap';
 import {ScrollTrigger} from 'gsap/ScrollTrigger';
 import {Router} from '@angular/router';
@@ -17,6 +26,7 @@ export class HeroComponent implements AfterViewInit, OnInit {
   @ViewChild('parallaxSection') parallaxSection!: ElementRef;
   @ViewChild('parallaxImage') parallaxImage!: ElementRef;
   @ViewChild('parallaxText') parallaxText!: ElementRef;
+
   qrCodeUrl!:string;
 
   constructor(private router: Router, private dialog: MatDialog){
@@ -26,8 +36,8 @@ export class HeroComponent implements AfterViewInit, OnInit {
   ngAfterViewInit() {
     // Parallax Effect on Image
     gsap.to(this.parallaxImage.nativeElement, {
-      y: -100, // Moves image upwards when scrolling
-      scale: 1.1, // Slight zoom effect
+      y: -50, // Moves image upwards when scrolling
+      scale: 1, // Slight zoom effect
       ease: 'none',
       scrollTrigger: {
         trigger: this.parallaxSection.nativeElement,
@@ -54,7 +64,7 @@ export class HeroComponent implements AfterViewInit, OnInit {
   ngOnInit() {
     const hotelId = '1';
     const tableId = '5';
-    this.qrCodeUrl = `http://localhost:4200/menu`
+    this.qrCodeUrl = `https://scaneatsqr.netlify.app/menu`
   }
 
   openQRCodeDialog(){
