@@ -9,20 +9,27 @@
     </div>
   </div>
 
-    <div class="container-full container-mobile">
-      <div class="flex justify-between items-center">
-        <p class="cursor-pointer bebas-neue-regular p-1" routerLink="/">ScanEats</p>
-        <i class="fas fa-bars md:hidden cursor-pointer menu"></i>
-        <nav class="hidden md:flex gap-6 text-black/60 items-center text-sm">
-          <a href="" class="align-text-bottom h-[24px]">About</a>
-          <a href="" class="align-text-bottom h-[24px]">Features</a>
-          <a href="" class="align-text-bottom h-[24px]">Customers</a>
-          <a href="" class="align-text-bottom h-[24px]">Updates</a>
-          <a href="" class="align-text-bottom h-[24px]">Help</a>
-          <button class="bg-black text-sm text-white px-4 py-2 rounded-lg font-medium inline-flex justify-center items-center tracking-tight">
-            Get
-            for free</button>
-        </nav>
-      </div>
+  <div class="container-full container-mobile">
+    <div class="flex justify-between items-center">
+      <p class="cursor-pointer bebas-neue-regular p-1" routerLink="/">ScanEats</p>
+      <i class="fas fa-bars md:hidden cursor-pointer menu"></i>
+      <nav class="hidden md:flex gap-6 text-black/60 items-center text-sm">
+        <a class="align-text-bottom h-[24px]">About</a>
+        <a class="align-text-bottom h-[24px]">Features</a>
+        <a class="align-text-bottom h-[24px]">Customers</a>
+        <a class="align-text-bottom h-[24px]">Updates</a>
+        <a class="align-text-bottom h-[24px]">Help</a>
+        <button *ngIf="ui.showCart()" routerLink="cart"
+                class="bg-black text-sm text-white px-4 py-2 rounded-lg font-medium inline-flex justify-center items-center tracking-tight">
+          Cart
+          <i class="material-icons text-sm pl-2">shopping_cart</i>
+        </button>
+        <button
+          class="bg-black text-sm text-white px-4 py-2 rounded-lg font-medium inline-flex justify-center items-center tracking-tight">
+          Get
+          for free
+        </button>
+      </nav>
     </div>
+  </div>
 </section>

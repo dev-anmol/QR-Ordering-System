@@ -11,7 +11,7 @@
   } @else {
     <div class="grid grid-cols-2 gap-4 md:grid-cols-4 container-full container-mobile">
       @for (item of foodItem(); track item.id) {
-        <app-food-item [foodItem]="item"></app-food-item>
+        <app-food-item [foodItem]="item" (handleAdd)="addItemToCart($event)"></app-food-item>
       }
     </div>
   }

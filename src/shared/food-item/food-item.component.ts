@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {foodInterface} from '../../model/food.interface';
 
 @Component({
@@ -9,5 +9,9 @@ import {foodInterface} from '../../model/food.interface';
 })
 export class FoodItemComponent {
   @Input() foodItem !: foodInterface ;
+  @Output() handleAdd = new EventEmitter();
 
+  addToCart(item: foodInterface) {
+    this.handleAdd.emit(item);
+  }
 }

@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
-import {Router, RouterLink, RouterLinkActive} from '@angular/router';
+import {Component, inject} from '@angular/core';
+import {Router, RouterLink} from '@angular/router';
 import {CommonModule} from '@angular/common';
+import {UicartService} from '../../shared/services/uicart.service';
 
 @Component({
   selector: 'app-header',
@@ -9,6 +10,6 @@ import {CommonModule} from '@angular/common';
   styleUrl: './header.component.css'
 })
 export class HeaderComponent {
-  constructor(private router: Router) {
-  }
+  public router = inject(Router);
+  public ui = inject(UicartService);
 }

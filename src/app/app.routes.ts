@@ -1,4 +1,4 @@
-import { Routes } from '@angular/router';
+import {Routes} from '@angular/router';
 import {MenuPageComponent} from '../components/menu-page/menu-page.component';
 
 export const routes: Routes = [
@@ -10,8 +10,11 @@ export const routes: Routes = [
   {
     path: 'menu',
     pathMatch: "full",
-    component: MenuPageComponent,
-    // loadComponent: () => import('../components/menu-page/menu-page.component').then(m => m.MenuPageComponent)
+    loadComponent: () => import('../components/menu-page/menu-page.component').then(m => m.MenuPageComponent)
+  }, {
+    path: 'cart',
+    pathMatch: "full",
+    loadComponent: () => import('../components/cart/cart.component').then(m => m.CartComponent)
   },
   {
     path: '**',

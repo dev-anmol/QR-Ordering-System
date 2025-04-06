@@ -5,6 +5,6 @@ export interface foodInterface {
   mealType: string,
   cuisine: string,
   rating?: number,
-  quantity?:number,
+  quantity:number,
   reviewCount?: number,
 }
