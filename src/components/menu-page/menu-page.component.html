@@ -1,11 +1,20 @@
-<section  class="flex justify-center items-center w-full md:mt-[100px] mt-[50px] overflow-hidden">
-<div class="grid grid-cols-2 gap-4 md:grid-cols-4 container-full container-mobile">
-  @for (item of foodItem$ | async; track item.id) {
-     <app-food-item [foodItem]="item"></app-food-item>
+<section class="flex justify-center items-center w-full md:mt-[100px] mt-[50px] overflow-hidden">
+  @if (isLoading()) {
+    <div class="w-full flex flex-col justify-center items-center py-10">
+      <div class="loader mb-4"></div>
+      <p class="text-center text-gray-600 text-lg mt-3">Fetching delicious items...</p>
+    </div>
+  } @else if (hasError()) {
+    <div class="w-full flex flex-col justify-center items-center py-10">
+      <p class="text-center text-red-600 text-lg">Oops! Something went wrong. Please try again later.</p>
+    </div>
+  } @else {
+    <div class="grid grid-cols-2 gap-4 md:grid-cols-4 container-full container-mobile">
+      @for (item of foodItem(); track item.id) {
+        <app-food-item [foodItem]="item"></app-food-item>
+      }
+    </div>
   }
-</div>
 </section>
+
 <app-menu-footer></app-menu-footer>
-
-
-
