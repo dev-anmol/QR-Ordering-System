@@ -11,6 +11,4 @@ import {CommonModule} from '@angular/common';
 export class HeaderComponent {
   constructor(private router: Router) {
   }
-
-
 }

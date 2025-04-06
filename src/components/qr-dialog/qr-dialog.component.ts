@@ -19,6 +19,7 @@ export class QrDialogComponent implements OnInit{
   }
 
   closeDialog() {
+    console.log("called closed");
     this.dialogRef.close();
   }
 
