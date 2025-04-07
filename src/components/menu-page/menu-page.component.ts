@@ -9,6 +9,7 @@ import {addToCart} from '../../state/cart/cart.actions';
 import {Router} from '@angular/router';
 import {UicartService} from '../../shared/services/uicart.service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {OverlayContainer, ToastrService} from 'ngx-toastr';
 
 @Component({
   selector: 'app-menu-page',
@@ -24,12 +25,14 @@ export class MenuPageComponent implements OnInit, OnDestroy {
   private foodApi = inject(FoodItemService);
   private uiCart = inject(UicartService);
   private destroyRef = inject(DestroyRef);
+  private toastr = inject(ToastrService);
+  private overlayContainer = inject(OverlayContainer);
   foodItem = signal<foodInterface[]>([]);
   isLoading = signal(true);
   hasError = signal(false);
-  showCart = new EventEmitter();
 
   constructor(private store: Store<AppState>, private route: Router) {
+    this.overlayContainer.getContainerElement();
   }
 
   ngOnInit() {
@@ -45,11 +48,13 @@ export class MenuPageComponent implements OnInit, OnDestroy {
       }
     });
     this.uiCart.setShowCart(true);
+    this.toastr.success('Toast should be visible now!');
+    console.log("toastr", this.toastr)
   }
 
   addItemToCart(product: foodInterface) {
-    console.log("here");
     this.store.dispatch(addToCart({product}));
+    this.toastr.success("Item added to Cart!")
   }
 
   ngOnDestroy() {

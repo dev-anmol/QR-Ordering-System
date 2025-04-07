@@ -9,6 +9,22 @@
   }
 }
 
+.toast-container {
+  z-index: 99999 !important;
+}
+
+.cdk-overlay-container {
+  position: fixed;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.cdk-global-overlay-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .bebas-neue-regular {
   font-family: "Bebas Neue", sans-serif;
   font-weight: 400;
@@ -82,8 +98,11 @@
 }
 
 
+html, body {
+  height: 100%;
+}
 
-
-
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
