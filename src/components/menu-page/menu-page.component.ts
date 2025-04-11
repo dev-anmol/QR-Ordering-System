@@ -1,4 +1,4 @@
-import {Component, DestroyRef, EventEmitter, inject, OnDestroy, OnInit, signal} from '@angular/core';
+import {Component, DestroyRef, inject, OnDestroy, OnInit, signal} from '@angular/core';
 import {FoodItemService} from '../../shared/services/foodItems/food-item.service';
 import {FoodItemComponent} from '../../shared/food-item/food-item.component';
 import {MenuFooterComponent} from '../menu-footer/menu-footer.component';
@@ -25,13 +25,13 @@ export class MenuPageComponent implements OnInit, OnDestroy {
   private foodApi = inject(FoodItemService);
   private uiCart = inject(UicartService);
   private destroyRef = inject(DestroyRef);
-  private toastr = inject(ToastrService);
+  // private toastr = inject(ToastrService);
   private overlayContainer = inject(OverlayContainer);
   foodItem = signal<foodInterface[]>([]);
   isLoading = signal(true);
   hasError = signal(false);
 
-  constructor(private store: Store<AppState>, private route: Router) {
+  constructor(private toastr: ToastrService, private store: Store<AppState>, private route: Router) {
     this.overlayContainer.getContainerElement();
   }
 
@@ -48,13 +48,11 @@ export class MenuPageComponent implements OnInit, OnDestroy {
       }
     });
     this.uiCart.setShowCart(true);
-    this.toastr.success('Toast should be visible now!');
-    console.log("toastr", this.toastr)
   }
 
   addItemToCart(product: foodInterface) {
     this.store.dispatch(addToCart({product}));
-    this.toastr.success("Item added to Cart!")
+    this.toastr.success("Item added to Cart!");
   }
 
   ngOnDestroy() {

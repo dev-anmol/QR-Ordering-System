@@ -1,7 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 
 @layer utilities {
   .container-full {
@@ -9,8 +11,12 @@
   }
 }
 
-.toast-container {
-  z-index: 99999 !important;
+#toast-container {
+  @apply fixed z-50 top-28 right-4 w-auto pointer-events-none;
+}
+
+.custom-toastr {
+  @apply bg-green-600 text-white rounded-lg px-4 py-2 shadow-lg mb-4 opacity-90 pointer-events-auto transition-opacity duration-300;
 }
 
 .cdk-overlay-container {
