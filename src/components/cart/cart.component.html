@@ -6,11 +6,9 @@
   </section>
 } @else {
   <section class="flex flex-col justify-center items-center gap-4 w-full md:mt-[100px] mt-[50px] overflow-hidden ">
-    <div class="flex w-full items-center justify-center container-full container-mobile">
-      <p class="pl-3 w-full text-lg text-gray-900">Cart</p>
-
-
-      <p class="pr-3 w-full text-end text-md text-gray-900">{{ (foodItem$ | async)?.length }} items</p>
+    <div class="flex flex-row w-full items-center justify-start container-full container-mobile md:pl-10">
+      <p class="max-w-fit p-2 w-full text-lg text-gray-900">Cart</p>
+      <p class="max-w-fit p-2 w-full text-end text-md text-gray-900">{{ (foodItem$ | async)?.length }} items</p>
     </div>
     <div
       class="flex flex-col md:flex-row md:items-center md:justify-center flex-wrap container-full container-mobile gap-4">
