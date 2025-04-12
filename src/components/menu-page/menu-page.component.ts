@@ -52,7 +52,7 @@ export class MenuPageComponent implements OnInit, OnDestroy {
 
   addItemToCart(product: foodInterface) {
     this.store.dispatch(addToCart({product}));
-    this.toastr.success("Item added to Cart!");
+    this.toastr.success("Item added to Cart :)");
   }
 
   ngOnDestroy() {
