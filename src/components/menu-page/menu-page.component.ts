@@ -1,4 +1,4 @@
-import {Component, DestroyRef, inject, OnDestroy, OnInit, signal} from '@angular/core';
+import {Component, computed, DestroyRef, inject, OnDestroy, OnInit, signal, WritableSignal} from '@angular/core';
 import {FoodItemService} from '../../shared/services/foodItems/food-item.service';
 import {FoodItemComponent} from '../../shared/food-item/food-item.component';
 import {MenuFooterComponent} from '../menu-footer/menu-footer.component';
@@ -26,9 +26,10 @@ export class MenuPageComponent implements OnInit, OnDestroy {
   private uiCart = inject(UicartService);
   private destroyRef = inject(DestroyRef);
   private overlayContainer = inject(OverlayContainer);
-  foodItem = signal<foodInterface[]>([]);
-  isLoading = signal(true);
-  hasError = signal(false);
+  foodItem: WritableSignal<foodInterface[]> = signal<foodInterface[]>([]);
+  isLoading: WritableSignal<boolean> = signal(true);
+  hasError: WritableSignal<boolean> = signal(false);
+  searchTerm: WritableSignal<string> = signal('');
 
   constructor(private toastr: ToastrService, private store: Store<AppState>, private route: Router) {
     this.overlayContainer.getContainerElement();
@@ -47,6 +48,16 @@ export class MenuPageComponent implements OnInit, OnDestroy {
       }
     });
     this.uiCart.setShowCart(true);
+  }
+
+  filteredFoodItems = computed<foodInterface[]>(() =>
+    this.foodItem().filter(item =>
+      item.name.toLowerCase().includes(this.searchTerm())
+    )
+  )
+
+  searchMenu(event: any) {
+    this.searchTerm.set(event.target.value.toLowerCase());
   }
 
   addItemToCart(product: foodInterface) {
