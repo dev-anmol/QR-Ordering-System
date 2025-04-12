@@ -25,7 +25,6 @@ export class MenuPageComponent implements OnInit, OnDestroy {
   private foodApi = inject(FoodItemService);
   private uiCart = inject(UicartService);
   private destroyRef = inject(DestroyRef);
-  // private toastr = inject(ToastrService);
   private overlayContainer = inject(OverlayContainer);
   foodItem = signal<foodInterface[]>([]);
   isLoading = signal(true);

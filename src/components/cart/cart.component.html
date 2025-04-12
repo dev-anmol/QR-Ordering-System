@@ -1,43 +1,53 @@
-<section class="flex flex-col justify-center items-center gap-4 w-full md:mt-[100px] mt-[50px] overflow-hidden ">
-  <div class="flex w-full items-center justify-center container-full container-mobile">
-    <p class="pl-3 w-full md:text-center text-lg text-gray-900">Cart</p>
-    <p class="pr-3 w-full md:text-center text-end text-md text-gray-900">{{ (foodItem$ | async)?.length }} items</p>
-  </div>
-  <div
-    class="flex flex-col md:flex-row md:items-center md:justify-center flex-wrap container-full container-mobile gap-4">
-    @for (item of foodItem$ | async; track item.id) {
-      <div
-        class="border-none max-w-sm  bg-white rounded-lg overflow-hidden transition-all duration-300 hover:translate-y-[-4px]">
-        <div class="relative h-48 overflow-hidden p-3">
-          <div class="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent z-10"></div>
-          <img
-            [src]="item.image"
-            alt="{{item.name}}"
-            class="w-full h-full object-cover transition-transform duration-500 hover:scale-105 rounded-lg"
-            style="image-rendering: smooth; transform: translateZ(0);"
-          >
-        </div>
-        <div class="p-5 flex flex-col gap-2">
-          <div class="flex justify-between items-center mb-3">
-            <h3 class="text-lg font-semibold text-gray-800 truncate">{{ item.name }}</h3>
-          </div>
+@if (!(foodItem$ | async)?.length) {
+  <section class="flex flex-col justify-center items-center gap-4 w-full md:mt-[100px] mt-[50px] overflow-hidden ">
+    <div class="flex flex-col container-full container-mobile justify-center items-center">
+      <p class="text-3xl text-gray-600">Cart is empty :(</p>
+    </div>
+  </section>
+} @else {
+  <section class="flex flex-col justify-center items-center gap-4 w-full md:mt-[100px] mt-[50px] overflow-hidden ">
+    <div class="flex w-full items-center justify-center container-full container-mobile">
+      <p class="pl-3 w-full text-lg text-gray-900">Cart</p>
 
-          <div class="flex flex-col md:flex-row justify-between px-1 gap-2">
-            <p class="text-gray-600 text-sm line-clamp-3 pl-1">{{ item.cuisine }}</p>
-            <p class="text-gray-600 text-sm">⭐ {{ item.rating }}</p>
-          </div>
 
-          <div>
-            <button
-              class="flex items-center justify-center gap-2 text-sm w-full text-white bg-yellow-500 p-2 rounded-lg hover:bg-yellow-400">
-              Order
-            </button>
+      <p class="pr-3 w-full text-end text-md text-gray-900">{{ (foodItem$ | async)?.length }} items</p>
+    </div>
+    <div
+      class="flex flex-col md:flex-row md:items-center md:justify-center flex-wrap container-full container-mobile gap-4">
+      @for (item of foodItem$ | async; track item.id) {
+        <div
+          class="border-none max-w-sm  bg-white rounded-lg overflow-hidden transition-all duration-300 hover:translate-y-[-4px]">
+          <div class="relative h-48 overflow-hidden p-3">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent z-10"></div>
+            <img
+              [src]="item.image"
+              alt="{{item.name}}"
+              class="w-full h-full object-cover transition-transform duration-500 hover:scale-105 rounded-lg"
+              style="image-rendering: smooth; transform: translateZ(0);"
+            >
+          </div>
+          <div class="p-5 flex flex-col gap-2">
+            <div class="flex justify-between items-center mb-3">
+              <h3 class="text-lg font-semibold text-gray-800 truncate">{{ item.name }}</h3>
+            </div>
+
+            <div class="flex flex-col md:flex-row justify-between px-1 gap-2">
+              <p class="text-gray-600 text-sm line-clamp-3 pl-1">{{ item.cuisine }}</p>
+              <p class="text-gray-600 text-sm">⭐ {{ item.rating }}</p>
+            </div>
+
+            <div>
+              <button
+                class="flex items-center justify-center gap-2 text-sm w-full text-white bg-yellow-500 p-2 rounded-lg hover:bg-yellow-400">
+                Order
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    }
-  </div>
-</section>
+      }
+    </div>
+  </section>
+}
 
 
 <app-menu-footer></app-menu-footer>
