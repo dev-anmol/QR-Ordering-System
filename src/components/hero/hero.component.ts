@@ -10,9 +10,10 @@ import {
 } from '@angular/core';
 import gsap from 'gsap';
 import {ScrollTrigger} from 'gsap/ScrollTrigger';
-import {Router} from '@angular/router';
+import {NavigationEnd, Router} from '@angular/router';
 import {MatDialog} from '@angular/material/dialog';
 import {QrDialogComponent} from '../qr-dialog/qr-dialog.component';
+import {Subscription} from 'rxjs';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -27,14 +28,20 @@ export class HeroComponent implements AfterViewInit, OnInit {
   @ViewChild('parallaxImage') parallaxImage!: ElementRef;
   @ViewChild('parallaxText') parallaxText!: ElementRef;
 
-  qrCodeUrl!:string;
+  qrCodeUrl!: string;
+  private routerSubscription!: Subscription;
 
-  constructor(private router: Router, private dialog: MatDialog){
+  constructor(private router: Router, private dialog: MatDialog) {
   }
 
-  heroImg:WritableSignal<string>= signal('assets/desing.png');
+  heroImg: WritableSignal<string> = signal('assets/desing.png');
+
   ngAfterViewInit() {
-    // Parallax Effect on Image
+    this.initAnimations();
+  }
+
+  initAnimations() {
+    ScrollTrigger.refresh();
     gsap.to(this.parallaxImage.nativeElement, {
       y: -50, // Moves image upwards when scrolling
       scale: 1, // Slight zoom effect
@@ -59,15 +66,25 @@ export class HeroComponent implements AfterViewInit, OnInit {
         toggleActions: 'play none none none',
       },
     });
+
   }
 
   ngOnInit() {
     const hotelId = '1';
     const tableId = '5';
     this.qrCodeUrl = `https://scaneatsqr.netlify.app/menu`
+
+    this.routerSubscription = this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.initAnimations();
+        setTimeout(() => {
+          this.initAnimations();
+        },100)
+      }
+    })
   }
 
-  openQRCodeDialog(){
+  openQRCodeDialog() {
     this.dialog.open(QrDialogComponent, {
       data: {qrCode: this.qrCodeUrl}
     })
