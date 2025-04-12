@@ -19,12 +19,12 @@
           <i class="material-icons text-sm pl-2">shopping_cart</i>
         </button>
         <i class="fas fa-bars md:hidden cursor-pointer menu"></i>
-
       </div>
+
       <nav class="hidden md:flex gap-6 text-black/60 items-center text-sm">
         <a class="align-text-bottom h-[24px]">About</a>
         <a class="align-text-bottom h-[24px]">Features</a>
-        <a class="align-text-bottom h-[24px]">Customers</a>
+        <a routerLink="menu" class="align-text-bottom h-[24px]">Menu</a>
         <a class="align-text-bottom h-[24px]">Updates</a>
         <a class="align-text-bottom h-[24px]">Help</a>
         <button *ngIf="ui.showCart()" routerLink="cart"

@@ -7,4 +7,5 @@ export interface foodInterface {
   rating?: number,
   quantity:number,
   reviewCount?: number,
+  price: number
 }

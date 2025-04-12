@@ -12,7 +12,7 @@
 }
 
 #toast-container {
-  @apply fixed z-50 top-28 right-4 w-auto pointer-events-none;
+  @apply fixed z-50 bottom-0 right-4 w-auto pointer-events-none;
 }
 
 .custom-toastr {

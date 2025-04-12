@@ -7,7 +7,7 @@ import {Store} from '@ngrx/store';
 import {AppState} from '../../state/app.state';
 import {addToCart} from '../../state/cart/cart.actions';
 import {Router} from '@angular/router';
-import {UicartService} from '../../shared/services/uicart.service';
+import {UicartService} from '../../shared/services/uicart/uicart.service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {OverlayContainer, ToastrService} from 'ngx-toastr';
 

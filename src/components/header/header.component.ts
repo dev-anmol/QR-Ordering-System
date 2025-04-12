@@ -1,7 +1,7 @@
-import {Component, inject} from '@angular/core';
+import {Component, inject, signal, WritableSignal} from '@angular/core';
 import {Router, RouterLink} from '@angular/router';
 import {CommonModule} from '@angular/common';
-import {UicartService} from '../../shared/services/uicart.service';
+import {UicartService} from '../../shared/services/uicart/uicart.service';
 
 @Component({
   selector: 'app-header',
@@ -12,4 +12,5 @@ import {UicartService} from '../../shared/services/uicart.service';
 export class HeaderComponent {
   public router = inject(Router);
   public ui = inject(UicartService);
+
 }
