@@ -6,7 +6,7 @@
   </section>
 } @else {
   <section class="flex flex-col justify-center items-center gap-4 w-full md:mt-[100px] mt-[50px] overflow-hidden ">
-    <div class="flex flex-row w-full items-center justify-start container-full container-mobile md:pl-10">
+    <div class="flex flex-row w-full items-center justify-start container-full container-mobile md:pl-36">
       <p class="max-w-fit p-2 w-full text-lg text-gray-900">Cart</p>
       <p class="max-w-fit p-2 w-full text-end text-md text-gray-900">{{ (foodItem$ | async)?.length }} items</p>
     </div>
@@ -37,7 +37,7 @@
             <div class="flex flex-col gap-4">
               <button
                 class="flex items-center justify-center gap-2 text-sm w-full text-white bg-yellow-500 p-2 rounded-lg hover:bg-yellow-400">
-                Order
+                Checkout
               </button>
               <button
                 (click)="removeItem(item)"
