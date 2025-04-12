@@ -1,7 +1,6 @@
-import {inject, Injectable, Signal, WritableSignal} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {Observable, map} from 'rxjs';
-import {log} from '@angular-devkit/build-angular/src/builders/ssr-dev-server';
+import {map} from 'rxjs';
 import {apiFormat} from '../../../model/api.interface';
 import {foodInterface} from '../../../model/food.interface';
 

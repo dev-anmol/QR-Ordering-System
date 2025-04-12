@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import {Component, inject, signal, WritableSignal} from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../state/app.state';
 import { selectCartState } from '../../state/cart/cart.selector';
@@ -15,4 +15,12 @@ import { MenuFooterComponent } from '../menu-footer/menu-footer.component';
 export class CartComponent {
   private store = inject<Store<AppState>>(Store);
   public foodItem$ = this.store.select(selectCartState);
+  public foodItemLength : WritableSignal<any> = signal(0)
+  getListSize() {
+    this.foodItemLength.set(this.foodItem$);
+    console.log(this.foodItemLength.length);
+    return this.foodItemLength.length;
+  }
+
+
 }
