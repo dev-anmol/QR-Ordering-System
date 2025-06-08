@@ -1,9 +1,13 @@
-import {Routes} from '@angular/router';
-import {MenuPageComponent} from '../components/menu-page/menu-page.component';
+import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   {
     path: '',
+    pathMatch: 'full',
+    loadComponent: () => import('../components/login/login.component').then(m => m.LoginComponent)
+  },
+  {
+    path: 'home',
     pathMatch: 'full',
     loadComponent: () => import('../components/landing-page/landing-page.component').then(m => m.LandingPageComponent),
   },
