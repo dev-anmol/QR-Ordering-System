@@ -1,15 +1,41 @@
-<section>
-    <p class="giest-light">signup works!</p>
+<section class="p-10 flex flex-col h-full w-full items-center bg-neutral-100">
 
-    <div>
-        <!-- signup form -->
-    </div>
-
-    <div>
-        <!-- image/content -->
+    <div class="flex flex-col gap-10">
         <div>
-            <img src="assets/signup.jpg" alt="">
-
+            <p class="cursor-pointer bebas-neue-regular text-center" routerLink="/">Welcome to ScanEats</p>
+            <p class="giest-light text-sm text-center text-neutral-700">Order Instantly at Your Table!</p>
         </div>
+
+        <div class="flex flex-row justify-between bg-white rounded-lg">
+
+            <div class="mt-10 p-6 md:w-[80%] w-full">
+                <p class="geist text-[22px] font-[500] text-neutral-950">Create your Account</p>
+
+                <div class="flex flex-col gap-6 giest-light text-sm w-full p-6">
+                    <div class="p-2 flex flex-col gap-2">
+                        <p class="font-semibold text-neutral-900">Name</p>
+                        <input type="text"
+                            class="bg-neutral-100 focus:outline-none text-sm md:w-[65%] w-full rounded-md p-1">
+                    </div>
+                    <div class="p-2 flex flex-col gap-2">
+                        <p class="font-semibold text-neutral-900">Email</p>
+                        <input type="text"
+                            class="bg-neutral-100 focus:outline-none text-sm  md:w-[65%] w-full rounded-md p-1">
+                    </div>
+                    <div class="p-2 flex flex-col gap-2">
+                        <p class="font-semibold text-neutral-900">Password</p>
+                        <input type="password"
+                            class="bg-neutral-100 focus:outline-none text-sm  md:w-[65%] w-full rounded-md p-1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-2">
+                <img src="assets/signup.jpg" alt="restaurants" class="h-[500px] hidden md:block rounded-lg">
+            </div>
+        </div>
+
+
     </div>
+
 </section>
