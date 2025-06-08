@@ -1,4 +1,4 @@
-<section class="p-6 md:p-10 flex flex-col h-full w-full items-center bg-neutral-100 min-h-screen">
+<section class="p-6 md:p-10 flex flex-col gap-4 h-full w-full items-center bg-neutral-100 min-h-screen">
     <div class="flex flex-col gap-10 w-full max-w-5xl">
         <!-- Header -->
         <div class="text-center">
@@ -23,26 +23,26 @@
                     <!-- Name -->
                     <div class="flex flex-col gap-2">
                         <label class="font-semibold text-neutral-900">Name</label>
-                        <input type="text"
+                        <input type="text" (input)="handleName($event)" [value]="name()"
                             class="text-neutral-800 bg-neutral-100 border border-gray-200/20 focus:border-indigo-400 focus:outline-none text-sm w-full rounded-md p-2" />
                     </div>
 
                     <!-- Email -->
                     <div class="flex flex-col gap-2">
                         <label class="font-semibold text-neutral-900">Email</label>
-                        <input type="email"
+                        <input type="email" [value]="email()" (input)="handleEmail($event)"
                             class="text-neutral-800 bg-neutral-100 border border-gray-200/20 focus:border-indigo-400 focus:outline-none text-sm w-full rounded-md p-2" />
                     </div>
 
                     <!-- Password -->
                     <div class="flex flex-col gap-2">
                         <label class="font-semibold text-neutral-900">Password</label>
-                        <input type="password"
+                        <input type="password" [value]="password()" (input)="handlePassword($event)"
                             class="text-neutral-800 bg-neutral-100 border border-gray-200/20 focus:border-indigo-400 focus:outline-none text-sm w-full rounded-md p-2" />
                     </div>
 
                     <!-- Submit Button -->
-                    <button type="submit"
+                    <button (click)="handleSubmit($event)" (input)="handleName($event)"
                         class="bg-indigo-600 p-2 rounded-lg text-white hover:bg-indigo-700 transition-all duration-300 w-full">
                         Sign up
                     </button>
@@ -54,5 +54,11 @@
                 <img src="assets/signup.jpg" alt="restaurants" class="object-cover h-full w-full" />
             </div>
         </div>
+    </div>
+
+    <div>
+        <p class="text-xs text-neutral-900">Already have an account? <a routerLink="/login" class="text-indigo-600">Log
+                in here</a>.
+        </p>
     </div>
 </section>
