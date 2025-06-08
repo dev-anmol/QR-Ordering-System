@@ -11,6 +11,15 @@
   }
 }
 
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
 #toast-container {
   @apply fixed z-50 bottom-0 right-4 w-auto pointer-events-none;
 }
@@ -103,12 +112,19 @@
   font-style: normal;
 }
 
-
-html, body {
-  height: 100%;
+.giest-light{
+  font-family: "Geist", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
 }
 
-body {
-  margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+.giest-medium{
+  font-family: "Geist", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
 }
+
+
+
