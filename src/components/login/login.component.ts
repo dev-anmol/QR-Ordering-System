@@ -33,5 +33,6 @@ export class LoginComponent {
       console.log(signupForm);
       this.email.update(prev => prev = '')
       this.password.update(prev => prev = '')
+      this.router.navigate(['home']);
   }
 }
