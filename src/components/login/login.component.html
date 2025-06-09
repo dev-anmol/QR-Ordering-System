@@ -12,12 +12,15 @@
 
         <!-- Signup Card -->
         <div
-            class="flex flex-col-reverse md:flex-row bg-white rounded-xl border border-neutral-200 shadow-xl overflow-hidden">
+            class="flex flex-col-reverse items-center md:flex-row bg-white rounded-xl border border-neutral-200 shadow-xl overflow-hidden">
             <!-- Form Section -->
             <div class="w-full md:w-2/3 p-6 md:p-10">
-                <p class="geist text-2xl font-medium text-neutral-950 mb-6">
-                    Create your Account
-                </p>
+                <div class="flex flex-col mb-6">
+                    <p class="geist text-2xl font-medium text-neutral-950">
+                        Welcome back
+                    </p>
+                    <p class="giest-light text-sm text-neutral-700">Please enter your detail to sign in</p>
+                </div>
 
                 <form class="flex flex-col gap-6 giest-light text-sm w-full">
                     <!-- Email -->
@@ -37,7 +40,7 @@
                     <!-- Submit Button -->
                     <button (click)="handleSubmit($event)"
                         class="bg-indigo-600 p-2 rounded-lg text-white hover:bg-indigo-700 transition-all duration-300 w-full">
-                        Sign up
+                        Sign in
                     </button>
                 </form>
             </div>
@@ -47,11 +50,5 @@
                 <img src="assets/signup.jpg" alt="restaurants" class="object-cover h-full w-full" />
             </div>
         </div>
-    </div>
-
-    <div>
-        <p class="text-xs text-neutral-900">Already have an account? <a routerLink="/login" class="text-indigo-600">Log
-                in here</a>.
-        </p>
     </div>
 </section>
