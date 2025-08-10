@@ -2,17 +2,14 @@ import { Component, inject, signal, WritableSignal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { MessageService } from 'primeng/api';
-import { ToastModule } from 'primeng/toast';
 import { LoginPayload } from '../../model/login';
 import { LoginService } from '../../services/login/login.service';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, RouterModule, ToastModule],
+  imports: [ReactiveFormsModule, RouterModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
-  providers: [MessageService],
 })
 
 

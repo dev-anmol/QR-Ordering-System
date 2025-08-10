@@ -50,31 +50,6 @@ export class HeroComponent implements AfterViewInit, OnInit {
         scrub: true,
       },
     });
-
-    // Parallax Effect on Text
-    // gsap.set(this.parallaxText.nativeElement, {opacity: 0, y : 50});
-
-    // Immediate animation for initial load
-    // gsap.to(this.parallaxText.nativeElement, {
-    //   opacity: 1,
-    //   y: 0,
-    //   duration: 1.5,
-    //   ease: 'power2.out',
-    // });
-    
-    // gsap.to(this.parallaxText.nativeElement, {
-    //   opacity: 1,
-    //   y: 0,
-    //   duration: 1.5,
-    //   ease: 'power2.out',
-    //   scrollTrigger: {
-    //     trigger: this.parallaxSection.nativeElement,
-    //     toggleActions: 'play none none none',
-    //     immediateRender: true,
-    //     once: true
-    //   },
-    // });
-
   }
 
   ngOnInit() {
