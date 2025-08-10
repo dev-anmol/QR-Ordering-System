@@ -1,6 +1,8 @@
 import { Component, inject, signal, WritableSignal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterModule } from '@angular/router';
+import { RegisterService } from '../../services/register/register.service';
+import { RegisterPayload } from '../../model/Register';
 
 @Component({
   selector: 'app-signup',
@@ -10,10 +12,12 @@ import { Router, RouterLink, RouterModule } from '@angular/router';
 })
 export class SignupComponent {
   private router = inject(Router);
+  private registerService = inject(RegisterService);
 
   name : WritableSignal<string> = signal('');
   email : WritableSignal<string> = signal('');
   password : WritableSignal<string> = signal('');
+  mobileNum : WritableSignal<string> = signal('');
 
   handleName(event: Event) {
     const inputVal = (event.target as HTMLInputElement).value;
@@ -30,19 +34,32 @@ export class SignupComponent {
     this.password.set(inputVal);
   }
 
+  handleMobileNum(event: Event) {
+    const inputVal = (event.target as HTMLInputElement).value;
+    this.mobileNum.set(inputVal);
+  }
+
   handleSubmit(event : Event) {
       event.preventDefault();
-      const signupForm = {
-        name : this.name(),
+      const signupForm: RegisterPayload = {
+        userName : this.name(),
         email: this.email(),
-        password: this.password()
+        password: this.password(),
+        mobileNum: this.mobileNum(),
+        role: 'OWNER'
       }
       console.log(signupForm);
-      this.email.update(prev => prev = '')
-      this.name.update(prev => prev = '')
-      this.password.update(prev => prev = '')
-      this.router.navigateByUrl('/home')
+      this.registerService.registerUser(signupForm).subscribe({
+        next: (res) => {
+          console.log("Register successful", res);
+        },
+        error: (err) => {
+          console.log("Error in register", err);
+        }
+      })
   }
+
+
 
 
 }

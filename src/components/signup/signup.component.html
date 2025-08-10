@@ -22,7 +22,7 @@
                 <form class="flex flex-col gap-6 giest-light text-sm w-full">
                     <!-- Name -->
                     <div class="flex flex-col gap-2">
-                        <label class="font-semibold text-neutral-900">Name</label>
+                        <label class="font-semibold text-neutral-900">Username</label>
                         <input type="text" (input)="handleName($event)" [value]="name()"
                             class="text-neutral-800 bg-neutral-100 border border-gray-200/20 focus:border-indigo-400 focus:outline-none text-sm w-full rounded-md p-2" />
                     </div>
@@ -38,6 +38,13 @@
                     <div class="flex flex-col gap-2">
                         <label class="font-semibold text-neutral-900">Password</label>
                         <input type="password" [value]="password()" (input)="handlePassword($event)"
+                            class="text-neutral-800 bg-neutral-100 border border-gray-200/20 focus:border-indigo-400 focus:outline-none text-sm w-full rounded-md p-2" />
+                    </div>
+
+                    <!-- Mobile Number -->
+                    <div class="flex flex-col gap-2">
+                        <label class="font-semibold text-neutral-900">Mobile Number</label>
+                        <input type="text" [value]="mobileNum()" (input)="handleMobileNum($event)"
                             class="text-neutral-800 bg-neutral-100 border border-gray-200/20 focus:border-indigo-400 focus:outline-none text-sm w-full rounded-md p-2" />
                     </div>
 
