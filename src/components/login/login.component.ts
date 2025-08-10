@@ -34,8 +34,13 @@ export class LoginComponent {
         password: this.password()
       }
       console.log(data);
-      this.loginService.loginUser(data).subscribe((res) => {
-        console.log(res);
+      this.loginService.loginUser(data).subscribe({
+        next: (res) => {
+          console.log("Login successful", res);
+        },
+        error: (err) => {
+          console.log("Error in login", err);
+        }
       })
   }
 }

@@ -13,7 +13,6 @@ export class LoginService {
 
   constructor() { }
 
-
   private http = inject(HttpClient);
   headers = new HttpHeaders().set('Content-Type', 'application/json');
 
