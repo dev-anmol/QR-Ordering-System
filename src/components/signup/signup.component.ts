@@ -1,19 +1,20 @@
 import { Component, inject, signal, WritableSignal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterLink, RouterModule } from '@angular/router';
-import { RegisterService } from '../../services/register/register.service';
+import { Router, RouterModule } from '@angular/router';
+import { MessageService } from 'primeng/api';
 import { RegisterPayload } from '../../model/Register';
+import { RegisterService } from '../../services/register/register.service';
 
 @Component({
   selector: 'app-signup',
   imports: [RouterModule, ReactiveFormsModule],
   templateUrl: './signup.component.html',
-  styleUrl: './signup.component.css'
+  styleUrl: './signup.component.css',
+  providers: [MessageService]
 })
 export class SignupComponent {
   private router = inject(Router);
   private registerService = inject(RegisterService);
-
   name : WritableSignal<string> = signal('');
   email : WritableSignal<string> = signal('');
   password : WritableSignal<string> = signal('');

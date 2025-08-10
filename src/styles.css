@@ -11,6 +11,7 @@
   }
 }
 
+
 html, body {
   height: 100%;
 }
@@ -21,12 +22,29 @@ body {
 }
 
 #toast-container {
-  @apply fixed z-50 bottom-0 right-4 w-auto pointer-events-none;
+  @apply fixed z-50 top-10 right-4 w-auto pointer-events-none;
 }
 
 .custom-toastr {
-  @apply bg-green-600 text-white rounded-lg px-4 py-2 shadow-lg mb-4 opacity-90 pointer-events-auto transition-opacity duration-300;
+  @apply pointer-events-auto mb-3 rounded-lg min-h-14 max-w-96 px-8 py-4 text-white/10 shadow-md
+         border border-white/15 ring-1 ring-white/10 backdrop-blur-md backdrop-saturate-150
+         bg-white/20;
 }
+
+/* Typography inside toast */
+#toast-container .custom-toastr .toast-title { @apply font-medium text-neutral-600; }
+
+#toast-container .custom-toastr .toast-message { @apply text-sm leading-snug text-neutral-500; }
+
+/* Progress bar with translucent white */
+#toast-container .custom-toastr .toast-progress { @apply bg-white/40; }
+
+/* Accent rings by intent (use with additional class via toast options) */
+.custom-toastr-success { @apply ring-emerald-300/40 bg-white/50 border-emerald-300/30; }
+.custom-toastr-warning { @apply ring-amber-300/40 border-amber-300/30; }
+.custom-toastr-error   { @apply ring-rose-300/40 border-rose-300/30; }
+.custom-toastr-info    { @apply ring-sky-300/40 border-sky-300/30; }
+
 
 .cdk-overlay-container {
   position: fixed;

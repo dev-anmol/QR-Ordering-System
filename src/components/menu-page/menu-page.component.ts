@@ -9,10 +9,12 @@ import {addToCart} from '../../state/cart/cart.actions';
 import {Router} from '@angular/router';
 import {UicartService} from '../../shared/services/uicart/uicart.service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {OverlayContainer, ToastrService} from 'ngx-toastr';
+import { ToastrService } from 'ngx-toastr';
+import { OverlayContainer } from '@angular/cdk/overlay';
 
 @Component({
   selector: 'app-menu-page',
+  standalone: true,
   imports: [
     FoodItemComponent,
     MenuFooterComponent,
@@ -31,11 +33,12 @@ export class MenuPageComponent implements OnInit, OnDestroy {
   hasError: WritableSignal<boolean> = signal(false);
   searchTerm: WritableSignal<string> = signal('');
 
-  constructor(private toastr: ToastrService, private store: Store<AppState>, private route: Router) {
-    this.overlayContainer.getContainerElement();
-  }
+  private toastr = inject(ToastrService);
+  private store = inject<Store<AppState>>(Store);
+  private route = inject(Router);
 
   ngOnInit() {
+    this.overlayContainer.getContainerElement();
     this.foodApi.getFoodItems().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => {
         this.foodItem.set(data);
@@ -62,7 +65,7 @@ export class MenuPageComponent implements OnInit, OnDestroy {
 
   addItemToCart(product: foodInterface) {
     this.store.dispatch(addToCart({product}));
-    this.toastr.success("Item added to Cart :)");
+    this.toastr.success('Item added to Cart :)', '', { toastClass: 'custom-toastr custom-toastr-success' });
   }
 
   ngOnDestroy() {

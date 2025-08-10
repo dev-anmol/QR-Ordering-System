@@ -1,4 +1,4 @@
-<section class="flex items-center justify-center flex-col sticky top-0 backdrop-blur-sm z-[999] text-center">
+<section class="flex items-center justify-center flex-col sticky top-0 backdrop-blur-sm z-50 text-center">
   <div class="w-full">
     <div class="flex justify-center items-center py-3  bg-black text-white text-sm gap-3">
       <p>✨Scan. Order. Enjoy✨</p>
@@ -14,7 +14,7 @@
       <p class="cursor-pointer bebas-neue-regular p-1" routerLink="/">ScanEats</p>
       <div class="flex justify-between items-center gap-4">
         <button *ngIf="ui.showCart()" routerLink="cart"
-                class="md:hidden bg-black text-sm text-white px-4 py-2 rounded-lg font-medium inline-flex justify-center items-center tracking-tight">
+          class="md:hidden bg-black text-sm text-white px-4 py-2 rounded-lg font-medium inline-flex justify-center items-center tracking-tight">
           Cart
           <i class="material-icons text-sm pl-2">shopping_cart</i>
         </button>
@@ -28,7 +28,7 @@
         <a class="align-text-bottom h-[24px]">Updates</a>
         <a class="align-text-bottom h-[24px]">Help</a>
         <button *ngIf="ui.showCart()" routerLink="cart"
-                class="bg-black text-sm text-white px-4 py-2 rounded-lg font-medium inline-flex justify-center items-center tracking-tight">
+          class="bg-black text-sm text-white px-4 py-2 rounded-lg font-medium inline-flex justify-center items-center tracking-tight">
           Cart
           <i class="material-icons text-sm pl-2">shopping_cart</i>
         </button>

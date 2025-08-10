@@ -1,18 +1,25 @@
 import { Component, inject, signal, WritableSignal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { LoginService } from '../../services/login/login.service';
+import { ToastrService } from 'ngx-toastr';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 import { LoginPayload } from '../../model/login';
+import { LoginService } from '../../services/login/login.service';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, RouterModule],
+  imports: [ReactiveFormsModule, RouterModule, ToastModule],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  styleUrl: './login.component.css',
+  providers: [MessageService],
 })
+
+
 export class LoginComponent {
   private router = inject(Router);
   private loginService = inject(LoginService);
+  private toastr = inject(ToastrService);
 
   email : WritableSignal<string> = signal('');
   password : WritableSignal<string> = signal('');
@@ -28,20 +35,36 @@ export class LoginComponent {
   }
 
   handleSubmit(event : Event) {
-    event.preventDefault();
-      const data: LoginPayload = {
-        email: this.email(),
-        password: this.password()
-      }
-      console.log(data);
-      this.loginService.loginUser(data).subscribe({
-        next: (res) => {
-          console.log("Login successful", res);
-          this.router.navigateByUrl('/home')
-        },
-        error: (err) => {
-          console.log("Error in login", err);
-        }
-      })
+      event.preventDefault();
+      this.validateFields() ? this.loginUser() : null;
   }
+
+  loginUser() {
+
+    const data: LoginPayload = {
+      email: this.email(),
+      password: this.password()
+    }
+
+    this.loginService.loginUser(data).subscribe({
+      next: (res) => {
+        console.log("Login successful", res);
+        this.router.navigateByUrl('/home')
+      },
+      error: (err) => {
+        console.log("Error in login", err);
+      }
+    })
+  }
+
+  
+  validateFields(): boolean {
+    if(this.email() == '' || this.password() == '') {
+      this.toastr.warning('Please enter email and password', 'Invalid Fields', { toastClass: 'custom-toastr custom-toastr-warning' });
+      return false;
+    }
+    return true;
+  }
+
+
 }
