@@ -2,18 +2,17 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
-  OnDestroy,
   OnInit,
   signal,
   ViewChild,
   WritableSignal
 } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { NavigationEnd, Router } from '@angular/router';
 import gsap from 'gsap';
-import {ScrollTrigger} from 'gsap/ScrollTrigger';
-import {NavigationEnd, Router} from '@angular/router';
-import {MatDialog} from '@angular/material/dialog';
-import {QrDialogComponent} from '../qr-dialog/qr-dialog.component';
-import {Subscription} from 'rxjs';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Subscription } from 'rxjs';
+import { QrDialogComponent } from '../qr-dialog/qr-dialog.component';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -42,30 +41,39 @@ export class HeroComponent implements AfterViewInit, OnInit {
 
   initAnimations() {
     ScrollTrigger.refresh();
+    gsap.from(this.parallaxImage.nativeElement, {x:200, duration:0.8})
     gsap.to(this.parallaxImage.nativeElement, {
-      y: -50, // Moves image upwards when scrolling
-      scale: 1, // Slight zoom effect
-      ease: 'none',
       scrollTrigger: {
         trigger: this.parallaxSection.nativeElement,
         start: 'top bottom', // Starts before entering viewport
         end: 'bottom top', // Ends after leaving viewport
-        scrub: true, // Makes animation smooth while scrolling
+        scrub: true,
       },
     });
 
     // Parallax Effect on Text
-    gsap.from(this.parallaxText.nativeElement, {
-      opacity: 0,
-      y: 50,
-      duration: 1.5,
-      ease: 'power2.out',
-      scrollTrigger: {
-        trigger: this.parallaxSection.nativeElement,
-        start: 'top 80%',
-        toggleActions: 'play none none none',
-      },
-    });
+    // gsap.set(this.parallaxText.nativeElement, {opacity: 0, y : 50});
+
+    // Immediate animation for initial load
+    // gsap.to(this.parallaxText.nativeElement, {
+    //   opacity: 1,
+    //   y: 0,
+    //   duration: 1.5,
+    //   ease: 'power2.out',
+    // });
+    
+    // gsap.to(this.parallaxText.nativeElement, {
+    //   opacity: 1,
+    //   y: 0,
+    //   duration: 1.5,
+    //   ease: 'power2.out',
+    //   scrollTrigger: {
+    //     trigger: this.parallaxSection.nativeElement,
+    //     toggleActions: 'play none none none',
+    //     immediateRender: true,
+    //     once: true
+    //   },
+    // });
 
   }
 

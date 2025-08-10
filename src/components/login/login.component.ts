@@ -1,6 +1,8 @@
 import { Component, inject, signal, WritableSignal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { LoginService } from '../../services/login/login.service';
+import { LoginPayload } from '../../model/login';
 
 @Component({
   selector: 'app-login',
@@ -10,6 +12,7 @@ import { Router, RouterModule } from '@angular/router';
 })
 export class LoginComponent {
   private router = inject(Router);
+  private loginService = inject(LoginService);
 
   email : WritableSignal<string> = signal('');
   password : WritableSignal<string> = signal('');
@@ -25,14 +28,14 @@ export class LoginComponent {
   }
 
   handleSubmit(event : Event) {
-      event.preventDefault();
-      const signupForm = {
+    event.preventDefault();
+      const data: LoginPayload = {
         email: this.email(),
         password: this.password()
       }
-      console.log(signupForm);
-      this.email.update(prev => prev = '')
-      this.password.update(prev => prev = '')
-      this.router.navigate(['home']);
+      console.log(data);
+      this.loginService.loginUser(data).subscribe((res) => {
+        console.log(res);
+      })
   }
 }
