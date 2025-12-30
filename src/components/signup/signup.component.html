@@ -49,10 +49,17 @@
                     </div>
 
                     <!-- Submit Button -->
-                    <button (click)="handleSubmit($event)"
-                        class="bg-indigo-600 p-2 rounded-lg text-white hover:bg-indigo-700 transition-all duration-300 w-full">
-                        Sign up
-                    </button>
+
+                    <div class="text-center">
+                        <button (click)="handleSubmit($event)"
+                            class="bg-indigo-600 p-2 rounded-lg text-white hover:bg-indigo-700 transition-all duration-300 w-full">
+                            Sign up
+                        </button>
+                        <p class="text-xs text-neutral-900 py-2">Already have an account? <a routerLink="/login"
+                                class="text-indigo-600">Log
+                                in here</a>.
+                        </p>
+                    </div>
                 </form>
             </div>
 
@@ -63,9 +70,5 @@
         </div>
     </div>
 
-    <div>
-        <p class="text-xs text-neutral-900">Already have an account? <a routerLink="/login" class="text-indigo-600">Log
-                in here</a>.
-        </p>
-    </div>
+
 </section>
