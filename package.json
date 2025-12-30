@@ -24,7 +24,7 @@
     "@angular/platform-browser-dynamic": "^21.0.6",
     "@angular/router": "^21.0.6",
     "@fortawesome/fontawesome-free": "^6.7.2",
-    "@ngrx/store": "^20.0.0",
+    "@ngrx/store": "^21.0.1",
     "@primeuix/themes": "^1.2.3",
     "angularx-qrcode": "^20.0.0",
     "autoprefixer": "^10.4.21",
