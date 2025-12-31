@@ -7,7 +7,7 @@ import {
   ViewChild,
   WritableSignal
 } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+// import { MatDialog } from '@angular/material/dialog';
 import { NavigationEnd, Router } from '@angular/router';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -30,7 +30,7 @@ export class HeroComponent implements AfterViewInit, OnInit {
   qrCodeUrl!: string;
   private routerSubscription!: Subscription;
 
-  constructor(private router: Router, private dialog: MatDialog) {
+  constructor(private router: Router) {
   }
 
   heroImg: WritableSignal<string> = signal('assets/desing.png');
@@ -67,9 +67,9 @@ export class HeroComponent implements AfterViewInit, OnInit {
     })
   }
 
-  openQRCodeDialog() {
-    this.dialog.open(QrDialogComponent, {
-      data: {qrCode: this.qrCodeUrl}
-    })
-  }
+  // openQRCodeDialog() {
+  //   this.dialog.open(QrDialogComponent, {
+  //     data: {qrCode: this.qrCodeUrl}
+  //   })
+  // }
 }
