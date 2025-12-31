@@ -1,29 +1,19 @@
-import {ApplicationConfig, provideZonelessChangeDetection} from '@angular/core';
+import {ApplicationConfig} from '@angular/core';
 import {provideRouter} from '@angular/router';
 
-import {provideHttpClient} from '@angular/common/http';
-import {provideAnimations} from '@angular/platform-browser/animations';
-import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
+import {provideHttpClient, withFetch} from '@angular/common/http';
 import {provideState, provideStore} from '@ngrx/store';
-import {provideToastr} from 'ngx-toastr';
 import {CartReducer} from '../state/cart/cart.reducer';
 import {routes} from './app.routes';
-import {provideClientHydration, withEventReplay, withIncrementalHydration} from '@angular/platform-browser';
+import {provideClientHydration, withIncrementalHydration} from '@angular/platform-browser';
 
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideStore(),
     provideRouter(routes),
-    provideHttpClient(),
+    provideHttpClient(withFetch()),
     provideClientHydration(withIncrementalHydration()),
     provideState({ name: 'products', reducer: CartReducer }),
-    provideToastr({
-      positionClass: 'toast-top-right',
-      timeOut: 3000,
-      progressBar: true,
-      progressAnimation: 'decreasing',
-      toastClass: 'custom-toastr'
-    }),
   ]
 };

@@ -19,7 +19,6 @@ gsap.registerPlugin(ScrollTrigger);
 @Component({
   selector: 'app-hero',
   templateUrl: './hero.html',
-  styleUrls: ['./hero.component.css'],
   imports: []
 })
 export class Hero implements AfterViewInit, OnInit {
