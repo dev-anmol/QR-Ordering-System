@@ -1,7 +1,7 @@
 import {Component, computed, DestroyRef, inject, OnDestroy, OnInit, signal, WritableSignal} from '@angular/core';
 import {FoodItemService} from '../../shared/services/foodItems/food-item.service';
-import {FoodItemComponent} from '../../shared/food-item/food-item.component';
-import {MenuFooterComponent} from '../menu-footer/menu-footer.component';
+import {FoodItem} from '../../shared/food-item/food-item';
+import {MenuFooter} from '../menu-footer/menu-footer';
 import {foodInterface} from '../../model/food.interface';
 import {Store} from '@ngrx/store';
 import {AppState} from '../../state/app.state';
@@ -9,36 +9,36 @@ import {addToCart} from '../../state/cart/cart.actions';
 import {Router} from '@angular/router';
 import {UicartService} from '../../shared/services/uicart/uicart.service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import { ToastrService } from 'ngx-toastr';
-import { OverlayContainer } from '@angular/cdk/overlay';
+// import { ToastrService } from 'ngx-toastr';
+// import { OverlayContainer } from '@angular/cdk/overlay';
 
 @Component({
   selector: 'app-menu-page',
   standalone: true,
   imports: [
-    FoodItemComponent,
-    MenuFooterComponent,
+    FoodItem,
+    MenuFooter,
   ],
-  templateUrl: './menu-page.component.html',
-  styleUrl: './menu-page.component.css'
+  templateUrl: './menu-page.html',
+  styleUrl: './menu-page.css'
 })
-export class MenuPageComponent implements OnInit, OnDestroy {
+export class MenuPage implements OnInit, OnDestroy {
 
   private foodApi = inject(FoodItemService);
   private uiCart = inject(UicartService);
   private destroyRef = inject(DestroyRef);
-  private overlayContainer = inject(OverlayContainer);
+  // private overlayContainer = inject(OverlayContainer);
   foodItem: WritableSignal<foodInterface[]> = signal<foodInterface[]>([]);
   isLoading: WritableSignal<boolean> = signal(true);
   hasError: WritableSignal<boolean> = signal(false);
   searchTerm: WritableSignal<string> = signal('');
 
-  private toastr = inject(ToastrService);
+  // private toastr = inject(ToastrService);
   private store = inject<Store<AppState>>(Store);
   private route = inject(Router);
 
   ngOnInit() {
-    this.overlayContainer.getContainerElement();
+    // this.overlayContainer.getContainerElement();
     this.foodApi.getFoodItems().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => {
         this.foodItem.set(data);
@@ -65,7 +65,7 @@ export class MenuPageComponent implements OnInit, OnDestroy {
 
   addItemToCart(product: foodInterface) {
     this.store.dispatch(addToCart({product}));
-    this.toastr.success('Item added to Cart :)', '', { toastClass: 'custom-toastr custom-toastr-success' });
+    // this.toastr.success('Item added to Cart :)', '', { toastClass: 'custom-toastr custom-toastr-success' });
   }
 
   ngOnDestroy() {

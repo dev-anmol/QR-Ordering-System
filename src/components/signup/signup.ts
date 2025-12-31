@@ -3,19 +3,16 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { RegisterPayload } from '../../model/Register';
 import { RegisterService } from '../../services/register/register.service';
-import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-signup',
   imports: [RouterModule, ReactiveFormsModule],
-  templateUrl: './signup.component.html',
-  styleUrl: './signup.component.css',
+  templateUrl: './signup.html',
 })
 
-export class SignupComponent {
+export class Signup {
   private router = inject(Router);
   private registerService = inject(RegisterService);
-  private toastr = inject(ToastrService)
   name : WritableSignal<string> = signal('');
   email : WritableSignal<string> = signal('');
   password : WritableSignal<string> = signal('');
@@ -28,7 +25,7 @@ export class SignupComponent {
 
   handleEmail(event: Event) {
     const inputVal = (event.target as HTMLInputElement).value;
-    this.email.set(inputVal); 
+    this.email.set(inputVal);
   }
 
   handlePassword(event: Event) {
@@ -60,8 +57,8 @@ export class SignupComponent {
       next: (res) => {
         console.log("Register successful", res);
         if(res.data === 'Registered') {
-          this.toastr.success('Please check your Email for verification for Login', 'Registered Successfully', {toastClass: 'custom-toastr custom-toastr-success'})
-        } 
+          // this.toastr.success('Please check your Email for verification for Login', 'Registered Successfully', {toastClass: 'custom-toastr custom-toastr-success'})
+        }
       },
       error: (err) => {
         console.log("Error in register", err);
@@ -73,17 +70,17 @@ export class SignupComponent {
   validateFields(): boolean {
 
     if(this.email() == '') {
-      this.toastr.warning('Please Enter Email', 'Invalid Fields', {toastClass: 'custom-toastr custom-toastr-warning'})
+      // this.toastr.warning('Please Enter Email', 'Invalid Fields', {toastClass: 'custom-toastr custom-toastr-warning'})
       return false;
     } if(this.password() == '') {
-      this.toastr.warning('Please Enter Password', 'Invalid Fields', {toastClass: 'custom-toastr custom-toastr-warning'})
+      // this.toastr.warning('Please Enter Password', 'Invalid Fields', {toastClass: 'custom-toastr custom-toastr-warning'})
       return false;
 
     } if(this.name() == '') {
-      this.toastr.warning('Please Enter Name', 'Invalid Fields', {toastClass: 'custom-toastr custom-toastr-warning'})
+      // this.toastr.warning('Please Enter Name', 'Invalid Fields', {toastClass: 'custom-toastr custom-toastr-warning'})
       return false;
     } if(this.mobileNum() == '') {
-      this.toastr.warning('Please Enter Mobile Number', 'Invalid Fields', {toastClass: 'custom-toastr custom-toastr-warning'})
+      // this.toastr.warning('Please Enter Mobile Number', 'Invalid Fields', {toastClass: 'custom-toastr custom-toastr-warning'})
       return false;
     }
     return true;

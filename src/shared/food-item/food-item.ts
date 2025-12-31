@@ -4,10 +4,10 @@ import {foodInterface} from '../../model/food.interface';
 @Component({
   selector: 'app-food-item',
   imports: [],
-  templateUrl: './food-item.component.html',
-  styleUrl: './food-item.component.css'
+  templateUrl: './food-item.html',
+  styleUrl: './food-item.css'
 })
-export class FoodItemComponent {
+export class FoodItem {
   @Input() foodItem !: foodInterface ;
   @Output() handleAdd = new EventEmitter();
 

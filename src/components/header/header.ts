@@ -6,10 +6,9 @@ import {UicartService} from '../../shared/services/uicart/uicart.service';
 @Component({
   selector: 'app-header',
   imports: [RouterLink],
-  templateUrl: './header.component.html',
-  styleUrl: './header.component.css'
+  templateUrl: './header.html',
 })
-export class HeaderComponent {
+export class Header {
   public router = inject(Router);
   public ui = inject(UicartService);
 

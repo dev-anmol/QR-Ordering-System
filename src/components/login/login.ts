@@ -1,29 +1,27 @@
 import { Component, inject, signal, WritableSignal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
 import { LoginPayload } from '../../model/login';
 import { LoginService } from '../../services/login/login.service';
 
 @Component({
   selector: 'app-login',
   imports: [ReactiveFormsModule, RouterModule],
-  templateUrl: './login.component.html',
-  styleUrl: './login.component.css',
+  templateUrl: './login.html',
+  styleUrl: './login.css',
 })
 
 
-export class LoginComponent {
+export class Login {
   private router = inject(Router);
   private loginService = inject(LoginService);
-  private toastr = inject(ToastrService);
 
   email : WritableSignal<string> = signal('');
   password : WritableSignal<string> = signal('');
 
   handleEmail(event: Event) {
     const inputVal = (event.target as HTMLInputElement).value;
-    this.email.set(inputVal); 
+    this.email.set(inputVal);
   }
 
   handlePassword(event: Event) {
@@ -33,7 +31,7 @@ export class LoginComponent {
 
   handleSubmit(event : Event) {
       event.preventDefault();
-      this.validateFields() ? this.loginUser() : null;
+      this.loginUser();
   }
 
   loginUser() {
@@ -54,14 +52,14 @@ export class LoginComponent {
     })
   }
 
-  
-  validateFields(): boolean {
-    if(this.email() == '' || this.password() == '') {
-      this.toastr.warning('Please enter email and password', 'Invalid Fields', { toastClass: 'custom-toastr custom-toastr-warning' });
-      return false;
-    }
-    return true;
-  }
+
+  // validateFields(): boolean {
+  //   if(this.email() == '' || this.password() == '') {
+  //     this.toastr.warning('Please enter email and password', 'Invalid Fields', { toastClass: 'custom-toastr custom-toastr-warning' });
+  //     return false;
+  //   }
+  //   return true;
+  // }
 
 
 }

@@ -1,17 +1,17 @@
 import {Component, inject, signal, WritableSignal} from '@angular/core';
 import {NavigationEnd, Router, RouterOutlet} from '@angular/router';
-import {HeaderComponent} from '../components/header/header.component';
+import {Header} from '../components/header/header';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, HeaderComponent],
+  imports: [RouterOutlet, Header],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
 export class AppComponent {
   private router = inject(Router);
   currentRoute : WritableSignal<string> = signal('');
-  
+
   constructor() {
     this.router.events.subscribe((e) => {
       if(e instanceof NavigationEnd) {

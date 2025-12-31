@@ -4,7 +4,6 @@ import { Component } from '@angular/core';
   selector: 'app-pricing',
   imports: [],
   templateUrl: './pricing.component.html',
-  styleUrl: './pricing.component.css'
 })
 export class PricingComponent {
 

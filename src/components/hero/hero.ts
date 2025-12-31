@@ -12,17 +12,17 @@ import { NavigationEnd, Router } from '@angular/router';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Subscription } from 'rxjs';
-import { QrDialogComponent } from '../qr-dialog/qr-dialog.component';
+import { QrDialog } from '../qr-dialog/qr-dialog';
 
 gsap.registerPlugin(ScrollTrigger);
 
 @Component({
   selector: 'app-hero',
-  templateUrl: './hero.component.html',
+  templateUrl: './hero.html',
   styleUrls: ['./hero.component.css'],
   imports: []
 })
-export class HeroComponent implements AfterViewInit, OnInit {
+export class Hero implements AfterViewInit, OnInit {
   @ViewChild('parallaxSection') parallaxSection!: ElementRef;
   @ViewChild('parallaxImage') parallaxImage!: ElementRef;
   @ViewChild('parallaxText') parallaxText!: ElementRef;
@@ -68,7 +68,7 @@ export class HeroComponent implements AfterViewInit, OnInit {
   }
 
   // openQRCodeDialog() {
-  //   this.dialog.open(QrDialogComponent, {
+  //   this.dialog.open(QrDialog, {
   //     data: {qrCode: this.qrCodeUrl}
   //   })
   // }

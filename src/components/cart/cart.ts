@@ -3,18 +3,17 @@ import {Store} from '@ngrx/store';
 import {AppState} from '../../state/app.state';
 import {selectCartState} from '../../state/cart/cart.selector';
 import {AsyncPipe} from '@angular/common';
-import {MenuFooterComponent} from '../menu-footer/menu-footer.component';
+import {MenuFooter} from '../menu-footer/menu-footer';
 import {foodInterface} from '../../model/food.interface';
 import {removeItem} from '../../state/cart/cart.actions';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [MenuFooterComponent, AsyncPipe],
-  templateUrl: './cart.component.html',
-  styleUrl: './cart.component.css',
+  imports: [MenuFooter, AsyncPipe],
+  templateUrl: './cart.html',
 })
-export class CartComponent {
+export class Cart {
   private store = inject<Store<AppState>>(Store);
   public foodItem$ = this.store.select(selectCartState);
   public foodItemLength: WritableSignal<any> = signal(0)
