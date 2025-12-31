@@ -18,6 +18,6 @@ export class LoginService {
 
   loginUser(payload: LoginPayload) : Observable<any> {
     // return this.http.post(`${environment.apiUrl}/login`, payload, {headers: this.headers})
-    return new Observable(observer => observer.next(true))
+    return new Observable(observer => observer.next(true)); // just for testing
   }
 }
