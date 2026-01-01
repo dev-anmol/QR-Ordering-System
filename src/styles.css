@@ -2,9 +2,9 @@
 
 @import "tailwindcss";
 
-/*@utility container-full {*/
-/*  width: 80%;*/
-/*}*/
+@utility container-full {
+  width: 80%;
+}
 
 html, body {
   height: 100%;

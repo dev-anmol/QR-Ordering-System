@@ -2,10 +2,10 @@
     <div class="flex flex-col justify-center items-center gap-10 container-mobile container-full">
         <div class="flex flex-col md:flex-row items-center justify-center gap-10 container-mobile container-full">
             <div>
-                <img src="assets/heroqr.jpg" alt="" class="w-[500px] rounded-xl" loading="eager">
+                <img [ngSrc]= "this.heroImgFirst()" width="500" height="500" alt="hero-secondary-1" class="w-[500px] rounded-xl" priority>
             </div>
             <div>
-                <img src="assets/heroone.jpg" alt="" class="w-[500px] rounded-xl" loading="eager">
+                <img [ngSrc]="this.heroImgSecond()" width="500" height="500"  alt="hero-secondary-1" class="w-[500px] rounded-xl" priority>
             </div>
         </div>
 

@@ -1,4 +1,4 @@
-<section class="flex items-center justify-center flex-col sticky top-0 backdrop-blur-xs z-50 text-center">
+<section class="flex items-center justify-center flex-col w-full fixed top-0 backdrop-blur-xs z-50 text-center">
   <div class="w-full">
     <div class="flex justify-center items-center py-3  bg-black text-white text-sm gap-3">
       <p>✨Scan. Order. Enjoy✨</p>
@@ -10,17 +10,19 @@
   </div>
 
   <div class="container-full container-mobile">
-    <div class="flex justify-between items-center">
+    <div class="flex flex-row justify-between items-center">
       <p class="cursor-pointer bebas-neue-regular p-1" routerLink="/">ScanEats</p>
       <div class="flex justify-between items-center gap-4">
         @if (ui.showCart()) {
           <button routerLink="cart"
-            class="md:hidden bg-black text-sm text-white px-4 py-2 rounded-lg font-medium inline-flex justify-center items-center tracking-tight">
+                  class="md:hidden bg-black text-sm text-white px-4 py-2 rounded-lg font-medium inline-flex justify-center items-center tracking-tight">
             Cart
             <i class="material-icons text-sm pl-2">shopping_cart</i>
           </button>
         }
-        <i class="fas fa-bars md:hidden cursor-pointer menu"></i>
+        <div class="md:hidden">
+          <i class="fas fa-bars cursor-pointer menu"></i>
+        </div>
       </div>
 
       <nav class="hidden md:flex gap-6 text-black/60 items-center text-sm">
@@ -31,7 +33,7 @@
         <a class="align-text-bottom h-[24px]">Help</a>
         @if (ui.showCart()) {
           <button routerLink="cart"
-            class="bg-black text-sm text-white px-4 py-2 rounded-lg font-medium inline-flex justify-center items-center tracking-tight">
+                  class="bg-black text-sm text-white px-4 py-2 rounded-lg font-medium inline-flex justify-center items-center tracking-tight">
             Cart
             <i class="material-icons text-sm pl-2">shopping_cart</i>
           </button>

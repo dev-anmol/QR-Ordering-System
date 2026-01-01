@@ -1,7 +1,6 @@
-<div>
   <section
     #parallaxSection
-    class="relative flex justify-center items-center w-full md:mt-[100px] mt-[50px] overflow-visible"
+    class="relative flex justify-center items-center pt-[120px] w-full mt-[50px] overflow-visible"
   >
     <div class="md:flex md:flex-row flex-col container-full container-mobile relative gap-7">
       <!-- Text Section -->
@@ -14,9 +13,9 @@
         </p>
         <div class="flex items-center justify-center gap-6 min-h-[80px]">
           <p class=" text-center text-[18px]">
-            <span class="text-blue-500 cursor-pointer hover:border-b-blue-300 hover:border-b">Scan. </span>
-            <span class="text-pink-500 cursor-pointer hover:border-b-pink-500 hover:border-b">Order. </span>
-            <span class="text-orange-500/80 cursor-pointer hover:border-b-orange-500/80 hover:border-b">Enjoy. </span>
+            <span class="text-blue-500 cursor-pointer hover:border-b-blue-300  hover:border-b-3 transition-all duration-50">Scan. </span>
+            <span class="text-pink-500 cursor-pointer hover:border-b-pink-500 hover:border-b-3 transition-all duration-50">Order. </span>
+            <span class="text-orange-500/80 cursor-pointer hover:border-b-orange-500/80 hover:border-b-3 transition-all duration-50">Enjoy. </span>
           </p>
           <div class="text-center">
             <!-- <button (click)="openQRCodeDialog()" class="text-white bg-black p-2 rounded-xl text-[12px] hover:bg-slate-900 hover:shadow-md cursor-pointer">Get Started For free</button> -->
@@ -27,18 +26,18 @@
       <!-- Image Section with Parallax -->
       <div class="md:w-1/2 pt-9 md:pt-2 flex justify-center relative">
         <img
-          #parallaxImage
-          [src]=heroImg()
+          [ngSrc]="heroImg()"
           alt="Example Image"
-          class="max-w-full h-auto min-h-[350px] md:h-[400px]"
-          loading="lazy"
+          width="1600"
+          height="1200"
+          priority
+          class="w-full h-auto min-h-[350px] md:h-[400px] object-cover"
         />
+
       </div>
     </div>
   </section>
-</div>
 
-<div>
   <section #parallaxSection
             class="relative justify-center items-center md:mt-[75px] mt-0 overflow-hidden flex p-4">
     <div class="max-w-[450px] text-center flex-col items-center justify-center container-full container-mobile">
@@ -55,7 +54,6 @@
       </div>
     </div>
   </section>
-</div>
 
 
 
