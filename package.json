@@ -25,12 +25,12 @@
     "@angular/ssr": "^21.0.4",
     "@fortawesome/fontawesome-free": "^6.7.2",
     "@ngrx/store": "^21.0.1",
-    "@primeuix/themes": "^2.0.2",
     "@tailwindcss/postcss": "^4.1.18",
+    "angularx-qrcode": "^21.0.4",
+    "daisyui": "^5.5.14",
     "express": "^5.1.0",
     "gsap": "^3.12.7",
-    "postcss": "^8.4.47",
-    "primeng": "^21.0.2",
+    "ng-zorro-antd": "^21.0.0-next.2",
     "rxjs": "~7.8.0",
     "tailwindcss": "^4.1.18",
     "tslib": "^2.3.0"
@@ -46,7 +46,7 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "postcss": "^8.5.3",
+    "postcss": "^8.5.6",
     "typescript": "~5.9.3"
   }
 }
