@@ -1,59 +1,72 @@
-  <section
-    #parallaxSection
-    class="relative flex justify-center items-center pt-[120px] w-full mt-[50px] overflow-visible"
-  >
-    <div class="md:flex md:flex-row flex-col container-full container-mobile relative gap-7">
-      <!-- Text Section -->
-      <div class="flex flex-col md:w-1/2 z-10 relative">
-        <p
-          #parallaxText
-          class="md:bebas-neue-heading bebas-neue-mobile text-center md:pt-[80px] pt-4"
-        >
-          Transform Your Dining Experience with QR Code Ordering
+<section
+  #parallaxSection
+  class="relative flex justify-center items-center pt-[150px] w-full mt-[50px] overflow-visible"
+>
+  <div class="md:flex md:flex-row flex-col container-full container-mobile relative gap-7">
+    <!-- Text Section -->
+    <div class="flex flex-col md:w-1/2 z-10 relative">
+      <p
+        #parallaxText
+        class="md:bebas-neue-heading bebas-neue-mobile text-center md:pt-[80px] pt-4"
+      >
+        Transform Your Dining Experience with QR Code Ordering
+      </p>
+      <div class="flex items-center justify-center gap-6 min-h-[80px]">
+        <p class=" text-center text-[18px]">
+          <span
+            class="text-blue-500 cursor-pointer hover:border-b-blue-300  hover:border-b-3 transition-all duration-50">Scan. </span>
+          <span
+            class="text-pink-500 cursor-pointer hover:border-b-pink-500 hover:border-b-3 transition-all duration-50">Order. </span>
+          <span
+            class="text-orange-500/80 cursor-pointer hover:border-b-orange-500/80 hover:border-b-3 transition-all duration-50">Enjoy. </span>
         </p>
-        <div class="flex items-center justify-center gap-6 min-h-[80px]">
-          <p class=" text-center text-[18px]">
-            <span class="text-blue-500 cursor-pointer hover:border-b-blue-300  hover:border-b-3 transition-all duration-50">Scan. </span>
-            <span class="text-pink-500 cursor-pointer hover:border-b-pink-500 hover:border-b-3 transition-all duration-50">Order. </span>
-            <span class="text-orange-500/80 cursor-pointer hover:border-b-orange-500/80 hover:border-b-3 transition-all duration-50">Enjoy. </span>
-          </p>
-          <div class="text-center">
-            <!-- <button (click)="openQRCodeDialog()" class="text-white bg-black p-2 rounded-xl text-[12px] hover:bg-slate-900 hover:shadow-md cursor-pointer">Get Started For free</button> -->
-          </div>
+        <div class="text-center">
+          <!--             <button class="text-white bg-black p-2 rounded-xl text-[12px] hover:bg-slate-900 hover:shadow-md cursor-pointer">Get Started For free</button>-->
+          <om-shine-border
+            animationDuration="10s"
+            styleClass="text-sm px-4 py-1 bg-black hover:bg-neutral-950 transition-all duration-300 text-neutral-100 border-none cursor-pointer"
+          >
+            <button (click)="onQrCode()" class="cursor-pointer px-4 py-1">
+              Get Started
+            </button>
+
+          </om-shine-border>
         </div>
       </div>
-
-      <!-- Image Section with Parallax -->
-      <div class="md:w-1/2 pt-9 md:pt-2 flex justify-center relative">
-        <img
-          [ngSrc]="heroImg()"
-          alt="Example Image"
-          width="1600"
-          height="1200"
-          priority
-          class="w-full h-auto min-h-[350px] md:h-[400px] object-cover"
-        />
-
-      </div>
     </div>
-  </section>
 
-  <section #parallaxSection
-            class="relative justify-center items-center md:mt-[75px] mt-0 overflow-hidden flex p-4">
-    <div class="max-w-[450px] text-center flex-col items-center justify-center container-full container-mobile">
-      <div #parallaxText2>
-        <p class="merriweather-regular text-center">Wave (a socially distant) goodbye</p>
-        <p class="merriweather-regular text-center">to physical menus and embrace the</p>
-        <p class="merriweather-regular text-center">future of contactless mobile menus.</p>
-        <p class="cookie-regular text-center text-4xl mt-1 font-light text-gray-800">Say Hello to ScanEats.</p>
-      </div>
-      <div class="mt-2 text-[12.5px]">
-        <p class="quicksand-regular text-center font-light">If your business serves food, ScanEats serves you. ScanEats places the</p>
-        <p class="quicksand-regular text-center font-light">power to create elegant, easy-to-update QR code menus for</p>
-        <p class="quicksand-regular text-center font-light">restaurants right at your fingertips</p>
-      </div>
+    <!-- Image Section with Parallax -->
+    <div class="md:w-1/2 pt-9 md:pt-2 flex justify-center relative">
+      <img
+        [ngSrc]="heroImg()"
+        alt="Example Image"
+        width="1600"
+        height="1200"
+        priority
+        class="w-full h-auto min-h-[350px] md:h-[400px] object-cover"
+      />
+
     </div>
-  </section>
+  </div>
+</section>
+
+<section #parallaxSection
+         class="relative justify-center items-center md:mt-[75px] mt-0 overflow-hidden flex p-4">
+  <div class="max-w-[450px] text-center flex-col items-center justify-center container-full container-mobile">
+    <div #parallaxText2>
+      <p class="merriweather-regular text-center">Wave (a socially distant) goodbye</p>
+      <p class="merriweather-regular text-center">to physical menus and embrace the</p>
+      <p class="merriweather-regular text-center">future of contactless mobile menus.</p>
+      <p class="cookie-regular text-center text-4xl mt-1 font-light text-gray-800">Say Hello to ScanEats.</p>
+    </div>
+    <div class="mt-2 text-[12.5px]">
+      <p class="quicksand-regular text-center font-light">If your business serves food, ScanEats serves you. ScanEats
+        places the</p>
+      <p class="quicksand-regular text-center font-light">power to create elegant, easy-to-update QR code menus for</p>
+      <p class="quicksand-regular text-center font-light">restaurants right at your fingertips</p>
+    </div>
+  </div>
+</section>
 
 
 

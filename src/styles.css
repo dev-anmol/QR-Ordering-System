@@ -1,9 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import "tailwindcss";
-@import '~ng-zorro-antd/ng-zorro-antd.min.css';
-@import '~ng-zorro-antd/style/index.min.css'; /* Import base styles */
-@plugin "daisyui";
+@plugin "daisyui" {
+  themes: false;
+}
 
 @utility container-full {
   width: 80%;
