@@ -26,10 +26,11 @@
             animationDuration="10s"
             styleClass="text-sm px-4 py-1 bg-black hover:bg-neutral-950 transition-all duration-300 text-neutral-100 border-none cursor-pointer"
           >
-            <button (click)="onQrCode()" class="cursor-pointer px-4 py-1">
+            <button
+              (click)="openDialog()"
+              type="button" class="cursor-pointer px-4 py-1">
               Get Started
             </button>
-
           </om-shine-border>
         </div>
       </div>

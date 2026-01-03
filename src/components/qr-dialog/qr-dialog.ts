@@ -1,24 +1,23 @@
-import {Component, Inject, OnInit} from '@angular/core';
-// import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import {ChangeDetectionStrategy, Component, inject, input, InputSignal} from '@angular/core';
+import {QRCodeComponent} from 'angularx-qrcode';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 
+interface QrDialogData {
+  qrCode: string;
+}
 
 @Component({
   selector: 'app-qr-dialog',
-  imports: [],
+  imports: [QRCodeComponent],
   templateUrl: './qr-dialog.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class QrDialog implements OnInit{
-  // constructor(private dialogRef: MatDialogRef<QrDialog>,
-  // @Inject(MAT_DIALOG_DATA) public data: {qrCode : string}
-  // ) {}
+export default class QrDialog {
 
-  ngOnInit() {
-    // console.log('QR Code Data Received:', this.data.qrCode);
-  }
+  readonly data = inject<QrDialogData>(MAT_DIALOG_DATA);
+  private readonly dialogRef = inject(MatDialogRef<QrDialog>);
 
   closeDialog() {
-    console.log("called closed");
-    // this.dialogRef.close();
+    this.dialogRef.close();
   }
-
 }

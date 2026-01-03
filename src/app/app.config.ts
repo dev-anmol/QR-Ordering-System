@@ -16,6 +16,6 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideBrowserGlobalErrorListeners(),
     provideClientHydration(withIncrementalHydration()),
-    provideState({ name: 'products', reducer: CartReducer }),
+    provideState({name: 'products', reducer: CartReducer}),
   ]
 };

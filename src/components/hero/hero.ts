@@ -1,29 +1,42 @@
-import {AfterViewInit, Component, OnInit, signal, WritableSignal} from '@angular/core';
-import gsap from 'gsap';
-import {ScrollTrigger} from 'gsap/ScrollTrigger';
+import {ChangeDetectionStrategy, Component, inject, OnInit, signal, WritableSignal} from '@angular/core';
 import {NgOptimizedImage} from '@angular/common';
-import { NzButtonModule } from 'ng-zorro-antd/button';
 import {NgxShineBorderComponent} from '@omnedia/ngx-shine-border';
+import {MatDialog} from '@angular/material/dialog';
+import QrDialog from '../qr-dialog/qr-dialog';
 
-gsap.registerPlugin(ScrollTrigger);
 
 @Component({
   selector: 'app-hero',
   templateUrl: './hero.html',
-  imports: [NgOptimizedImage, NzButtonModule, NgxShineBorderComponent]
+  imports: [NgOptimizedImage, NgxShineBorderComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class Hero implements AfterViewInit, OnInit {
-  qrCodeUrl!: string;
+export class Hero implements OnInit {
+
+
+  qrCodeUrl: WritableSignal<string> = signal('');
   heroImg: WritableSignal<string> = signal('assets/desing.png');
-  ngAfterViewInit() {
-  }
+  readonly dialog = inject(MatDialog);
+
+
   ngOnInit() {
-    const hotelId = '1';
-    const tableId = '5';
-    this.qrCodeUrl = `https://scaneatsqr.netlify.app/menu`
+    this.qrCodeUrl.set("https://scaneatsqr.netlify.app/menu")
   }
 
-  onQrCode() {
-    console.log("triggered")
+  openDialog() {
+    const dialogRef = this.dialog.open(QrDialog, {
+      data: {
+        qrCode: this.qrCodeUrl(),
+      },
+      panelClass: 'qr-dialog-panel', // optional
+      autoFocus: false,
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+    });
   }
+
+
+
+  protected readonly open = open;
 }

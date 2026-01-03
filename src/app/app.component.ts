@@ -10,11 +10,11 @@ import {Header} from '../components/header/header';
 })
 export class AppComponent {
   private router = inject(Router);
-  currentRoute : WritableSignal<string> = signal('');
+  currentRoute: WritableSignal<string> = signal('');
 
   constructor() {
     this.router.events.subscribe((e) => {
-      if(e instanceof NavigationEnd) {
+      if (e instanceof NavigationEnd) {
         this.currentRoute.set(e.url);
       }
     })

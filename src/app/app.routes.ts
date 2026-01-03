@@ -1,19 +1,19 @@
-import { Routes } from '@angular/router';
+import {Routes} from '@angular/router';
 
 export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
     loadComponent: () => import('../components/signup/signup').then(m => m.Signup)
-  },{
+  }, {
     path: 'login',
-    pathMatch:'full',
+    pathMatch: 'full',
     loadComponent: () => import('../components/login/login').then(m => m.Login)
   },
   {
     path: 'home',
     pathMatch: 'full',
-    loadComponent: () => import('../components/landing-page/landing-page').then(m => m.LandingPage),
+    loadComponent: async () => import('../components/landing-page/landing-page').then(m => m.LandingPage),
   },
   {
     path: 'menu',
