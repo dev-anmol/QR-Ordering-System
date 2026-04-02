@@ -28,6 +28,8 @@ export class Cart implements OnInit {
   public foodItemLength: WritableSignal<any> = signal(0);
   public tableId = localStorage.getItem('table_id');
   private restaurantId = localStorage.getItem('restaurant_id') || '101';
+  
+  public gstRate = 0.05; // 5% GST for restaurants
 
 
 
@@ -120,5 +122,13 @@ export class Cart implements OnInit {
         }
       });
     }
+  }
+
+  calculateTax(subtotal: number = 0): number {
+    return subtotal * this.gstRate;
+  }
+
+  calculateGrandTotal(subtotal: number = 0): number {
+    return subtotal + this.calculateTax(subtotal);
   }
 }

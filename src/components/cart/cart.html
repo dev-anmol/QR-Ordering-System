@@ -97,17 +97,22 @@
   <div class="summary-card item-animate">
     <div class="summary-inner">
       <div class="summary-row">
-        <span class="summary-label">Subtotal · {{ (cart$ | async)?.items?.length }} items</span>
-        <span class="summary-value">₹{{ (cart$ | async)?.subtotal }}</span>
+        <span class="summary-label">Subtotal</span>
+        <span class="summary-value">₹{{ (cart$ | async)?.subtotal || 0 }}</span>
+      </div>
+
+      <div class="summary-row">
+        <span class="summary-label">GST ({{ gstRate * 100 }}%)</span>
+        <span class="summary-value">₹{{ calculateTax((cart$ | async)?.subtotal || 0) | number:'1.2-2' }}</span>
       </div>
 
       <div class="summary-divider"></div>
 
       <div class="summary-total-row">
         <div class="summary-total">
-          <span class="total-label">Total</span>
+          <span class="total-label">To Pay</span>
           <span class="total-amount">
-            <span class="total-symbol">₹</span>{{ (cart$ | async)?.subtotal }}
+            <span class="total-symbol">₹</span>{{ calculateGrandTotal((cart$ | async)?.subtotal || 0) | number:'1.2-2' }}
           </span>
         </div>
 
