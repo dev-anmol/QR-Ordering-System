@@ -9,35 +9,35 @@ import { AddToCartRequest, Cart, UpdateCartItemRequest, CheckoutRequest, Checkou
 })
 export class CartService {
     private http = inject(HttpClient);
-    private cartUrl = environment.cartUrl;
+    private cartUrl = `${environment.baseUrl}${environment.cart}`;
 
     addItem(req: AddToCartRequest): Observable<Cart> {
-        return this.http.post<Cart>(`${this.cartUrl}/cart/items`, req);
+        return this.http.post<Cart>(`${this.cartUrl}/items`, req);
     }
 
     getCart(restaurantId: number, sessionId: string, tableNumber: number = 1): Observable<Cart> {
-        return this.http.get<Cart>(`${this.cartUrl}/cart`);
+        return this.http.get<Cart>(`${this.cartUrl}`);
     }
 
     updateItemQuantity(cartItemId: string, req: UpdateCartItemRequest): Observable<Cart> {
-        return this.http.put<Cart>(`${this.cartUrl}/cart/items/${cartItemId}`, req);
+        return this.http.put<Cart>(`${this.cartUrl}/items/${cartItemId}`, req);
     }
 
     removeItem(cartItemId: string, restaurantId: number, sessionId: string): Observable<Cart> {
         let params = new HttpParams()
             .set('restaurantId', restaurantId.toString())
             .set('sessionId', sessionId);
-        return this.http.delete<Cart>(`${this.cartUrl}/cart/items/${cartItemId}`, { params });
+        return this.http.delete<Cart>(`${this.cartUrl}/items/${cartItemId}`, { params });
     }
 
     clearCart(restaurantId: number, sessionId: string): Observable<void> {
         let params = new HttpParams()
             .set('restaurantId', restaurantId.toString())
             .set('sessionId', sessionId);
-        return this.http.delete<void>(`${this.cartUrl}/cart`, { params });
+        return this.http.delete<void>(`${this.cartUrl}`, { params });
     }
 
     checkout(req: CheckoutRequest): Observable<CheckoutResponse> {
-        return this.http.post<CheckoutResponse>(`${this.cartUrl}/cart/checkout`, req);
+        return this.http.post<CheckoutResponse>(`${this.cartUrl}/checkout`, req);
     }
 }

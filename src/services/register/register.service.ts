@@ -14,7 +14,7 @@ export class RegisterService {
 
 
   registerUser(payload: RegisterPayload) : Observable<any> {
-    return this.http.post(`${environment.apiUrl}/register`, payload, {headers: this.headers})
+    return this.http.post(`${environment.baseUrl}${environment.register}`, payload, {headers: this.headers})
   }
 
 }

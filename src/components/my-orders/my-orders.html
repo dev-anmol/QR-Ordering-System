@@ -1,14 +1,14 @@
-<div class="my-orders-container max-w-4xl mx-auto px-4 md:px-8 py-24 md:py-32 min-h-screen relative z-10">
+<div class="my-orders-container max-w-4xl mx-auto px-4 md:px-8 pt-32 md:pt-40 pb-32 min-h-screen relative z-10">
     <!-- Header -->
-    <div class="mb-12 flex flex-col items-center md:items-start text-center md:text-left">
-        <div class="inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/10 text-indigo-600 rounded-full w-fit mb-4">
-            <span class="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse"></span>
+    <div class="mb-10 flex flex-col items-center md:items-start text-center md:text-left">
+        <div class="inline-flex items-center gap-2 px-3 py-1 bg-yellow-400/10 text-yellow-600 rounded-full w-fit mb-4">
+            <span class="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse"></span>
             <span class="text-[10px] font-black uppercase tracking-widest">Order History</span>
         </div>
-        <h1 class="text-4xl md:text-6xl font-black text-[#090A0F] tracking-tight leading-[0.9] title-gradient-modern">
-            Your Orders
+        <h1 class="text-4xl md:text-8xl font-black text-[#090A0F] tracking-tight leading-[0.9]">
+            My <br class="hidden md:block"> <span class="title-gradient-modern">Orders.</span>
         </h1>
-        <p class="text-gray-500 font-medium text-lg mt-4 max-w-lg">
+        <p class="text-gray-500 font-medium text-sm md:text-lg mt-4 max-w-lg">
             Keep track of your latest cravings and active food preparations.
         </p>
     </div>
@@ -43,70 +43,55 @@
         </div>
     } @else {
         <!-- Order List -->
-        <div class="grid gap-6 perspective-1000">
+        <div class="space-y-4">
             @for (order of orders(); track order.orderId; let i = $index) {
                 <a [routerLink]="['/order', order.orderId]" 
-                   class="glass-effect block p-6 md:p-8 rounded-[2rem] border border-gray-100 hover:border-indigo-500/30 shadow-premium hover:shadow-2xl transition-all duration-300 group cursor-pointer bg-white/80 backdrop-blur-xl relative overflow-hidden" 
-                   [style.animation-delay]="(i * 100) + 'ms'" 
-                   class="fade-in-up">
+                   class="block p-5 md:p-6 rounded-[2rem] border border-white bg-white/70 backdrop-blur-xl shadow-premium hover:shadow-2xl transition-all duration-300 group cursor-pointer active:scale-[0.98]" 
+                   [style.animation-delay]="(i * 100) + 'ms'">
                     
-                    <!-- Decorative background element for hovering -->
-                    <div class="absolute inset-0 bg-gradient-to-r from-indigo-50/0 to-indigo-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"></div>
-                    
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
-                        <!-- Left info -->
-                        <div class="flex items-center gap-5">
-                            <div class="w-16 h-16 rounded-[1.25rem] flex items-center justify-center font-bold shadow-sm transition-transform group-hover:scale-105"
+                    <div class="flex items-center justify-between gap-4">
+                        <!-- Left: Status Icon + Order Info -->
+                        <div class="flex items-center gap-4">
+                            <div class="w-14 h-14 rounded-2xl flex items-center justify-center font-bold shadow-sm transition-transform group-hover:scale-105"
                                  [ngClass]="{
-                                    'bg-indigo-50 text-indigo-600': order.status === OrderStatus.PENDING,
-                                    'bg-yellow-50 text-yellow-600': order.status === OrderStatus.PREPARING,
-                                    'bg-emerald-50 text-emerald-600': [OrderStatus.READY, OrderStatus.SERVED].includes(order.status),
-                                    'bg-red-50 text-red-600': order.status === OrderStatus.CANCELLED
+                                    'bg-yellow-400/10 text-yellow-600': order.status === OrderStatus.PENDING,
+                                    'bg-blue-400/10 text-blue-600': order.status === OrderStatus.PREPARING,
+                                    'bg-emerald-400/10 text-emerald-600': [OrderStatus.READY, OrderStatus.SERVED].includes(order.status),
+                                    'bg-red-400/10 text-red-600': order.status === OrderStatus.CANCELLED
                                  }">
-                                 @if (order.status === OrderStatus.PENDING) { <span class="material-icons text-2xl">hourglass_empty</span> }
-                                 @if (order.status === OrderStatus.PREPARING) { <span class="material-icons animate-bounce text-2xl">restaurant</span> }
-                                 @if (order.status === OrderStatus.READY) { <span class="material-icons text-2xl">room_service</span> }
-                                 @if (order.status === OrderStatus.SERVED) { <span class="material-icons text-2xl">done_all</span> }
-                                 @if (order.status === OrderStatus.CANCELLED) { <span class="material-icons text-2xl">cancel</span> }
+                                 @if (order.status === OrderStatus.PENDING) { <span class="material-icons text-xl">hourglass_bottom</span> }
+                                 @if (order.status === OrderStatus.PREPARING) { <span class="material-icons animate-spin-slow text-xl">restaurant</span> }
+                                 @if (order.status === OrderStatus.READY) { <span class="material-icons text-xl">notifications_active</span> }
+                                 @if (order.status === OrderStatus.SERVED) { <span class="material-icons text-xl">check_circle</span> }
+                                 @if (order.status === OrderStatus.CANCELLED) { <span class="material-icons text-xl">block</span> }
                             </div>
                             
                             <div>
-                                <h3 class="font-black text-[#090A0F] text-xl uppercase tracking-wider mb-1 group-hover:text-indigo-950 transition-colors">
-                                    Order #{{ order.orderId.substring(0, 6) }}
+                                <h3 class="font-black text-[#090A0F] text-lg leading-tight mb-1">
+                                    #{{ order.orderId.substring(0, 8).toUpperCase() }}
                                 </h3>
-                                
                                 <div class="flex items-center gap-2">
-                                    <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-widest"
-                                       [ngClass]="{
-                                        'bg-indigo-50 text-indigo-600': order.status === OrderStatus.PENDING,
-                                        'bg-yellow-50 text-yellow-600': order.status === OrderStatus.PREPARING,
-                                        'bg-emerald-50 text-emerald-600': [OrderStatus.READY, OrderStatus.SERVED].includes(order.status),
-                                        'bg-red-50 text-red-500': order.status === OrderStatus.CANCELLED
-                                       }">
-                                        <span class="w-1.5 h-1.5 rounded-full block"
-                                              [ngClass]="{
-                                                'bg-indigo-500': order.status === OrderStatus.PENDING,
-                                                'bg-yellow-500 animate-pulse': order.status === OrderStatus.PREPARING,
-                                                'bg-emerald-500': [OrderStatus.READY, OrderStatus.SERVED].includes(order.status),
-                                                'bg-red-500': order.status === OrderStatus.CANCELLED
-                                              }"></span>
+                                    <span class="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md"
+                                          [ngClass]="{
+                                            'bg-yellow-400/20 text-yellow-700': order.status === OrderStatus.PENDING,
+                                            'bg-blue-400/20 text-blue-700': order.status === OrderStatus.PREPARING,
+                                            'bg-emerald-400/20 text-emerald-700': [OrderStatus.READY, OrderStatus.SERVED].includes(order.status),
+                                            'bg-red-400/20 text-red-700': order.status === OrderStatus.CANCELLED
+                                          }">
                                         {{ order.status }}
-                                    </div>
+                                    </span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Right Info -->
-                        <div class="flex items-center justify-between md:justify-end gap-8 border-t md:border-none border-gray-100/80 pt-5 md:pt-0 w-full md:w-auto">
-                            <div class="text-left md:text-right">
-                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Total</p>
-                                <div class="flex items-baseline gap-0.5" [class.opacity-50]="order.status === OrderStatus.CANCELLED" [class.line-through]="order.status === OrderStatus.CANCELLED">
-                                    <span class="text-sm font-bold text-gray-400">₹</span>
-                                    <p class="font-black text-2xl md:text-3xl text-[#090A0F]">{{ order.totalAmount }}</p>
-                                </div>
+                        <!-- Right: Price + Arrow -->
+                        <div class="flex items-center gap-4">
+                            <div class="text-right">
+                                <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest block mb-0.5">Paid</span>
+                                <p class="font-black text-xl text-[#090A0F]">₹{{ order.totalAmount }}</p>
                             </div>
-                            <div class="bg-gray-50/80 border border-gray-100 w-12 h-12 rounded-2xl flex items-center justify-center text-gray-400 group-hover:bg-[#090A0F] group-hover:text-white group-hover:border-[#090A0F] transition-all duration-300 group-hover:translate-x-1 shadow-sm">
-                                <span class="material-icons">east</span>
+                            <div class="w-10 h-10 bg-gray-50 border border-gray-100 rounded-xl flex items-center justify-center text-gray-300 group-hover:bg-black group-hover:text-white transition-all">
+                                <span class="material-icons text-sm">arrow_forward_ios</span>
                             </div>
                         </div>
                     </div>

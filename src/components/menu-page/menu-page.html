@@ -3,18 +3,18 @@
 
 <div class="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
   <!-- Header Section -->
-  <header class="pt-24 md:pt-32 pb-12">
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-8">
-      <div class="flex flex-col gap-4">
+  <header class="pt-32 md:pt-40 pb-8">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div class="flex flex-col gap-3">
         <div class="inline-flex items-center gap-2 px-3 py-1 bg-yellow-400/10 text-yellow-600 rounded-full w-fit">
           <span class="w-1.5 h-1.5 bg-yellow-400 rounded-full"></span>
-          <span class="text-[10px] font-black uppercase tracking-widest">Open Now</span>
+          <span class="text-[10px] font-black uppercase tracking-widest">Order from Table</span>
         </div>
-        <h1 class="text-5xl md:text-8xl font-black tracking-tight leading-[0.9] text-[#090A0F]">
-          Find your <br> <span class="title-gradient-modern">Cravings.</span>
+        <h1 class="text-4xl md:text-8xl font-black tracking-tight leading-[0.9] text-[#090A0F]">
+          Fast <br class="hidden md:block"> <span class="title-gradient-modern">Cravings.</span>
         </h1>
-        <p class="text-gray-500 font-medium max-w-sm mt-2 text-lg">
-          Taste the perfection in every bite with our curated chef specials.
+        <p class="text-gray-500 font-medium max-w-sm mt-1 text-sm md:text-lg">
+          Taste perfection in every bite with curated chef specials.
         </p>
       </div>
 
@@ -32,14 +32,14 @@
     </div>
 
     <!-- Modern Search Row -->
-    <div class="mt-12">
+    <div class="mt-8">
       <div
-        class="glass-effect flex items-center gap-4 p-2 pl-6 rounded-3xl border border-gray-100 shadow-premium w-full md:w-[60%] lg:w-[45%] focus-within:border-black transition-all">
-        <span class="material-icons text-gray-400">search</span>
-        <input type="text" (input)="searchMenu($event)" placeholder="Search for sushi, pasta..."
-          class="text-base font-semibold placeholder:text-gray-300 focus:outline-hidden w-full bg-transparent border-none">
+        class="glass-effect flex items-center gap-3 p-1.5 pl-5 rounded-2xl border border-gray-100 shadow-premium w-full md:w-[60%] lg:w-[45%] focus-within:border-black transition-all">
+        <span class="material-icons text-gray-400 text-xl">search</span>
+        <input type="text" (input)="searchMenu($event)" placeholder="Search menu..."
+          class="text-sm font-semibold placeholder:text-gray-300 focus:outline-hidden w-full bg-transparent border-none">
         <button
-          class="bg-[#090A0F] text-sm font-bold text-white px-8 py-3.5 cursor-pointer rounded-2xl hover:bg-gray-800 transition-all active:scale-95 shadow-lg shadow-black/10">
+          class="bg-[#090A0F] text-xs font-bold text-white px-6 py-3 cursor-pointer rounded-[14px] hover:bg-gray-800 transition-all active:scale-95 shadow-lg shadow-black/10">
           Find
         </button>
       </div>
@@ -53,7 +53,7 @@
       <button (click)="selectCategory(category.categoryId)"
         [class.category-btn-active]="selectedCategoryId() === category.categoryId"
         [class.category-btn]="selectedCategoryId() !== category.categoryId"
-        class="whitespace-nowrap px-8 py-3.5 rounded-2xl font-bold transition-all duration-300 cursor-pointer shadow-sm">
+        class="whitespace-nowrap px-6 py-3 rounded-xl font-bold transition-all duration-300 cursor-pointer shadow-sm text-sm">
         {{ category.name }}
       </button>
       }
@@ -63,7 +63,7 @@
   <!-- Items Grid Section -->
   <section class="pb-32">
     @defer (when !isLoading()) {
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 md:grid-cols-3 gap-8">
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
       @for (item of filteredFoodItems(); track item.id) {
       <app-food-item [foodItem]="item" [quantity]="(cartQuantityMap$ | async)?.[item.id] || 0"
         (handleAdd)="addItemToCart($event)" (handleRemove)="removeFromCart($event)" class="block h-full">

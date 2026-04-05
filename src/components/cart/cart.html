@@ -1,91 +1,102 @@
-<div class="cart-container max-w-2xl mx-auto px-4 md:px-6 pt-24 md:pt-32 pb-60">
+<div class="cart-container max-w-2xl mx-auto px-4 md:px-6 pt-32 md:pt-40 pb-60">
+
+  <!-- Modern Mesh Background -->
+  <div class="fixed inset-0 mesh-bg -z-10 pointer-events-none"></div>
 
   <!-- Header Section -->
-  <div class="cart-header mb-8">
-    <div class="flex items-center justify-between">
-      <div>
-        <h1 class="cart-title giest-medium">My Cart</h1>
-        <p class="cart-subtitle">
-          {{ (cart$ | async)?.items?.length || 0 }} items · Table #{{ tableId || 'N/A' }}
-        </p>
+  <header class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <div class="flex flex-col gap-3">
+      <div class="inline-flex items-center gap-2 px-3 py-1 bg-yellow-400/10 text-yellow-600 rounded-full w-fit">
+        <span class="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse"></span>
+        <span class="text-[10px] font-black uppercase tracking-widest">Your Selections</span>
       </div>
-
-      @if ((cart$ | async)?.items?.length) {
-      <button (click)="loadCart()"
-        class="refresh-btn" title="Refresh Cart">
-        <span class="material-icons text-lg">refresh</span>
-      </button>
-      }
+      <div class="flex items-center gap-4">
+        <button routerLink="/menu" class="w-10 h-10 flex items-center justify-center bg-white rounded-xl border border-gray-100 shadow-sm active:scale-90 transition-transform">
+          <span class="material-icons text-gray-800">arrow_back</span>
+        </button>
+        <h1 class="text-4xl md:text-8xl font-black text-[#090A0F] tracking-tight leading-[0.9]">
+          My <br class="hidden md:block"> <span class="title-gradient-modern">Cart.</span>
+        </h1>
+      </div>
+      <p class="text-gray-500 font-medium text-sm md:text-lg mt-2 max-w-lg">
+        {{ (cart$ | async)?.items?.length || 0 }} items · Table #{{ tableId || 'N/A' }}
+      </p>
     </div>
-  </div>
+    
+    <button (click)="loadCart()" class="group h-12 w-12 flex items-center justify-center bg-white rounded-2xl shadow-sm border border-gray-100 hover:bg-black hover:text-white transition-all active:scale-95">
+      <span class="material-icons group-hover:rotate-180 transition-transform duration-500">refresh</span>
+    </button>
+  </header>
 
   @if (!(cart$ | async)?.items?.length) {
   <!-- Empty State -->
-  <div class="empty-state">
-    <div class="empty-icon-wrap">
-      <span class="material-icons empty-icon">shopping_cart</span>
+  <div class="glass-effect text-center p-12 rounded-[2.5rem] border border-white/50 max-w-lg mx-auto shadow-premium transform transition-all hover:scale-[1.02]">
+    <div class="w-24 h-24 bg-gray-50 text-gray-200 rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-inner">
+      <span class="material-icons text-5xl">shopping_cart</span>
     </div>
-    <h2 class="empty-title giest-medium">Your cart is empty</h2>
-    <p class="empty-desc">Looks like you haven't added anything yet. Explore our menu and find something delicious!</p>
-    <button routerLink="/menu" class="browse-btn">
+    <h2 class="text-3xl font-black text-[#090A0F] mb-4">Your cart is empty</h2>
+    <p class="text-gray-500 mb-8 font-medium px-4">Hungry? Explore our menu and find your next favorite craving!</p>
+    <a routerLink="/menu" class="inline-flex items-center gap-3 bg-[#090A0F] text-white px-8 py-5 rounded-[1.5rem] font-black hover:bg-gray-800 transition-all active:scale-95 shadow-lg shadow-black/10">
       <span class="material-icons text-lg">restaurant_menu</span>
-      Browse Menu
-    </button>
+      Explore Menu
+    </a>
   </div>
   } @else {
   <!-- Cart Items List -->
-  <div class="cart-items-list">
+  <div class="space-y-4 mb-12">
     @for (item of (cart$ | async)?.items; track item.cartItemId; let i = $index) {
-    <div class="cart-item item-animate" [style.animation-delay]="(i * 60) + 'ms'">
-
-      <!-- Item Image -->
-      <div class="cart-item-image-wrap">
-        @if (item.imageUrl) {
-        <img [src]="item.imageUrl" [alt]="item.name" class="cart-item-image">
-        } @else {
-        <div class="cart-item-image-placeholder">
-          <span class="material-icons">restaurant</span>
-        </div>
-        }
-      </div>
-
-      <!-- Item Details -->
-      <div class="cart-item-details">
-        <div class="cart-item-top">
-          <div class="cart-item-name-wrap">
-            <h3 class="cart-item-name">{{ item.name }}</h3>
-            @if (item.variant) {
-            <span class="cart-item-variant">{{ item.variant.label || item.variant.variantName }}</span>
-            }
+    <div class="glass-effect p-4 md:p-6 rounded-[2rem] border border-white bg-white/70 backdrop-blur-xl shadow-premium group item-animate" [style.animation-delay]="(i * 60) + 'ms'">
+      <div class="flex gap-5">
+        <!-- Item Image -->
+        <div class="w-20 h-20 md:w-28 md:h-28 rounded-2xl overflow-hidden shadow-sm flex-shrink-0 bg-gray-50">
+          @if (item.imageUrl) {
+          <img [src]="item.imageUrl" [alt]="item.name" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+          } @else {
+          <div class="w-full h-full flex items-center justify-center text-gray-200">
+            <span class="material-icons text-4xl">fastfood</span>
           </div>
-          <button (click)="removeItem(item)" class="remove-btn" title="Remove">
-            <span class="material-icons">close</span>
-          </button>
-        </div>
-
-        <!-- Addons -->
-        @if (item.addons && item.addons.length > 0) {
-        <div class="cart-item-addons">
-          @for (addon of item.addons; track addon.addonId) {
-          <span class="addon-chip">+ {{ addon.name || addon.addonName }}</span>
           }
         </div>
-        }
 
-        <!-- Bottom: Price + Quantity -->
-        <div class="cart-item-bottom">
-          <div class="cart-item-price">
-            <span class="price-symbol">₹</span>{{ item.totalPrice }}
+        <!-- Item Content -->
+        <div class="flex flex-col flex-1 min-w-0">
+          <div class="flex justify-between items-start mb-1">
+            <div class="min-w-0">
+              <h3 class="font-black text-[#090A0F] text-lg md:text-xl truncate">{{ item.name }}</h3>
+              @if (item.variant) {
+                <p class="text-[10px] font-black text-yellow-600 uppercase tracking-widest">{{ item.variant.label }}</p>
+              }
+            </div>
+            <button (click)="removeItem(item)" class="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
+              <span class="material-icons text-xl">close</span>
+            </button>
           </div>
 
-          <div class="quantity-controls">
-            <button (click)="updateQuantity(item, -1)" class="qty-btn" title="Decrease">
-              <span class="material-icons">remove</span>
-            </button>
-            <span class="qty-value">{{ item.quantity }}</span>
-            <button (click)="updateQuantity(item, 1)" class="qty-btn" title="Increase">
-              <span class="material-icons">add</span>
-            </button>
+          <!-- Addons -->
+          @if (item.addons && item.addons.length > 0) {
+          <div class="flex flex-wrap gap-2 mt-2">
+            @for (addon of item.addons; track addon.addonId) {
+            <span class="px-2 py-0.5 bg-gray-50 text-gray-500 text-[10px] font-bold rounded-md">+ {{ addon.name }}</span>
+            }
+          </div>
+          }
+
+          <!-- Bottom: Price + Quantity -->
+          <div class="mt-auto flex items-center justify-between pt-4">
+            <div class="flex items-baseline gap-0.5">
+                <span class="text-sm font-bold text-gray-400">₹</span>
+                <span class="text-xl font-black text-[#090A0F]">{{ item.totalPrice }}</span>
+            </div>
+            
+            <div class="flex items-center bg-gray-50 hover:bg-gray-100 rounded-2xl p-1 transition-colors">
+              <button (click)="updateQuantity(item, -1)" class="w-8 h-8 flex items-center justify-center bg-white rounded-xl shadow-sm text-black active:scale-90 transition-transform">
+                <span class="material-icons text-sm">remove</span>
+              </button>
+              <span class="w-10 text-center font-black text-sm text-[#090A0F]">{{ item.quantity }}</span>
+              <button (click)="updateQuantity(item, 1)" class="w-8 h-8 flex items-center justify-center bg-white rounded-xl shadow-sm text-black active:scale-90 transition-transform">
+                <span class="material-icons text-sm">add</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -94,7 +105,7 @@
   </div>
 
   <!-- Sticky Summary Bar -->
-  <div class="summary-card item-animate">
+  <div class="summary-card">
     <div class="summary-inner">
       <div class="summary-row">
         <span class="summary-label">Subtotal</span>

@@ -17,6 +17,6 @@ export class LoginService {
   headers = new HttpHeaders().set('Content-Type', 'application/json');
 
   loginUser(payload: LoginPayload): Observable<any> {
-    return this.http.post(`${environment.loginUrl}/login`, payload, { headers: this.headers });
+    return this.http.post(`${environment.baseUrl}${environment.login}`, payload, { headers: this.headers });
   }
 }

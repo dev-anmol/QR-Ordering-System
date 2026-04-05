@@ -1,10 +1,11 @@
 export const environment = {
-  apiUrl: 'http://localhost:8083',
-
-  authUrl: 'http://localhost:8083',
-  menuUrl: 'http://localhost:8083',
-  inventoryUrl: 'http://localhost:8083',
-  orderUrl: 'http://localhost:8083',
-  cartUrl: 'http://localhost:8083',
-  loginUrl: 'http://localhost:8083'
+  baseUrl: 'https://food-qr-micro-services-3.onrender.com',
+  auth: '/auth',
+  menu: '/menu',
+  inventory: '/inventory',
+  order: '/order',
+  cart: '/cart',
+  login: '/login',
+  restaurant: '/restaurant',
+  register: '/register'
 }

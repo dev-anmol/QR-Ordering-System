@@ -329,13 +329,22 @@
 /* ─── Summary Card ─── */
 .summary-card {
     position: fixed;
-    bottom: 0;
+    bottom: env(safe-area-inset-bottom, 0); /* Default */
     left: 0;
     right: 0;
-    z-index: 50;
+    z-index: 40; /* Lower than BottomNav if needed, but we will offset it */
     background: white;
     border-top: 1px solid rgba(0, 0, 0, 0.06);
     box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.08);
+}
+
+@media (max-width: 768px) {
+    .summary-card {
+        bottom: 85px; /* Offset to sit above the BottomNav */
+        border-radius: 2rem 2rem 0 0;
+        margin: 0 8px; /* Give it some "floating" appearance too */
+        border: 1px solid rgba(0,0,0,0.1);
+    }
 }
 
 .summary-inner {

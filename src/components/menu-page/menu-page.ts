@@ -73,6 +73,7 @@ export class MenuPage implements OnInit, OnDestroy {
   public cartQuantityMap$ = this.store.select(selectCartQuantityMap);
 
   ngOnInit() {
+    console.log('MenuPage Debug: restaurantId from storage:', localStorage.getItem('restaurant_id'));
     this.uiCart.setShowCart(true);
     this.loadCategories();
     this.loadCart();
@@ -82,7 +83,7 @@ export class MenuPage implements OnInit, OnDestroy {
     const sessionId = this.customerService.getSessionToken();
     const tableId = localStorage.getItem('table_id');
     const tableNumber = tableId ? parseInt(tableId) : 1;
-    if (sessionId) {
+    if (sessionId && this.restaurantId) {
       this.cartService.getCart(parseInt(this.restaurantId), sessionId, tableNumber).subscribe({
         next: (cart) => {
           this.store.dispatch(CartActions.loadCartSuccess({ cart }));
@@ -94,6 +95,7 @@ export class MenuPage implements OnInit, OnDestroy {
 
 
   loadCategories() {
+    if (!this.restaurantId) return;
     this.foodApi.getCategories(this.restaurantId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => {
         this.categories.set(data);
@@ -115,6 +117,7 @@ export class MenuPage implements OnInit, OnDestroy {
       this.foodListSub.unsubscribe();
     }
 
+    if (!this.restaurantId) return;
     this.foodListSub = this.foodApi.getFoodItems(this.restaurantId, categoryId || undefined)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -198,7 +201,7 @@ export class MenuPage implements OnInit, OnDestroy {
 
     const request: AddToCartRequest = {
       sessionId: sessionId,
-      restaurantId: parseInt(this.restaurantId),
+      restaurantId: parseInt(this.restaurantId!),
       imageUrl: product.image,
       menuItemId: product.id,
       quantity: 1,
@@ -230,14 +233,14 @@ export class MenuPage implements OnInit, OnDestroy {
       if (item) {
         if (item.quantity > 1) {
           this.cartService.updateItemQuantity(item.cartItemId, {
-            restaurantId: parseInt(this.restaurantId),
+            restaurantId: parseInt(this.restaurantId!),
             sessionId: sessionId,
             quantity: item.quantity - 1
           }).subscribe(updatedCart => {
             this.store.dispatch(CartActions.loadCartSuccess({ cart: updatedCart }));
           });
         } else {
-          this.cartService.removeItem(item.cartItemId, parseInt(this.restaurantId), sessionId).subscribe(updatedCart => {
+          this.cartService.removeItem(item.cartItemId, parseInt(this.restaurantId!), sessionId).subscribe(updatedCart => {
             this.store.dispatch(CartActions.loadCartSuccess({ cart: updatedCart }));
           });
         }

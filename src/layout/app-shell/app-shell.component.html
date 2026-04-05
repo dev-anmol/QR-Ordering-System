@@ -2,7 +2,8 @@
 <main class="min-h-screen pb-16">
   <router-outlet></router-outlet>
 </main>
-<app-footer></app-footer>
+<app-footer *ngIf="!isCartPage()"></app-footer>
+<app-bottom-nav></app-bottom-nav>
 
 <!-- Floating Call Waiter Button -->
 <button class="fixed bottom-6 right-6 z-50 bg-indigo-600 text-white p-3 md:px-5 md:py-3 rounded-2xl shadow-xl shadow-indigo-600/30 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 group cursor-pointer border-2 border-transparent hover:border-indigo-400">

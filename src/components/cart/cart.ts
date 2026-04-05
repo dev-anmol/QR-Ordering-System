@@ -40,7 +40,7 @@ export class Cart implements OnInit {
   loadCart() {
     const sessionId = this.customerService.getSessionToken();
     const tableNumber = this.tableId ? parseInt(this.tableId) : 1;
-    if (sessionId) {
+    if (sessionId && this.restaurantId) {
       this.cartService.getCart(parseInt(this.restaurantId), sessionId, tableNumber).subscribe({
         next: (cart) => {
           console.log('Cart loaded successfully:', cart);
@@ -65,7 +65,7 @@ export class Cart implements OnInit {
       return;
     }
 
-    if (sessionId && item.cartItemId) {
+    if (sessionId && item.cartItemId && this.restaurantId) {
       this.cartService.updateItemQuantity(item.cartItemId, {
         restaurantId: parseInt(this.restaurantId),
         sessionId: sessionId,
@@ -85,7 +85,7 @@ export class Cart implements OnInit {
 
   removeItem(item: any) {
     const sessionId = this.customerService.getSessionToken();
-    if (sessionId && item.cartItemId) {
+    if (sessionId && item.cartItemId && this.restaurantId) {
       this.cartService.removeItem(item.cartItemId, parseInt(this.restaurantId), sessionId).subscribe({
         next: (cart) => {
           console.log('Item removed successfully. Updated cart:', cart);
@@ -104,7 +104,7 @@ export class Cart implements OnInit {
     const tableId = localStorage.getItem('table_id');
     const tableNumber = tableId ? parseInt(tableId) : 1;
 
-    if (sessionId) {
+    if (sessionId && this.restaurantId) {
       this.cartService.checkout({
         restaurantId: parseInt(this.restaurantId),
         sessionId: sessionId,

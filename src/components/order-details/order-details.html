@@ -1,94 +1,111 @@
-<div class="order-details-container px-6 py-12 min-h-screen bg-slate-900 text-white font-['Outfit']">
-    @if (loading()) {
-    <div class="flex flex-col items-center justify-center p-20 glass-card animate-pulse">
-        <div class="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p class="text-xl font-medium tracking-wide">Cooking up your order details...</p>
-    </div>
-    } @else if (error()) {
-    <div class="glass-card p-12 text-center max-w-lg mx-auto border-red-500/30">
-        <span class="material-icons text-red-400 text-6xl mb-6">error_outline</span>
-        <h2 class="text-3xl font-bold mb-4">Oops!</h2>
-        <p class="text-slate-400 mb-8">{{ error() }}</p>
-        <a routerLink="/menu" class="btn-primary w-full inline-block">Back to Menu</a>
-    </div>
-    } @else if (order()) {
+<!-- Modern Mesh Background -->
+<div class="fixed inset-0 mesh-bg -z-10 pointer-events-none"></div>
+
+<div class="order-details-container px-4 md:px-8 pt-32 md:pt-40 pb-32 min-h-screen relative z-10">
     <div class="max-w-2xl mx-auto">
-        <!-- Success Header -->
-        <div class="text-center mb-12">
-            <div class="success-icon-wrapper mb-6 animate-bounce-slow">
-                <span class="material-icons text-7xl text-emerald-400 glow-icon">check_circle</span>
-            </div>
-            <h1 class="text-4xl font-bold mb-2">Order Confirmed!</h1>
-            <p class="text-slate-400 text-lg">Your food journey has begun. Get ready!</p>
+        <!-- Header with Back Button -->
+        <div class="flex items-center gap-4 mb-10">
+            <button routerLink="/orders" class="w-10 h-10 flex items-center justify-center bg-white rounded-xl border border-gray-100 shadow-sm active:scale-90 transition-transform">
+                <span class="material-icons text-gray-800">arrow_back</span>
+            </button>
+            <h1 class="text-2xl font-black text-[#090A0F]">Order Details</h1>
         </div>
 
-        <!-- Quick Info Cards -->
-        <div class="grid grid-cols-2 gap-4 mb-8">
-            <div class="glass-card p-6 flex flex-col items-center justify-center">
-                <span class="text-indigo-400 text-sm font-bold uppercase tracking-wider mb-1">Order ID</span>
-                <span class="text-xl font-mono">#{{ order()?.orderId?.substring(0, 8) }}</span>
+        @if (loading()) {
+            <div class="flex flex-col items-center justify-center p-20 glass-effect rounded-[2.5rem] border border-white/50 shadow-premium animate-pulse">
+                <span class="loading loading-spinner loading-lg text-[#090A0F] mb-4"></span>
+                <p class="text-lg font-bold text-gray-500">Live updating order...</p>
             </div>
-            <div class="glass-card p-6 flex flex-col items-center justify-center">
-                <span class="text-indigo-400 text-sm font-bold uppercase tracking-wider mb-1">Total Paid</span>
-                <span class="text-2xl font-bold text-emerald-400">₹{{ order()?.totalAmount }}</span>
+        } @else if (error()) {
+            <div class="glass-effect p-12 text-center rounded-[2.5rem] border border-red-100 shadow-premium">
+                <span class="material-icons text-red-500 text-6xl mb-6">error_outline</span>
+                <h2 class="text-3xl font-black text-[#090A0F] mb-4">Oops!</h2>
+                <p class="text-gray-500 mb-8 font-medium">{{ error() }}</p>
+                <a routerLink="/menu" class="bg-[#090A0F] text-white px-8 py-4 rounded-2xl font-bold hover:bg-gray-800 transition-all active:scale-95 shadow-lg shadow-black/10 inline-block">Back to Menu</a>
             </div>
-        </div>
-
-        <!-- Progress Tracking Card -->
-        <div class="glass-card p-8 mb-8 border-indigo-500/20">
-            <h3 class="text-xl font-bold mb-8 flex items-center">
-                <span class="material-icons mr-2 text-indigo-400">track_changes</span>
-                Live Order Status
-            </h3>
-
-            <div class="status-timeline">
-                <div class="timeline-step" [class.active]="order()?.status === OrderStatus.PENDING">
-                    <div class="step-dot transition-all duration-500"
-                        [class.complete]="order()?.status !== OrderStatus.PENDING">
-                        @if (order()?.status !== OrderStatus.PENDING) { <span class="material-icons text-xs">done</span>
-                        }
-                    </div>
-                    <div class="step-content">
-                        <p class="font-bold">Order Received</p>
-                        <p class="text-sm text-slate-400">Waiting for kitchen acceptance</p>
-                    </div>
+        } @else if (order()) {
+            <!-- Success Header -->
+            <div class="text-center mb-10">
+                <div class="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-[2rem] flex items-center justify-center mx-auto mb-6 shadow-sm">
+                    <span class="material-icons text-5xl">check_circle</span>
                 </div>
+                <h2 class="text-3xl md:text-5xl font-black text-[#090A0F] tracking-tight leading-[0.9] mb-4">
+                    Order <span class="text-emerald-500">Confirmed!</span>
+                </h2>
+                <p class="text-gray-500 font-medium text-sm md:text-lg">Your food journey has begun. Get ready!</p>
+            </div>
 
-                <div class="timeline-step" [class.active]="order()?.status === OrderStatus.PREPARING">
-                    <div class="step-dot transition-all duration-500"
-                        [class.complete]="[OrderStatus.READY, OrderStatus.SERVED].includes(order()!.status)">
-                        @if ([OrderStatus.READY, OrderStatus.SERVED].includes(order()!.status)) { <span
-                            class="material-icons text-xs">done</span> }
-                    </div>
-                    <div class="step-content">
-                        <p class="font-bold">Preparing</p>
-                        <p class="text-sm text-slate-400">Chefs are working their magic</p>
-                    </div>
+            <!-- Quick Info Grid -->
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="bg-white/80 backdrop-blur-xl p-6 rounded-[2rem] border border-white shadow-premium flex flex-col items-center justify-center">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Order ID</span>
+                    <span class="text-lg font-black text-[#090A0F]">#{{ (order()?.orderId?.substring(0, 8) || '').toUpperCase() }}</span>
                 </div>
-
-                <div class="timeline-step" [class.active]="order()?.status === OrderStatus.READY">
-                    <div class="step-dot transition-all duration-500"
-                        [class.complete]="order()?.status === OrderStatus.SERVED">
-                        @if (order()?.status === OrderStatus.SERVED) { <span class="material-icons text-xs">done</span>
-                        }
-                    </div>
-                    <div class="step-content">
-                        <p class="font-bold">Ready</p>
-                        <p class="text-sm text-slate-400">Hot and fresh, coming to you!</p>
-                    </div>
+                <div class="bg-white/80 backdrop-blur-xl p-6 rounded-[2rem] border border-white shadow-premium flex flex-col items-center justify-center text-center">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Paid</span>
+                    <span class="text-2xl font-black text-emerald-600">₹{{ order()?.totalAmount }}</span>
                 </div>
             </div>
-        </div>
 
-        <!-- Action Footer -->
-        <div class="flex flex-col gap-4">
-            <a routerLink="/menu"
-                class="btn-primary w-full text-center py-4 flex items-center justify-center gap-2 group">
-                <span class="material-icons group-hover:-translate-x-1 transition-transform">arrow_back</span>
-                Back to Menu
-            </a>
-            <p class="text-center text-slate-500 text-sm">Need help? Contact the restaurant staff.</p>
-        </div>
+            <!-- Progress Tracking Section -->
+            <div class="bg-white/80 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white shadow-premium mb-10">
+                <h3 class="text-xl font-black text-[#090A0F] mb-8 flex items-center gap-3">
+                    <span class="material-icons text-yellow-500">timer</span>
+                    Live Tracking
+                </h3>
+
+                <div class="space-y-8 relative">
+                    <!-- Progress Line background -->
+                    <div class="absolute left-[19px] top-4 bottom-4 w-0.5 bg-gray-100 -z-10"></div>
+
+                    <!-- Step 1: Received -->
+                    <div class="flex gap-6 items-start relative opacity-100">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center z-10 border-4 border-white shadow-sm transition-all duration-500"
+                             [ngClass]="order()?.status !== OrderStatus.PENDING ? 'bg-emerald-500 text-white' : 'bg-white text-gray-300 ring-2 ring-emerald-500/20'">
+                            @if (order()?.status !== OrderStatus.PENDING) { <span class="material-icons text-base">done</span> }
+                            @else { <span class="material-icons text-base">radio_button_checked</span> }
+                        </div>
+                        <div>
+                            <p class="font-black text-lg text-[#090A0F]" [class.opacity-50]="order()!.status !== OrderStatus.PENDING && order()!.status !== OrderStatus.PREPARING">Order Received</p>
+                            <p class="text-sm text-gray-500 font-medium">Waiting for kitchen acceptance</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Preparing -->
+                    <div class="flex gap-6 items-start relative" [class.opacity-50]="order()?.status === OrderStatus.PENDING">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center z-10 border-4 border-white shadow-sm transition-all duration-500"
+                             [ngClass]="[OrderStatus.READY, OrderStatus.SERVED].includes(order()!.status) ? 'bg-emerald-500 text-white' : (order()?.status === OrderStatus.PREPARING ? 'bg-yellow-400 text-black animate-pulse' : 'bg-white text-gray-300')">
+                            @if ([OrderStatus.READY, OrderStatus.SERVED].includes(order()!.status)) { <span class="material-icons text-base">done</span> }
+                            @else { <span class="material-icons text-base">restaurant</span> }
+                        </div>
+                        <div>
+                            <p class="font-black text-lg text-[#090A0F]">Preparing</p>
+                            <p class="text-sm text-gray-500 font-medium">Chefs are working their magic</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Ready -->
+                    <div class="flex gap-6 items-start relative" [class.opacity-50]="order()?.status === OrderStatus.PENDING || order()?.status === OrderStatus.PREPARING">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center z-10 border-4 border-white shadow-sm transition-all duration-500"
+                             [ngClass]="order()?.status === OrderStatus.SERVED ? 'bg-emerald-500 text-white' : (order()?.status === OrderStatus.READY ? 'bg-indigo-600 text-white shadow-indigo-200 shadow-xl' : 'bg-white text-gray-300')">
+                            @if (order()?.status === OrderStatus.SERVED) { <span class="material-icons text-base">done</span> }
+                            @else { <span class="material-icons text-base">notifications_active</span> }
+                        </div>
+                        <div>
+                            <p class="font-black text-lg text-[#090A0F]">Served</p>
+                            <p class="text-sm text-gray-500 font-medium">Hot and fresh, enjoy your meal!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Action -->
+            <div class="flex flex-col gap-4">
+                <a routerLink="/menu" class="w-full bg-[#090A0F] text-white py-5 rounded-3xl font-black text-center shadow-premium hover:bg-gray-800 transition-all active:scale-[0.98]">
+                    Explore More Cravings
+                </a>
+                <p class="text-center text-gray-400 text-[10px] font-black uppercase tracking-widest">Need help? Contact restaurant staff.</p>
+            </div>
+        }
     </div>
-    }
 </div>

@@ -8,16 +8,16 @@ import { Observable, tap } from 'rxjs';
 })
 export class CustomerService {
     private http = inject(HttpClient);
-    private apiUrl = environment.apiUrl;
+
 
     // Check if restaurant is accepting orders
     checkRestaurantStatus(restaurantId: string): Observable<any> {
-        return this.http.get(`${this.apiUrl}/restaurant/${restaurantId}/status`);
+        return this.http.get(`${environment.baseUrl}${environment.restaurant}/${restaurantId}/status`);
     }
 
     // Generate session token for the customer using secure QR ID
     generateSessionToken(qrId: string): Observable<any> {
-        return this.http.post(`${this.apiUrl}/auth/session/start`, {
+        return this.http.post(`${environment.baseUrl}${environment.auth}/session/start`, {
             qrId
         }).pipe(
             tap((response: any) => {
