@@ -16,18 +16,35 @@ function getCookie(name: string): string | null {
     return null;
 }
 
-// In-memory device ID (not persisted in cookies or localStorage)
-let memoryDeviceId: string | null = null;
+// Persist in localStorage to survive page reloads and act as a reliable device identifier
+let cachedDeviceId: string | null = null;
 
 function getOrCreateDeviceId(): string {
-    if (!memoryDeviceId) {
-        if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-            memoryDeviceId = crypto.randomUUID();
-        } else {
-            memoryDeviceId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    if (cachedDeviceId) return cachedDeviceId;
+    
+    const DEVICE_ID_KEY = 'customer_device_id';
+    
+    if (typeof localStorage !== 'undefined') {
+        const stored = localStorage.getItem(DEVICE_ID_KEY);
+        if (stored) {
+            cachedDeviceId = stored;
+            return cachedDeviceId;
         }
     }
-    return memoryDeviceId;
+    
+    let newId: string;
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        newId = crypto.randomUUID();
+    } else {
+        newId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    }
+    
+    if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(DEVICE_ID_KEY, newId);
+    }
+    
+    cachedDeviceId = newId;
+    return cachedDeviceId;
 }
 
 export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, next: HttpHandlerFn) => {
@@ -43,10 +60,8 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
 
     let headers: { [name: string]: string } = {};
 
-    // 1. Add Device ID for specific endpoints if needed by backend
-    if (req.url.includes('/auth/session/start') || req.url.includes('/menu/items')) {
-        headers['X-Device-Id'] = deviceId;
-    }
+    // 1. Add Device ID to ALL requests as requested
+    headers['X-Device-Id'] = deviceId;
 
     // 2. Add Authorization header for everything EXCEPT session start
     //    The Gateway will extract userId, restaurantId, tableNo from the JWT
