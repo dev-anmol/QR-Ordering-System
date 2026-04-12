@@ -117,7 +117,8 @@ export class Cart implements OnInit {
           this.isCheckingOut.set(false);
           localStorage.setItem('last_order_id', res.orderId);
           this.store.dispatch(CartActions.loadCartSuccess({ cart: null as any }));
-          this.router.navigate(['/order', res.orderId]);
+          // Navigate to the full orders list since downstream processing takes time
+          this.router.navigate(['/orders']);
         },
         error: (err) => {
           this.isCheckingOut.set(false);
