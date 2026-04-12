@@ -63,6 +63,12 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
     // 1. Add Device ID to ALL requests as requested
     headers['X-Device-Id'] = deviceId;
 
+    // 2. Add Restaurant ID from localStorage if available
+    const restaurantId = typeof localStorage !== 'undefined' ? localStorage.getItem('restaurant_id') : null;
+    if (restaurantId) {
+        headers['X-Restaurant-Id'] = restaurantId;
+    }
+
     // 2. Add Authorization header for everything EXCEPT session start
     //    The Gateway will extract userId, restaurantId, tableNo from the JWT
     //    and inject them as X-User-Id, X-Restaurant-Id, X-Table-No headers automatically
@@ -80,7 +86,7 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
         retry({
             count: 3,
             delay: (error, retryCount) => {
-                if (error.status === 429) {
+                if (error.status === 429 && req.method === 'GET') {
                     const delayMs = Math.pow(2, retryCount) * 1000; // 2s, 4s, 8s
                     console.warn(`[Retry ${retryCount}/3] Server returned 429. Retrying in ${delayMs / 1000}s...`);
                     return timer(delayMs);

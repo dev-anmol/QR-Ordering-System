@@ -9,7 +9,7 @@ import { AddToCartRequest, Cart, UpdateCartItemRequest, CheckoutRequest, Checkou
 })
 export class CartService {
     private http = inject(HttpClient);
-    private cartUrl = `${environment.baseUrl}${environment.cart}`;
+    private cartUrl = environment.cartUrl;
 
     addItem(req: AddToCartRequest): Observable<Cart> {
         return this.http.post<Cart>(`${this.cartUrl}/items`, req);

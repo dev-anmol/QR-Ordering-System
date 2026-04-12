@@ -22,6 +22,7 @@ export class Cart implements OnInit {
   private cartService = inject(CartService);
   private customerService = inject(CustomerService);
 
+  public isCheckingOut = signal(false);
   private router = inject(Router);
 
   public cart$ = this.store.select(selectCart);
@@ -104,7 +105,8 @@ export class Cart implements OnInit {
     const tableId = localStorage.getItem('table_id');
     const tableNumber = tableId ? parseInt(tableId) : 1;
 
-    if (sessionId && this.restaurantId) {
+    if (sessionId && this.restaurantId && !this.isCheckingOut()) {
+      this.isCheckingOut.set(true);
       this.cartService.checkout({
         restaurantId: parseInt(this.restaurantId),
         sessionId: sessionId,
@@ -112,11 +114,13 @@ export class Cart implements OnInit {
         variantId: ""
       }).subscribe({
         next: (res) => {
+          this.isCheckingOut.set(false);
           localStorage.setItem('last_order_id', res.orderId);
           this.store.dispatch(CartActions.loadCartSuccess({ cart: null as any }));
           this.router.navigate(['/order', res.orderId]);
         },
         error: (err) => {
+          this.isCheckingOut.set(false);
           console.error('Checkout failed:', err);
           alert('Failed to place order. Please try again.');
         }

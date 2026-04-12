@@ -17,7 +17,7 @@ export class CustomerService {
 
     // Generate session token for the customer using secure QR ID
     generateSessionToken(qrId: string): Observable<any> {
-        return this.http.post(`${environment.baseUrl}${environment.auth}/session/start`, {
+        return this.http.post(`${environment.authUrl}/session/start`, {
             qrId
         }).pipe(
             tap((response: any) => {

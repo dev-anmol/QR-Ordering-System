@@ -127,9 +127,16 @@
           </span>
         </div>
 
-        <button (click)="checkout()" class="checkout-btn">
-          <span>Place Order</span>
-          <span class="material-icons checkout-arrow">arrow_forward</span>
+        <button (click)="checkout()" [disabled]="isCheckingOut()" class="checkout-btn disabled:opacity-50 disabled:cursor-not-allowed">
+          @if (isCheckingOut()) {
+            <span class="flex items-center gap-2">
+              <span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+              Processing...
+            </span>
+          } @else {
+            <span>Place Order</span>
+            <span class="material-icons checkout-arrow">arrow_forward</span>
+          }
         </button>
       </div>
 

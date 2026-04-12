@@ -14,18 +14,15 @@ export class FoodItemService {
   constructor() {
   }
 
-  private menuApiUrl = `${environment.baseUrl}${environment.menu}`;
+  private menuApiUrl = environment.menuUrl;
 
   getCategories(restaurantId?: string) {
-    const params: any = {};
-    if (restaurantId) params.restaurantId = restaurantId;
-    return this.http.get<any[]>(`${this.menuApiUrl}/categories`, { params });
+    return this.http.get<any[]>(`${this.menuApiUrl}/categories`);
   }
 
   getFoodItems(restaurantId?: string, categoryId?: string | number) {
     const url = categoryId != null ? `${this.menuApiUrl}/items-by-category` : `${this.menuApiUrl}/items`;
     const params: any = {};
-    if (restaurantId) params.restaurantId = restaurantId;
     if (categoryId) params.categoryId = categoryId;
 
     return this.http.get<{ items: any[], totalElements: number }>(url, { params })

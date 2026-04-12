@@ -11,7 +11,7 @@ import { CustomerService } from '../customer/customer.service';
 export class OrderService {
     private http = inject(HttpClient);
     private customerService = inject(CustomerService);
-    private orderUrl = `${environment.baseUrl}${environment.order}`;
+    private orderUrl = environment.orderUrl;
 
     getOrder(orderId: string): Observable<CheckoutResponse> {
         return this.http.get<CheckoutResponse>(`${this.orderUrl}/${orderId}`);
