@@ -74,6 +74,7 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
     //    and inject them as X-User-Id, X-Restaurant-Id, X-Table-No headers automatically
     if (token && !req.url.includes('/auth/session/start')) {
         headers['Authorization'] = `Bearer ${token}`;
+        headers['X-Session-Token'] = token;
     }
 
     const outgoing = Object.keys(headers).length > 0
