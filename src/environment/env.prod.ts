@@ -1,4 +1,4 @@
-const GATEWAY_URL = import.meta.env['VITE_API_BASE_URL'] ?? 'https://food-qr-monolith.onrender.com';
+const GATEWAY_URL = 'https://food-qr-monolith.onrender.com';
 
 export const environment = {
   production: true,
