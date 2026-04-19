@@ -1,4 +1,4 @@
-const GATEWAY_URL = 'http://localhost:8083';
+const GATEWAY_URL = import.meta.env['VITE_API_BASE_URL'] ?? 'http://localhost:8083';
 
 export const environment = {
   production: false,

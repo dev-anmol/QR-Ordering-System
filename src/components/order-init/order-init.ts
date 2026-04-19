@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CustomerService } from '../../services/customer/customer.service';
-import { catchError, of, switchMap } from 'rxjs';
+import { catchError, of } from 'rxjs';
 
 @Component({
     selector: 'app-order-init',
@@ -35,9 +35,20 @@ export class OrderInitComponent implements OnInit {
             return;
         }
 
-        // In the secure flow, the backend handles the mapping and status check
-        // We directly request a session token using the qrId
-        this.customerService.generateSessionToken(qrId).pipe(
+        // If the customer already has a valid session cookie, skip re-auth and
+        // go straight to the menu — their cart/order is still alive on the backend.
+        const existingSession = this.customerService.getSessionToken();
+        if (existingSession) {
+            console.log('[OrderInit] Existing session found — skipping re-auth, resuming session.');
+            this.router.navigate(['/menu']);
+            return;
+        }
+
+        // No existing session: start a new one.
+        // We send the persistent deviceId so the backend can look up any
+        // prior orders/cart tied to this device and restore them.
+        const deviceId = this.customerService.getOrCreateDeviceId();
+        this.customerService.generateSessionToken(qrId, deviceId).pipe(
             catchError((err: Error) => {
                 this.handleError(err.message || 'Failed to initialize order session.');
                 return of(null);

@@ -15,11 +15,13 @@ export class CustomerService {
         return this.http.get(`${environment.baseUrl}${environment.restaurant}/${restaurantId}/status`);
     }
 
-    // Generate session token for the customer using secure QR ID
-    generateSessionToken(qrId: string): Observable<any> {
-        return this.http.post(`${environment.authUrl}/session/start`, {
-            qrId
-        }).pipe(
+    // Generate session token for the customer using secure QR ID.
+    // Passing deviceId allows the backend to restore any prior order/cart
+    // for this physical device even if the session cookie expired.
+    generateSessionToken(qrId: string, deviceId?: string): Observable<any> {
+        const body: any = { qrId };
+        if (deviceId) body.deviceId = deviceId;
+        return this.http.post(`${environment.authUrl}/session/start`, body).pipe(
             tap((response: any) => {
                 // response: { sessionToken: string, expiresIn: number }
                 if (response && response.sessionToken) {
@@ -29,6 +31,23 @@ export class CustomerService {
                 }
             })
         );
+    }
+
+    // Returns the persistent device ID for this browser.
+    // Creates one if it doesn't exist yet (stored in localStorage).
+    getOrCreateDeviceId(): string {
+        const DEVICE_ID_KEY = 'customer_device_id';
+        if (typeof localStorage !== 'undefined') {
+            const stored = localStorage.getItem(DEVICE_ID_KEY);
+            if (stored) return stored;
+        }
+        const newId = (typeof crypto !== 'undefined' && crypto.randomUUID)
+            ? crypto.randomUUID()
+            : Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        if (typeof localStorage !== 'undefined') {
+            localStorage.setItem(DEVICE_ID_KEY, newId);
+        }
+        return newId;
     }
 
     getSessionToken(): string | null {
