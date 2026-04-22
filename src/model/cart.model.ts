@@ -3,13 +3,15 @@ export enum OrderStatus {
     PREPARING = 'PREPARING',
     READY = 'READY',
     SERVED = 'SERVED',
-    CANCELLED = 'CANCELLED'
+    CANCELLED = 'CANCELLED',
+    REJECTED = 'REJECTED'
 }
 
 export interface CheckoutResponse {
     orderId: string;
     status: OrderStatus;
     totalAmount: number;
+    items?: any[];
 }
 
 export interface AddonSnapshot {

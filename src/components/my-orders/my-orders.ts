@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { OrderService } from '../../services/order/order.service';
@@ -11,7 +11,7 @@ import { CheckoutResponse, OrderStatus } from '../../model/cart.model';
     templateUrl: './my-orders.html',
     styleUrls: ['./my-orders.css']
 })
-export class MyOrdersComponent implements OnInit, OnDestroy {
+export class MyOrdersComponent implements OnInit {
     private orderService = inject(OrderService);
     
     public orders = signal<CheckoutResponse[]>([]);
@@ -19,25 +19,20 @@ export class MyOrdersComponent implements OnInit, OnDestroy {
     public error = signal<string | null>(null);
     public OrderStatus = OrderStatus;
 
-    private timeoutId: any;
+    public expandedOrderId = signal<string | null>(null);
     private isFetching = false;
 
-    ngOnInit() {
-        this.fetchMyOrders(true);
-    }
-
-    ngOnDestroy() {
-        if (this.timeoutId) {
-            clearTimeout(this.timeoutId);
+    toggleExpandedOrder(orderId: string, event: Event) {
+        event.stopPropagation();
+        if (this.expandedOrderId() === orderId) {
+            this.expandedOrderId.set(null);
+        } else {
+            this.expandedOrderId.set(orderId);
         }
     }
 
-    private hasActiveOrders(orders: CheckoutResponse[]): boolean {
-        return orders.some(o => 
-            o.status === OrderStatus.PENDING || 
-            o.status === OrderStatus.PREPARING || 
-            o.status === OrderStatus.READY
-        );
+    ngOnInit() {
+        this.fetchMyOrders(true);
     }
 
     fetchMyOrders(showLoading = true) {
@@ -48,23 +43,12 @@ export class MyOrdersComponent implements OnInit, OnDestroy {
             this.loading.set(true);
         }
 
-        if (this.timeoutId) {
-            clearTimeout(this.timeoutId);
-            this.timeoutId = null;
-        }
-
         this.orderService.getMyOrders().subscribe({
             next: (data) => {
                 const ordersList = data || [];
                 this.orders.set(ordersList);
                 this.loading.set(false);
                 this.isFetching = false;
-
-                if (ordersList.length > 0 && this.hasActiveOrders(ordersList)) {
-                    this.timeoutId = setTimeout(() => {
-                        this.fetchMyOrders(false);
-                    }, 2000);
-                }
             },
             error: (err) => {
                 console.error('Error fetching orders:', err);
