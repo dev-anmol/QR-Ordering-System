@@ -1,15 +1,20 @@
 export enum OrderStatus {
+    CREATED = 'CREATED',
+    REJECTED = 'REJECTED',
     PENDING = 'PENDING',
+    PAID = 'PAID',
     PREPARING = 'PREPARING',
-    READY = 'READY',
-    SERVED = 'SERVED',
-    CANCELLED = 'CANCELLED',
-    REJECTED = 'REJECTED'
+    CLOSED = 'CLOSED',
+    PAYMENT_PENDING = 'PAYMENT_PENDING',
+    PAYMENT_REQUESTED = 'PAYMENT_REQUESTED',
+    CANCEL = 'CANCEL',
+    CANCELLED = 'CANCELLED'
 }
 
 export interface CheckoutResponse {
     orderId: string;
     status: OrderStatus;
+    paymentStatus?: string;
     totalAmount: number;
     items?: any[];
 }

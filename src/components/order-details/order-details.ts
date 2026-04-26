@@ -35,9 +35,8 @@ export class OrderDetailsComponent implements OnInit, OnDestroy {
             return;
         }
 
-        // Using timer(0, 20000) runs immediately, then waits 20 seconds between calls!
-        // This stops simultaneous API hits and massively reduces impact on the backend.
-        this.pollingSubscription = timer(0, 20000)
+        // Using timer(0, 5000) runs immediately, then waits 5 seconds between calls
+        this.pollingSubscription = timer(0, 5000)
             .pipe(
                 switchMap(() => this.orderService.getOrder(orderId))
             )
@@ -47,7 +46,16 @@ export class OrderDetailsComponent implements OnInit, OnDestroy {
                         this.order.set(fetchedOrder);
                         this.loading.set(false);
                         // Stop polling if finalized
-                        if (fetchedOrder.status === OrderStatus.SERVED || fetchedOrder.status === OrderStatus.CANCELLED) {
+                        const stopPollingStatuses = [
+                            OrderStatus.CLOSED,
+                            OrderStatus.PAID,
+                            OrderStatus.CANCEL,
+                            OrderStatus.CANCELLED,
+                            OrderStatus.REJECTED,
+                            'CANCELED' as OrderStatus,
+                            'REJECT' as OrderStatus
+                        ];
+                        if (stopPollingStatuses.includes(fetchedOrder.status)) {
                             this.pollingSubscription?.unsubscribe();
                         }
                     } else {
@@ -73,16 +81,30 @@ export class OrderDetailsComponent implements OnInit, OnDestroy {
 
     getStatusIcon(status: OrderStatus): string {
         switch (status) {
-            case OrderStatus.PENDING: return 'hourglass_empty';
+            case OrderStatus.CREATED: return 'hourglass_empty';
+            case OrderStatus.PENDING: return 'pending_actions';
             case OrderStatus.PREPARING: return 'restaurant';
-            case OrderStatus.READY: return 'check_circle';
-            case OrderStatus.SERVED: return 'done_all';
-            case OrderStatus.CANCELLED: return 'cancel';
-            default: return 'help';
+            case OrderStatus.PAYMENT_PENDING:
+            case OrderStatus.PAYMENT_REQUESTED: return 'payment';
+            case OrderStatus.PAID: return 'check_circle';
+            case OrderStatus.CLOSED: return 'done_all';
+            case OrderStatus.CANCEL:
+            case OrderStatus.CANCELLED:
+            case OrderStatus.REJECTED: return 'cancel';
         }
     }
 
     getStatusClass(status: OrderStatus): string {
         return status.toLowerCase();
+    }
+
+    isCancelled(): boolean {
+        const s = (this.order()?.status || '').toString().toUpperCase();
+        return s.includes('CANCEL');
+    }
+
+    isRejected(): boolean {
+        const s = (this.order()?.status || '').toString().toUpperCase();
+        return s.includes('REJECT');
     }
 }

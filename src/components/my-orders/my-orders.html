@@ -61,16 +61,15 @@
                         <div class="flex items-center gap-4">
                             <div class="w-14 h-14 rounded-2xl flex items-center justify-center font-bold shadow-sm transition-transform group-hover:scale-105"
                                  [ngClass]="{
-                                    'bg-yellow-400/10 text-yellow-600': order.status === OrderStatus.PENDING,
+                                    'bg-yellow-400/10 text-yellow-600': order.status === OrderStatus.PENDING || order.status === OrderStatus.CREATED,
                                     'bg-blue-400/10 text-blue-600': order.status === OrderStatus.PREPARING,
-                                    'bg-emerald-400/10 text-emerald-600': [OrderStatus.READY, OrderStatus.SERVED].includes(order.status),
-                                    'bg-red-400/10 text-red-600': order.status === OrderStatus.CANCELLED || order.status === OrderStatus.REJECTED
+                                    'bg-emerald-400/10 text-emerald-600': [OrderStatus.PAID, OrderStatus.CLOSED, OrderStatus.PAYMENT_PENDING, OrderStatus.PAYMENT_REQUESTED].includes(order.status),
+                                    'bg-red-400/10 text-red-600': isCancelled(order.status) || isRejected(order.status)
                                  }">
-                                 @if (order.status === OrderStatus.PENDING) { <span class="material-icons text-xl">hourglass_bottom</span> }
+                                 @if (order.status === OrderStatus.PENDING || order.status === OrderStatus.CREATED) { <span class="material-icons text-xl">hourglass_bottom</span> }
                                  @if (order.status === OrderStatus.PREPARING) { <span class="material-icons animate-spin-slow text-xl">restaurant</span> }
-                                 @if (order.status === OrderStatus.READY) { <span class="material-icons text-xl">notifications_active</span> }
-                                 @if (order.status === OrderStatus.SERVED) { <span class="material-icons text-xl">check_circle</span> }
-                                 @if (order.status === OrderStatus.CANCELLED || order.status === OrderStatus.REJECTED) { <span class="material-icons text-xl">block</span> }
+                                 @if ([OrderStatus.PAID, OrderStatus.CLOSED, OrderStatus.PAYMENT_PENDING, OrderStatus.PAYMENT_REQUESTED].includes(order.status)) { <span class="material-icons text-xl">check_circle</span> }
+                                 @if (isCancelled(order.status) || isRejected(order.status)) { <span class="material-icons text-xl">cancel</span> }
                             </div>
                             
                             <div>
@@ -80,10 +79,10 @@
                                 <div class="flex items-center gap-2">
                                     <span class="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md"
                                           [ngClass]="{
-                                            'bg-yellow-400/20 text-yellow-700': order.status === OrderStatus.PENDING,
+                                            'bg-yellow-400/20 text-yellow-700': order.status === OrderStatus.PENDING || order.status === OrderStatus.CREATED,
                                             'bg-blue-400/20 text-blue-700': order.status === OrderStatus.PREPARING,
-                                            'bg-emerald-400/20 text-emerald-700': [OrderStatus.READY, OrderStatus.SERVED].includes(order.status),
-                                            'bg-red-400/20 text-red-700': order.status === OrderStatus.CANCELLED || order.status === OrderStatus.REJECTED
+                                            'bg-emerald-400/20 text-emerald-700': [OrderStatus.PAID, OrderStatus.CLOSED, OrderStatus.PAYMENT_PENDING, OrderStatus.PAYMENT_REQUESTED].includes(order.status),
+                                            'bg-red-400/20 text-red-700': isCancelled(order.status) || isRejected(order.status)
                                           }">
                                         {{ order.status }}
                                     </span>

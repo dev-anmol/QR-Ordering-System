@@ -58,4 +58,14 @@ export class MyOrdersComponent implements OnInit {
             }
         });
     }
+
+    isCancelled(status: any): boolean {
+        const s = (status || '').toString().toUpperCase();
+        return s.includes('CANCEL');
+    }
+
+    isRejected(status: any): boolean {
+        const s = (status || '').toString().toUpperCase();
+        return s.includes('REJECT');
+    }
 }
