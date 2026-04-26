@@ -1,4 +1,4 @@
-const GATEWAY_URL = 'https://food-qr-monolith.onrender.com';
+const GATEWAY_URL = 'https://scan-eat-admin.onrender.com';
 
 export const environment = {
   production: true,
