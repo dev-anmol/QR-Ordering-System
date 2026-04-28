@@ -27,9 +27,10 @@ export class CustomerService {
                 if (response && response.sessionToken) {
                     this.setCookie('customer_session', response.sessionToken, 1); // 1 day expire
                     if (response.restaurantId) localStorage.setItem('restaurant_id', response.restaurantId);
-                    if (response.tableId) localStorage.setItem('table_id', response.tableId);
+                    if (response.tableNumber) localStorage.setItem('table_id', response.tableNumber.toString());
                 }
             })
+
         );
     }
 

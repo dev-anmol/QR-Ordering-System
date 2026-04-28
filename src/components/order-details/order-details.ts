@@ -20,6 +20,8 @@ export class OrderDetailsComponent implements OnInit, OnDestroy {
     public order = signal<CheckoutResponse | null>(null);
     public loading = signal(true);
     public error = signal<string | null>(null);
+    public tableId = localStorage.getItem('table_id');
+
 
     public OrderStatus = OrderStatus;
 
