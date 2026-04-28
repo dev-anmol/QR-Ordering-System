@@ -77,13 +77,11 @@ export class MenuPage implements OnInit, OnDestroy {
     return { ...this.storeQuantities(), ...this.optimisticQuantities() };
   });
 
-  constructor() {
-    // Re-fetch items whenever category changes
-    effect(() => {
-      const catId = this.selectedCategoryId();
-      this.loadFoodItems(catId);
-    }, { allowSignalWrites: true });
+  private menuCache: Record<string, foodInterface[]> = {};
+  private fullMenu = signal<foodInterface[]>([]);
 
+
+  constructor() {
     // Handle debounced sync
     this.quantitySync$.pipe(
       debounceTime(500),
@@ -91,9 +89,7 @@ export class MenuPage implements OnInit, OnDestroy {
     ).subscribe(() => this.performSync());
   }
 
-
   ngOnInit() {
-    console.log('MenuPage Debug: restaurantId from storage:', localStorage.getItem('restaurant_id'));
     this.uiCart.setShowCart(true);
     this.loadCategories();
     this.loadCart();
@@ -113,37 +109,40 @@ export class MenuPage implements OnInit, OnDestroy {
     }
   }
 
-
   loadCategories() {
     if (!this.restaurantId) return;
     this.foodApi.getCategories(this.restaurantId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => {
         this.categories.set(data);
-        if (data.length > 0 && !this.selectedCategoryId()) {
-          this.selectedCategoryId.set(data[0].categoryId);
+        if (data.length > 0) {
+          const firstCatId = data[0].categoryId;
+          this.selectedCategoryId.set(firstCatId);
+          this.loadFoodItems(firstCatId);
         }
       },
       error: (err) => console.error('Error fetching categories:', err)
     });
   }
 
-  private foodListSub?: Subscription;
-
   loadFoodItems(categoryId: string | number | null) {
-    this.isLoading.set(true);
+    if (!this.restaurantId || !categoryId) return;
 
-    // Cancel the previous API request so they don't get mixed up!
-    if (this.foodListSub) {
-      this.foodListSub.unsubscribe();
+    // Check cache for optimization
+    const cacheKey = categoryId.toString();
+    if (this.menuCache[cacheKey]) {
+      this.fullMenu.set(this.menuCache[cacheKey]);
+      return;
     }
 
-    if (!this.restaurantId) return;
-    this.foodListSub = this.foodApi.getFoodItems(this.restaurantId, categoryId || undefined)
+    this.isLoading.set(true);
+    this.foodApi.getFoodItems(this.restaurantId, categoryId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {
-          this.foodItem.set(data);
+          this.menuCache[cacheKey] = data;
+          this.fullMenu.set(data);
           this.isLoading.set(false);
+          this.hasError.set(false);
         },
         error: (err) => {
           console.error('Error fetching food items:', err);
@@ -155,13 +154,21 @@ export class MenuPage implements OnInit, OnDestroy {
 
   selectCategory(id: string | number) {
     this.selectedCategoryId.set(id);
+    this.loadFoodItems(id);
   }
 
-  filteredFoodItems = computed<foodInterface[]>(() =>
-    this.foodItem().filter(item =>
-      item.name.toLowerCase().includes(this.searchTerm()) && item.enabled
-    )
-  )
+  filteredFoodItems = computed<foodInterface[]>(() => {
+    const term = this.searchTerm().toLowerCase();
+    const menu = this.fullMenu();
+    
+    if (!menu.length) return [];
+
+    return menu.filter(item => {
+      const matchesSearch = item.name.toLowerCase().includes(term);
+      return matchesSearch && item.enabled;
+    });
+  });
+
 
 
   searchMenu(event: any) {
@@ -237,10 +244,11 @@ export class MenuPage implements OnInit, OnDestroy {
         // Increase: use addItem with delta
         const delta = targetQty - storeQty;
         // We need the full product object. Let's find it in our current list.
-        const product = this.foodItem().find(p => p.id === productId);
+        const product = this.fullMenu().find(p => p.id === productId);
         if (product) {
           this.executeAddToCart(product, undefined, [], delta);
         }
+
       } else {
         // Decrease: use updateItemQuantity or removeItem
         this.store.select(selectCart).pipe(first()).subscribe(cart => {

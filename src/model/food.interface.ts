@@ -21,7 +21,9 @@ export interface foodInterface {
   quantity: number;
   price: number;
   enabled: boolean;
+  categoryId: string;
   variants?: Variant[];
+
 
   addons?: Addon[];
   mealType?: string;

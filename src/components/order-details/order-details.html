@@ -33,7 +33,9 @@
                     <h2 class="text-3xl md:text-5xl font-black text-[#090A0F] tracking-tight leading-[0.9] mb-4">
                         Order <span class="text-red-500">Cancelled</span>
                     </h2>
-                    <p class="text-gray-500 font-medium text-sm md:text-lg">Your order has been cancelled.</p>
+                    <p class="text-gray-500 font-medium text-sm md:text-lg">
+                        {{ order()?.reason || 'Your order has been cancelled.' }}
+                    </p>
                 } @else if (isRejected()) {
                     <div class="w-20 h-20 bg-red-50 text-red-500 rounded-[2rem] flex items-center justify-center mx-auto mb-6 shadow-sm">
                         <span class="material-icons text-5xl">error_outline</span>
@@ -41,8 +43,11 @@
                     <h2 class="text-3xl md:text-5xl font-black text-[#090A0F] tracking-tight leading-[0.9] mb-4">
                         Order <span class="text-red-500">Rejected</span>
                     </h2>
-                    <p class="text-gray-500 font-medium text-sm md:text-lg">Unfortunately, your order could not be processed.</p>
+                    <p class="text-gray-500 font-medium text-sm md:text-lg">
+                        {{ order()?.reason || 'Unfortunately, your order could not be processed.' }}
+                    </p>
                 } @else {
+
                     <div class="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-[2rem] flex items-center justify-center mx-auto mb-6 shadow-sm">
                         <span class="material-icons text-5xl">check_circle</span>
                     </div>

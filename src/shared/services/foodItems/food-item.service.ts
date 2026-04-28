@@ -23,10 +23,11 @@ export class FoodItemService {
   getFoodItems(restaurantId?: string, categoryId?: string | number) {
     const url = `${this.menuApiUrl}/items`;
     const params: any = {};
+    if (restaurantId) params.restaurantId = restaurantId;
     if (categoryId) params.categoryId = categoryId;
 
-
     return this.http.get<{ items: any[], totalElements: number }>(url, { params })
+
       .pipe(
         map((response) => {
           return response.items.map((item: any) => {
@@ -39,9 +40,11 @@ export class FoodItemService {
               quantity: 1,
               price: item.basePrice,
               enabled: item.enabled,
+              categoryId: item.categoryId,
               variants: item.variants,
               addons: item.addons
             }
+
           })
         })
       );

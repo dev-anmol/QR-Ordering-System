@@ -3,7 +3,21 @@
   <!-- Modern Mesh Background -->
   <div class="fixed inset-0 mesh-bg -z-10 pointer-events-none"></div>
 
+  <!-- Error Message -->
+  @if (error()) {
+    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl flex items-center justify-between animate-in fade-in slide-in-from-top-4 duration-300">
+        <div class="flex items-center gap-3 text-red-600">
+            <span class="material-icons">error_outline</span>
+            <span class="font-bold text-sm">{{ error() }}</span>
+        </div>
+        <button (click)="error.set(null)" class="text-red-400 hover:text-red-600 cursor-pointer">
+            <span class="material-icons text-sm">close</span>
+        </button>
+    </div>
+  }
+
   <!-- Header Section -->
+
   <header class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
     <div class="flex flex-col gap-3">
       <div class="inline-flex items-center gap-2 px-3 py-1 bg-yellow-400/10 text-yellow-600 rounded-full w-fit">
@@ -19,7 +33,7 @@
         </h1>
       </div>
       <p class="text-gray-500 font-medium text-sm md:text-lg mt-2 max-w-lg">
-        {{ (cart$ | async)?.items?.length || 0 }} items · Table #{{ tableId || 'N/A' }}
+        {{ (displayCart())?.items?.length || 0 }} items · Table #{{ tableId || 'N/A' }}
       </p>
     </div>
     
@@ -28,123 +42,125 @@
     </button>
   </header>
 
-  @if (!(cart$ | async)?.items?.length) {
-  <!-- Empty State -->
-  <div class="glass-effect text-center p-12 rounded-[2.5rem] border border-white/50 max-w-lg mx-auto shadow-premium transform transition-all hover:scale-[1.02]">
-    <div class="w-24 h-24 bg-gray-50 text-gray-200 rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-inner">
-      <span class="material-icons text-5xl">shopping_cart</span>
-    </div>
-    <h2 class="text-3xl font-black text-[#090A0F] mb-4">Your cart is empty</h2>
-    <p class="text-gray-500 mb-8 font-medium px-4">Hungry? Explore our menu and find your next favorite craving!</p>
-    <a routerLink="/menu" class="inline-flex items-center gap-3 bg-[#090A0F] text-white px-8 py-5 rounded-[1.5rem] font-black hover:bg-gray-800 transition-all active:scale-95 shadow-lg shadow-black/10">
-      <span class="material-icons text-lg">restaurant_menu</span>
-      Explore Menu
-    </a>
-  </div>
-  } @else {
-  <!-- Cart Items List -->
-  <div class="space-y-4 mb-12">
-    @for (item of (cart$ | async)?.items; track item.cartItemId; let i = $index) {
-    <div class="glass-effect p-4 md:p-6 rounded-[2rem] border border-white bg-white/70 backdrop-blur-xl shadow-premium group item-animate" [style.animation-delay]="(i * 60) + 'ms'">
-      <div class="flex gap-5">
-        <!-- Item Image -->
-        <div class="w-20 h-20 md:w-28 md:h-28 rounded-2xl overflow-hidden shadow-sm flex-shrink-0 bg-gray-50">
-          @if (item.imageUrl) {
-          <img [src]="item.imageUrl" [alt]="item.name" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-          } @else {
-          <div class="w-full h-full flex items-center justify-center text-gray-200">
-            <span class="material-icons text-4xl">fastfood</span>
-          </div>
-          }
-        </div>
-
-        <!-- Item Content -->
-        <div class="flex flex-col flex-1 min-w-0">
-          <div class="flex justify-between items-start mb-1">
-            <div class="min-w-0">
-              <h3 class="font-black text-[#090A0F] text-lg md:text-xl truncate">{{ item.name }}</h3>
-              @if (item.variant) {
-                <p class="text-[10px] font-black text-yellow-600 uppercase tracking-widest">{{ item.variant.label }}</p>
+  @if (displayCart(); as cart) {
+    @if (cart.items.length > 0) {
+      <!-- Cart Items List -->
+      <div class="space-y-4 mb-12">
+        @for (item of cart.items; track item.cartItemId; let i = $index) {
+        <div class="glass-effect p-4 md:p-6 rounded-[2rem] border border-white bg-white/70 backdrop-blur-xl shadow-premium group item-animate" [style.animation-delay]="(i * 60) + 'ms'">
+          <div class="flex gap-5">
+            <!-- Item Image -->
+            <div class="w-20 h-20 md:w-28 md:h-28 rounded-2xl overflow-hidden shadow-sm flex-shrink-0 bg-gray-50">
+              @if (item.imageUrl) {
+              <img [src]="item.imageUrl" [alt]="item.name" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+              } @else {
+              <div class="w-full h-full flex items-center justify-center text-gray-200">
+                <span class="material-icons text-4xl">fastfood</span>
+              </div>
               }
             </div>
-            <button (click)="removeItem(item)" class="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
-              <span class="material-icons text-xl">close</span>
+
+            <!-- Item Content -->
+            <div class="flex flex-col flex-1 min-w-0">
+              <div class="flex justify-between items-start mb-1">
+                <div class="min-w-0">
+                  <h3 class="font-black text-[#090A0F] text-lg md:text-xl truncate">{{ item.name }}</h3>
+                  @if (item.variant) {
+                    <p class="text-[10px] font-black text-yellow-600 uppercase tracking-widest">{{ item.variant.label || item.variant.variantName }}</p>
+                  }
+                </div>
+                <button (click)="removeItem(item)" class="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
+                  <span class="material-icons text-xl">close</span>
+                </button>
+              </div>
+
+              <!-- Addons -->
+              @if (item.addons && item.addons.length > 0) {
+              <div class="flex flex-wrap gap-2 mt-2">
+                @for (addon of item.addons; track addon.addonId) {
+                <span class="px-2 py-0.5 bg-gray-50 text-gray-500 text-[10px] font-bold rounded-md">+ {{ addon.name || addon.addonName }}</span>
+                }
+              </div>
+              }
+
+              <!-- Bottom: Price + Quantity -->
+              <div class="mt-auto flex items-center justify-between pt-4">
+                <div class="flex items-baseline gap-0.5">
+                    <span class="text-sm font-bold text-gray-400">₹</span>
+                    <span class="text-xl font-black text-[#090A0F]">{{ item.unitPrice * item.quantity }}</span>
+                </div>
+                
+                <div class="flex items-center bg-gray-50 hover:bg-gray-100 rounded-2xl p-1 transition-colors">
+                  <button (click)="updateQuantity(item, -1)" class="w-8 h-8 flex items-center justify-center bg-white rounded-xl shadow-sm text-black active:scale-90 transition-transform">
+                    <span class="material-icons text-sm">remove</span>
+                  </button>
+                  <span class="w-10 text-center font-black text-sm text-[#090A0F]">{{ item.quantity }}</span>
+                  <button (click)="updateQuantity(item, 1)" class="w-8 h-8 flex items-center justify-center bg-white rounded-xl shadow-sm text-black active:scale-90 transition-transform">
+                    <span class="material-icons text-sm">add</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        }
+      </div>
+
+      <!-- Sticky Summary Bar -->
+      <div class="summary-card">
+        <div class="summary-inner">
+          <div class="summary-row">
+            <span class="summary-label">Subtotal</span>
+            <span class="summary-value">₹{{ cart.subtotal || 0 }}</span>
+          </div>
+
+          <div class="summary-row">
+            <span class="summary-label">GST ({{ gstRate * 100 }}%)</span>
+            <span class="summary-value">₹{{ calculateTax(cart.subtotal || 0) | number:'1.2-2' }}</span>
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <div class="summary-total-row">
+            <div class="summary-total">
+              <span class="total-label">To Pay</span>
+              <span class="total-amount">
+                <span class="total-symbol">₹</span>{{ calculateGrandTotal(cart.subtotal || 0) | number:'1.2-2' }}
+              </span>
+            </div>
+
+            <button (click)="checkout()" [disabled]="isCheckingOut()" class="checkout-btn disabled:opacity-50 disabled:cursor-not-allowed">
+              @if (isCheckingOut()) {
+                <span class="flex items-center gap-2">
+                  <span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                  Processing...
+                </span>
+              } @else {
+                <span>Place Order</span>
+                <span class="material-icons checkout-arrow">arrow_forward</span>
+              }
             </button>
           </div>
 
-          <!-- Addons -->
-          @if (item.addons && item.addons.length > 0) {
-          <div class="flex flex-wrap gap-2 mt-2">
-            @for (addon of item.addons; track addon.addonId) {
-            <span class="px-2 py-0.5 bg-gray-50 text-gray-500 text-[10px] font-bold rounded-md">+ {{ addon.name }}</span>
-            }
-          </div>
-          }
-
-          <!-- Bottom: Price + Quantity -->
-          <div class="mt-auto flex items-center justify-between pt-4">
-            <div class="flex items-baseline gap-0.5">
-                <span class="text-sm font-bold text-gray-400">₹</span>
-                <span class="text-xl font-black text-[#090A0F]">{{ item.totalPrice }}</span>
-            </div>
-            
-            <div class="flex items-center bg-gray-50 hover:bg-gray-100 rounded-2xl p-1 transition-colors">
-              <button (click)="updateQuantity(item, -1)" class="w-8 h-8 flex items-center justify-center bg-white rounded-xl shadow-sm text-black active:scale-90 transition-transform">
-                <span class="material-icons text-sm">remove</span>
-              </button>
-              <span class="w-10 text-center font-black text-sm text-[#090A0F]">{{ item.quantity }}</span>
-              <button (click)="updateQuantity(item, 1)" class="w-8 h-8 flex items-center justify-center bg-white rounded-xl shadow-sm text-black active:scale-90 transition-transform">
-                <span class="material-icons text-sm">add</span>
-              </button>
-            </div>
-          </div>
+          <p class="summary-note">
+            Food will be served at Table #{{ tableId || 'N/A' }}
+          </p>
         </div>
       </div>
-    </div>
+    } @else {
+      <!-- Empty State -->
+      <div class="glass-effect text-center p-12 rounded-[2.5rem] border border-white/50 max-w-lg mx-auto shadow-premium transform transition-all hover:scale-[1.02]">
+        <div class="w-24 h-24 bg-gray-50 text-gray-200 rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-inner">
+          <span class="material-icons text-5xl">shopping_cart</span>
+        </div>
+        <h2 class="text-3xl font-black text-[#090A0F] mb-4">Your cart is empty</h2>
+        <p class="text-gray-500 mb-8 font-medium px-4">Hungry? Explore our menu and find your next favorite craving!</p>
+        <a routerLink="/menu" class="inline-flex items-center gap-3 bg-[#090A0F] text-white px-8 py-5 rounded-[1.5rem] font-black hover:bg-gray-800 transition-all active:scale-95 shadow-lg shadow-black/10">
+          <span class="material-icons text-lg">restaurant_menu</span>
+          Explore Menu
+        </a>
+      </div>
     }
-  </div>
-
-  <!-- Sticky Summary Bar -->
-  <div class="summary-card">
-    <div class="summary-inner">
-      <div class="summary-row">
-        <span class="summary-label">Subtotal</span>
-        <span class="summary-value">₹{{ (cart$ | async)?.subtotal || 0 }}</span>
-      </div>
-
-      <div class="summary-row">
-        <span class="summary-label">GST ({{ gstRate * 100 }}%)</span>
-        <span class="summary-value">₹{{ calculateTax((cart$ | async)?.subtotal || 0) | number:'1.2-2' }}</span>
-      </div>
-
-      <div class="summary-divider"></div>
-
-      <div class="summary-total-row">
-        <div class="summary-total">
-          <span class="total-label">To Pay</span>
-          <span class="total-amount">
-            <span class="total-symbol">₹</span>{{ calculateGrandTotal((cart$ | async)?.subtotal || 0) | number:'1.2-2' }}
-          </span>
-        </div>
-
-        <button (click)="checkout()" [disabled]="isCheckingOut()" class="checkout-btn disabled:opacity-50 disabled:cursor-not-allowed">
-          @if (isCheckingOut()) {
-            <span class="flex items-center gap-2">
-              <span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-              Processing...
-            </span>
-          } @else {
-            <span>Place Order</span>
-            <span class="material-icons checkout-arrow">arrow_forward</span>
-          }
-        </button>
-      </div>
-
-      <p class="summary-note">
-        Food will be served at Table #{{ tableId || 'N/A' }}
-      </p>
-    </div>
-  </div>
   }
 
 </div>

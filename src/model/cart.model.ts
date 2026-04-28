@@ -17,7 +17,9 @@ export interface CheckoutResponse {
     paymentStatus?: string;
     totalAmount: number;
     items?: any[];
+    reason?: string;
 }
+
 
 export interface AddonSnapshot {
     addonId: string;
