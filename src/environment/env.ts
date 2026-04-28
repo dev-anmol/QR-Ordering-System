@@ -1,4 +1,4 @@
-const GATEWAY_URL = 'https://scan-eat-admin.onrender.com';
+const GATEWAY_URL = 'http://localhost:8083';
 
 export const environment = {
   production: false,

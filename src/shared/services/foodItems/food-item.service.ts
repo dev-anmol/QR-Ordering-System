@@ -21,9 +21,10 @@ export class FoodItemService {
   }
 
   getFoodItems(restaurantId?: string, categoryId?: string | number) {
-    const url = categoryId != null ? `${this.menuApiUrl}/items-by-category` : `${this.menuApiUrl}/items`;
+    const url = `${this.menuApiUrl}/items`;
     const params: any = {};
     if (categoryId) params.categoryId = categoryId;
+
 
     return this.http.get<{ items: any[], totalElements: number }>(url, { params })
       .pipe(
@@ -37,6 +38,7 @@ export class FoodItemService {
               veg: item.veg,
               quantity: 1,
               price: item.basePrice,
+              enabled: item.enabled,
               variants: item.variants,
               addons: item.addons
             }
@@ -44,4 +46,5 @@ export class FoodItemService {
         })
       );
   }
+
 }

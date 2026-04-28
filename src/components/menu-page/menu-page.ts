@@ -10,6 +10,9 @@ import {
   WritableSignal,
   effect
 } from '@angular/core';
+
+import { toSignal } from '@angular/core/rxjs-interop';
+
 import { CommonModule } from '@angular/common';
 import { FoodItemService } from '../../shared/services/foodItems/food-item.service';
 import { FoodItem } from '../../shared/food-item/food-item';
@@ -20,8 +23,9 @@ import { addToCart } from '../../state/cart/cart.actions';
 import { Router } from '@angular/router';
 import { UicartService } from '../../shared/services/uicart/uicart.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { first, Subscription } from 'rxjs';
+import { first, Subscription, Subject, debounceTime } from 'rxjs';
 import { CartService } from '../../services/cart/cart.service';
+
 
 import { CustomerService } from '../../services/customer/customer.service';
 import * as CartActions from '../../state/cart/cart.actions';
@@ -62,15 +66,31 @@ export class MenuPage implements OnInit, OnDestroy {
   private store = inject<Store<AppState>>(Store);
   private router = inject(Router);
 
+  // --- Optimistic UI & Debouncing ---
+  private optimisticQuantities = signal<Record<string, number>>({});
+  private quantitySync$ = new Subject<void>();
+  public cartQuantityMap$ = this.store.select(selectCartQuantityMap);
+  private storeQuantities = toSignal(this.cartQuantityMap$, { initialValue: {} as Record<string, number> });
+
+  // Merged signal for UI
+  public displayQuantityMap = computed(() => {
+    return { ...this.storeQuantities(), ...this.optimisticQuantities() };
+  });
+
   constructor() {
     // Re-fetch items whenever category changes
     effect(() => {
       const catId = this.selectedCategoryId();
       this.loadFoodItems(catId);
     }, { allowSignalWrites: true });
+
+    // Handle debounced sync
+    this.quantitySync$.pipe(
+      debounceTime(500),
+      takeUntilDestroyed()
+    ).subscribe(() => this.performSync());
   }
- 
-  public cartQuantityMap$ = this.store.select(selectCartQuantityMap);
+
 
   ngOnInit() {
     console.log('MenuPage Debug: restaurantId from storage:', localStorage.getItem('restaurant_id'));
@@ -139,9 +159,10 @@ export class MenuPage implements OnInit, OnDestroy {
 
   filteredFoodItems = computed<foodInterface[]>(() =>
     this.foodItem().filter(item =>
-      item.name.toLowerCase().includes(this.searchTerm())
+      item.name.toLowerCase().includes(this.searchTerm()) && item.enabled
     )
   )
+
 
   searchMenu(event: any) {
     this.searchTerm.set(event.target.value.toLowerCase());
@@ -185,17 +206,84 @@ export class MenuPage implements OnInit, OnDestroy {
     if ((product.variants && product.variants.length > 0) || (product.addons && product.addons.length > 0)) {
       this.openCustomizationModal(product);
     } else {
-      this.executeAddToCart(product);
+      const currentQty = this.displayQuantityMap()[product.id] || 0;
+      this.optimisticQuantities.update(prev => ({ ...prev, [product.id]: currentQty + 1 }));
+      this.quantitySync$.next();
     }
   }
 
-  executeAddToCart(product: foodInterface, variantId?: string, addonIds: string[] = []) {
-    const sessionId = this.customerService.getSessionToken();
-    console.log('Attempting to add to cart. SessionId:', sessionId, 'Product:', product.name);
+  removeFromCart(product: foodInterface) {
+    const currentQty = this.displayQuantityMap()[product.id] || 0;
+    if (currentQty <= 0) return;
 
+    this.optimisticQuantities.update(prev => ({ ...prev, [product.id]: currentQty - 1 }));
+    this.quantitySync$.next();
+  }
+
+  private performSync() {
+    const optimistic = this.optimisticQuantities();
+    const store = this.storeQuantities();
+    const sessionId = this.customerService.getSessionToken();
+    if (!sessionId || !this.restaurantId) return;
+
+    // We sync each item that has a different quantity in optimistic vs store
+    Object.keys(optimistic).forEach(productId => {
+      const targetQty = optimistic[productId];
+      const storeQty = store[productId] || 0;
+
+      if (targetQty === storeQty) return;
+
+      if (targetQty > storeQty) {
+        // Increase: use addItem with delta
+        const delta = targetQty - storeQty;
+        // We need the full product object. Let's find it in our current list.
+        const product = this.foodItem().find(p => p.id === productId);
+        if (product) {
+          this.executeAddToCart(product, undefined, [], delta);
+        }
+      } else {
+        // Decrease: use updateItemQuantity or removeItem
+        this.store.select(selectCart).pipe(first()).subscribe(cart => {
+          if (!cart) return;
+          const item = cart.items.find(i => i.menuItemId === productId);
+          if (item) {
+            if (targetQty > 0) {
+              this.cartService.updateItemQuantity(item.cartItemId, {
+                restaurantId: parseInt(this.restaurantId!),
+                sessionId: sessionId,
+                quantity: targetQty
+              }).subscribe(updatedCart => {
+                this.store.dispatch(CartActions.loadCartSuccess({ cart: updatedCart }));
+                this.clearOptimisticIfMatched(productId, targetQty);
+              });
+            } else {
+              this.cartService.removeItem(item.cartItemId, parseInt(this.restaurantId!), sessionId).subscribe(updatedCart => {
+                this.store.dispatch(CartActions.loadCartSuccess({ cart: updatedCart }));
+                this.clearOptimisticIfMatched(productId, 0);
+              });
+            }
+          }
+        });
+      }
+    });
+  }
+
+  private clearOptimisticIfMatched(productId: string, targetQty: number) {
+    // If the optimistic value is still what we just synced, we can clear it
+    // If the user clicked more while we were syncing, we keep the new optimistic value
+    if (this.optimisticQuantities()[productId] === targetQty) {
+      this.optimisticQuantities.update(prev => {
+        const next = { ...prev };
+        delete next[productId];
+        return next;
+      });
+    }
+  }
+
+  executeAddToCart(product: foodInterface, variantId?: string, addonIds: string[] = [], delta: number = 1) {
+    const sessionId = this.customerService.getSessionToken();
     if (!sessionId) {
-      alert('Your session has expired or you haven\'t scanned a QR code. Please scan the QR code again.');
-      console.error('No session token found. Please scan QR code again.');
+      alert('Your session has expired. Please scan the QR code again.');
       return;
     }
 
@@ -204,49 +292,28 @@ export class MenuPage implements OnInit, OnDestroy {
       restaurantId: parseInt(this.restaurantId!),
       imageUrl: product.image,
       menuItemId: product.id,
-      quantity: 1,
+      quantity: delta,
       addonIds: addonIds,
       variantId: variantId
     };
 
     this.cartService.addItem(request).subscribe({
       next: (cart) => {
-        console.log('Item added successfully. Updated cart:', cart);
         this.store.dispatch(CartActions.loadCartSuccess({ cart }));
+        this.clearOptimisticIfMatched(product.id, (this.storeQuantities()[product.id] || 0) + delta);
       },
       error: (err) => {
-        console.error('Error adding item to cart:', err);
-        alert('Could not add item to cart. Please try again later.');
+        console.error('Error syncing cart:', err);
+        // On error, we might want to revert the optimistic state
+        this.optimisticQuantities.update(prev => {
+          const next = { ...prev };
+          delete next[product.id];
+          return next;
+        });
       }
     });
   }
 
-  removeFromCart(product: foodInterface) {
-    const sessionId = this.customerService.getSessionToken();
-    if (!sessionId) return;
-
-    // We need to find the cart item that matches this menu item
-    this.store.select(selectCart).pipe(first()).subscribe(cart => {
-      if (!cart) return;
-
-      const item = cart.items.find(i => i.menuItemId === product.id);
-      if (item) {
-        if (item.quantity > 1) {
-          this.cartService.updateItemQuantity(item.cartItemId, {
-            restaurantId: parseInt(this.restaurantId!),
-            sessionId: sessionId,
-            quantity: item.quantity - 1
-          }).subscribe(updatedCart => {
-            this.store.dispatch(CartActions.loadCartSuccess({ cart: updatedCart }));
-          });
-        } else {
-          this.cartService.removeItem(item.cartItemId, parseInt(this.restaurantId!), sessionId).subscribe(updatedCart => {
-            this.store.dispatch(CartActions.loadCartSuccess({ cart: updatedCart }));
-          });
-        }
-      }
-    });
-  }
 
   ngOnDestroy() {
     this.uiCart.setShowCart(false);

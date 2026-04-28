@@ -65,10 +65,11 @@
     @defer (when !isLoading()) {
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
       @for (item of filteredFoodItems(); track item.id) {
-      <app-food-item [foodItem]="item" [quantity]="(cartQuantityMap$ | async)?.[item.id] || 0"
+      <app-food-item [foodItem]="item" [quantity]="displayQuantityMap()[item.id] || 0"
         (handleAdd)="addItemToCart($event)" (handleRemove)="removeFromCart($event)" class="block h-full">
       </app-food-item>
       }
+
     </div>
     } @placeholder {
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 md:grid-cols-3 gap-8 text-center pt-20">

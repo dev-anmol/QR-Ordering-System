@@ -20,7 +20,9 @@ export interface foodInterface {
   veg: boolean;
   quantity: number;
   price: number;
+  enabled: boolean;
   variants?: Variant[];
+
   addons?: Addon[];
   mealType?: string;
   cuisine?: string;
