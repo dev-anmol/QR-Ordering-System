@@ -194,10 +194,15 @@ export class Cart implements OnInit {
         restaurantId: parseInt(this.restaurantId),
         sessionId: sessionId,
         tableNumber: tableNumber,
-        variantId: ""
+        items: this.rawCart()?.items.map(item => ({
+          menuItemId: item.menuItemId,
+          variantId: item.variant?.variantId,
+          quantity: item.quantity
+        }))
       }).subscribe({
         next: (res) => {
           this.isCheckingOut.set(false);
+          this.error.set(null); // Clear any previous errors
           localStorage.setItem('last_order_id', res.orderId);
           this.store.dispatch(CartActions.loadCartSuccess({ cart: null as any }));
           // Navigate to the full orders list since downstream processing takes time
@@ -206,10 +211,35 @@ export class Cart implements OnInit {
         error: (err) => {
           this.isCheckingOut.set(false);
           console.error('Checkout failed:', err);
-          this.error.set(err.error?.message || 'Failed to place order. Please try again.');
+          const friendlyMsg = this.getFriendlyErrorMessage(err);
+          this.error.set(friendlyMsg);
+          // Scroll to top to see the error
+          if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
         }
       });
     }
+  }
+
+  private getFriendlyErrorMessage(err: any): string {
+    const errorMsg = err.error?.message || '';
+    
+    if (errorMsg.includes('INSUFFICIENT_STOCK')) {
+      return 'Oops! Some items in your cart just ran out of stock. Please check availability.';
+    }
+    if (errorMsg.includes('ITEM_NOT_FOUND')) {
+      return 'One of the items in your cart is no longer available. Please remove it to proceed.';
+    }
+    if (errorMsg.includes('ITEM_DISABLED')) {
+      return 'One of your items is currently not being served. Please check back later.';
+    }
+    if (errorMsg.includes('Cart empty')) {
+      return 'Your cart is empty. Please add some delicious food first!';
+    }
+    if (err.status === 0) {
+      return 'Connection error. Please check your internet and try again.';
+    }
+    
+    return err.error?.message || 'Something went wrong while placing your order. Please try again.';
   }
 
   calculateTax(subtotal: number = 0): number {

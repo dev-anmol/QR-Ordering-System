@@ -78,5 +78,9 @@ export interface CheckoutRequest {
     restaurantId: number;
     sessionId: string;
     tableNumber: number;
-    variantId?: string;
+    items?: {
+        menuItemId: string;
+        variantId?: string;
+        quantity: number;
+    }[];
 }

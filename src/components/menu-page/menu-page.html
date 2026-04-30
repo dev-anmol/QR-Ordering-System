@@ -3,51 +3,36 @@
 
 <div class="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
   <!-- Header Section -->
-  <header class="pt-32 md:pt-40 pb-8">
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
-      <div class="flex flex-col gap-3">
-        <div class="inline-flex items-center gap-2 px-3 py-1 bg-yellow-400/10 text-yellow-600 rounded-full w-fit">
-          <span class="w-1.5 h-1.5 bg-yellow-400 rounded-full"></span>
-          <span class="text-[10px] font-black uppercase tracking-widest">Order from Table</span>
+  <header class="pt-16 md:pt-20 pb-4">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="flex flex-col gap-1">
+        <div class="inline-flex items-center gap-2 px-2.5 py-1 bg-yellow-400/10 text-yellow-600 rounded-full w-fit">
+          <span class="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse"></span>
+          <span class="text-[9px] font-black uppercase tracking-widest">Order from Table</span>
         </div>
-        <h1 class="text-4xl md:text-8xl font-black tracking-tight leading-[0.9] text-[#090A0F]">
-          Fast <br class="hidden md:block"> <span class="title-gradient-modern">Cravings.</span>
+        <h1 class="text-3xl md:text-5xl font-black tracking-tight text-[#090A0F]">
+          Fast <span class="title-gradient-modern">Cravings.</span>
         </h1>
-        <p class="text-gray-500 font-medium max-w-sm mt-1 text-sm md:text-lg">
-          Taste perfection in every bite with curated chef specials.
-        </p>
       </div>
 
-      <!-- Desktop Recommendation -->
-      <div class="hidden md:block">
+      <!-- Compact Search bar -->
+      <div class="w-full md:w-[400px]">
         <div
-          class="glass-effect p-6 rounded-[2rem] border border-white/50 shadow-premium max-w-xs transition-all hover:scale-[1.02] cursor-pointer group">
-          <div class="flex items-center gap-3 mb-3">
-            <span class="text-2xl group-hover:animate-bounce">✨</span>
-            <p class="text-[10px] uppercase font-black tracking-[0.2em] text-gray-400">Chef's Choice</p>
-          </div>
-          <p class="font-bold text-[#090A0F] leading-snug">The Truffle Mushroom Risotto is trending today!</p>
+          class="glass-effect flex items-center gap-3 p-1.5 pl-5 rounded-2xl border border-gray-100 shadow-premium focus-within:border-black transition-all">
+          <span class="material-icons text-gray-400 text-lg">search</span>
+          <input type="text" (input)="searchMenu($event)" placeholder="Search menu..."
+            class="text-sm font-semibold placeholder:text-gray-300 focus:outline-hidden w-full bg-transparent border-none">
+          <button
+            class="bg-[#090A0F] text-xs font-bold text-white px-5 py-2.5 cursor-pointer rounded-xl hover:bg-gray-800 transition-all active:scale-95">
+            Find
+          </button>
         </div>
-      </div>
-    </div>
-
-    <!-- Modern Search Row -->
-    <div class="mt-8">
-      <div
-        class="glass-effect flex items-center gap-3 p-1.5 pl-5 rounded-2xl border border-gray-100 shadow-premium w-full md:w-[60%] lg:w-[45%] focus-within:border-black transition-all">
-        <span class="material-icons text-gray-400 text-xl">search</span>
-        <input type="text" (input)="searchMenu($event)" placeholder="Search menu..."
-          class="text-sm font-semibold placeholder:text-gray-300 focus:outline-hidden w-full bg-transparent border-none">
-        <button
-          class="bg-[#090A0F] text-xs font-bold text-white px-6 py-3 cursor-pointer rounded-[14px] hover:bg-gray-800 transition-all active:scale-95 shadow-lg shadow-black/10">
-          Find
-        </button>
       </div>
     </div>
   </header>
 
   <!-- Premium Category Navigation -->
-  <section class="w-full mb-12 sticky top-[100px] z-20 py-4">
+  <section class="w-full mb-6 sticky top-[68px] z-20 py-3 backdrop-blur-xl bg-white/70 -mx-4 px-4 md:-mx-8 md:px-8 border-b border-gray-100/50">
     <div class="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
       @for (category of categories(); track category.categoryId) {
       <button (click)="selectCategory(category.categoryId)"

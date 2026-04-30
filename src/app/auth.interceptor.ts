@@ -78,6 +78,11 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
         headers['X-Restaurant-Id'] = restaurantId;
     }
 
+    const tableId = typeof localStorage !== 'undefined' ? localStorage.getItem('table_id') : null;
+    if (tableId) {
+        headers['X-Table-No'] = tableId;
+    }
+
     // 2. Add Authorization header for everything EXCEPT session start
     if (token && !req.url.includes('/auth/session/start')) {
         headers['Authorization'] = `Bearer ${token}`;

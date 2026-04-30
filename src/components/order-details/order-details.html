@@ -1,10 +1,10 @@
 <!-- Modern Mesh Background -->
 <div class="fixed inset-0 mesh-bg -z-10 pointer-events-none"></div>
 
-<div class="order-details-container px-4 md:px-8 pt-32 md:pt-40 pb-32 min-h-screen relative z-10">
+<div class="order-details-container px-4 md:px-8 pt-20 md:pt-24 pb-20 min-h-screen relative z-10">
     <div class="max-w-2xl mx-auto">
         <!-- Header with Back Button -->
-        <div class="flex items-center gap-4 mb-10">
+        <div class="flex items-center gap-4 mb-6">
             <button routerLink="/orders" class="w-10 h-10 flex items-center justify-center bg-white rounded-xl border border-gray-100 shadow-sm active:scale-90 transition-transform">
                 <span class="material-icons text-gray-800">arrow_back</span>
             </button>
@@ -24,81 +24,56 @@
                 <a routerLink="/menu" class="bg-[#090A0F] text-white px-8 py-4 rounded-2xl font-bold hover:bg-gray-800 transition-all active:scale-95 shadow-lg shadow-black/10 inline-block">Back to Menu</a>
             </div>
         } @else if (order()) {
-            <!-- Success / Reject Header -->
-            <div class="text-center mb-10">
-                @if (isCancelled()) {
-                    <div class="w-20 h-20 bg-red-50 text-red-500 rounded-[2rem] flex items-center justify-center mx-auto mb-6 shadow-sm">
-                        <span class="material-icons text-5xl">cancel</span>
-                    </div>
-                    <h2 class="text-3xl md:text-5xl font-black text-[#090A0F] tracking-tight leading-[0.9] mb-4">
-                        Order <span class="text-red-500">Cancelled</span>
-                    </h2>
-                    <p class="text-gray-500 font-medium text-sm md:text-lg">
-                        {{ order()?.reason || 'Your order has been cancelled.' }}
-                    </p>
-                } @else if (isRejected()) {
-                    <div class="w-20 h-20 bg-red-50 text-red-500 rounded-[2rem] flex items-center justify-center mx-auto mb-6 shadow-sm">
-                        <span class="material-icons text-5xl">error_outline</span>
-                    </div>
-                    <h2 class="text-3xl md:text-5xl font-black text-[#090A0F] tracking-tight leading-[0.9] mb-4">
-                        Order <span class="text-red-500">Rejected</span>
-                    </h2>
-                    <p class="text-gray-500 font-medium text-sm md:text-lg">
-                        {{ order()?.reason || 'Unfortunately, your order could not be processed.' }}
-                    </p>
-                } @else {
+            <!-- Unified Tracking Card -->
+            <div class="bg-white/80 backdrop-blur-xl p-6 rounded-[2rem] border border-white shadow-premium mb-6 overflow-hidden relative">
+                <!-- Status Background Glow -->
+                <div class="absolute -top-24 -right-24 w-48 h-48 bg-emerald-500/5 blur-[80px] rounded-full"></div>
 
-                    <div class="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-[2rem] flex items-center justify-center mx-auto mb-6 shadow-sm">
-                        <span class="material-icons text-5xl">check_circle</span>
+                <!-- Status Header -->
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="w-14 h-14 bg-emerald-50 text-emerald-500 rounded-xl flex items-center justify-center shadow-sm shrink-0">
+                        <span class="material-icons text-3xl">check_circle</span>
                     </div>
-                    <h2 class="text-3xl md:text-5xl font-black text-[#090A0F] tracking-tight leading-[0.9] mb-4">
-                        Order <span class="text-emerald-500">Confirmed!</span>
-                    </h2>
-                    <p class="text-gray-500 font-medium text-sm md:text-lg">Your food journey has begun. Get ready!</p>
-                }
-            </div>
-
-            <!-- Quick Info Grid -->
-            <div class="grid grid-cols-2 gap-4 mb-8">
-                <div class="bg-white/80 backdrop-blur-xl p-6 rounded-[2rem] border border-white shadow-premium flex flex-col items-center justify-center">
-                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Order ID</span>
-                    <span class="text-lg font-black text-[#090A0F]">#{{ (order()?.orderId?.substring(0, 8) || '').toUpperCase() }}</span>
+                    <div>
+                        <h2 class="text-xl font-black text-[#090A0F] leading-tight">Order Confirmed</h2>
+                        <p class="text-[11px] text-gray-500 font-medium">Your food journey has begun!</p>
+                    </div>
                 </div>
-                <div class="bg-white/80 backdrop-blur-xl p-6 rounded-[2rem] border border-white shadow-premium flex flex-col items-center justify-center">
-                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Table No.</span>
-                    <span class="text-2xl font-black text-indigo-600">#{{ tableId || 'N/A' }}</span>
+
+            <!-- Quick Info Row -->
+            <div class="grid grid-cols-2 gap-3 mb-8">
+                <div class="bg-white/60 p-5 rounded-3xl border border-white flex flex-col items-center justify-center text-center">
+                    <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Order ID</span>
+                    <span class="text-sm font-black text-[#090A0F]">#{{ (order()?.orderId?.substring(0, 8) || '').toUpperCase() }}</span>
+                </div>
+                <div class="bg-white/60 p-5 rounded-3xl border border-white flex flex-col items-center justify-center text-center">
+                    <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Table</span>
+                    <span class="text-lg font-black text-indigo-600">#{{ tableId || 'N/A' }}</span>
                 </div>
             </div>
 
             <!-- Total Amount Section -->
-            <div class="bg-white/80 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white shadow-premium mb-8 text-center">
+            <div class="bg-white/80 backdrop-blur-xl p-6 rounded-[2rem] border border-white shadow-premium mb-6 text-center">
                 <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 block">Total Amount</span>
                 <span class="text-4xl font-black text-emerald-600">₹{{ order()?.totalAmount }}</span>
             </div>
 
 
-            <!-- Progress Tracking Section -->
-            @if (!isCancelled() && !isRejected()) {
-            <div class="bg-white/80 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white shadow-premium mb-10">
-                <h3 class="text-xl font-black text-[#090A0F] mb-8 flex items-center gap-3">
-                    <span class="material-icons text-yellow-500">timer</span>
-                    Live Tracking
-                </h3>
-
+                <!-- Progress Steps -->
                 <div class="space-y-8 relative">
-                    <!-- Progress Line background -->
-                    <div class="absolute left-[19px] top-4 bottom-4 w-0.5 bg-gray-100 -z-10"></div>
+                    <!-- Progress Line -->
+                    <div class="absolute left-[19px] top-4 bottom-4 w-0.5 bg-gray-100 -z-0"></div>
 
                     <!-- Step 1: Received -->
-                    <div class="flex gap-6 items-start relative opacity-100">
+                    <div class="flex gap-6 items-start relative">
                         <div class="w-10 h-10 rounded-full flex items-center justify-center z-10 border-4 border-white shadow-sm transition-all duration-500"
                              [ngClass]="![OrderStatus.CREATED, OrderStatus.PENDING].includes(order()!.status) ? 'bg-emerald-500 text-white' : 'bg-white text-gray-300 ring-2 ring-emerald-500/20'">
                             @if (![OrderStatus.CREATED, OrderStatus.PENDING].includes(order()!.status)) { <span class="material-icons text-base">done</span> }
                             @else { <span class="material-icons text-base">radio_button_checked</span> }
                         </div>
                         <div>
-                            <p class="font-black text-lg text-[#090A0F]">Order Received</p>
-                            <p class="text-sm text-gray-500 font-medium">Waiting for kitchen acceptance</p>
+                            <p class="font-black text-base text-[#090A0F]">Order Received</p>
+                            <p class="text-xs text-gray-500 font-medium">Waiting for kitchen acceptance</p>
                         </div>
                     </div>
 
@@ -110,8 +85,8 @@
                             @else { <span class="material-icons text-base">restaurant</span> }
                         </div>
                         <div>
-                            <p class="font-black text-lg text-[#090A0F]">Preparing</p>
-                            <p class="text-sm text-gray-500 font-medium">Chefs are working their magic</p>
+                            <p class="font-black text-base text-[#090A0F]">Preparing</p>
+                            <p class="text-xs text-gray-500 font-medium">Chefs are working their magic</p>
                         </div>
                     </div>
 
@@ -123,13 +98,13 @@
                             @else { <span class="material-icons text-base">payment</span> }
                         </div>
                         <div>
-                            <p class="font-black text-lg text-[#090A0F]">Served & Payment</p>
-                            <p class="text-sm text-gray-500 font-medium">Please clear the bill to complete</p>
+                            <p class="font-black text-base text-[#090A0F]">Served & Payment</p>
+                            <p class="text-xs text-gray-500 font-medium">Please clear the bill to complete</p>
                         </div>
                     </div>
                 </div>
             </div>
-            }
+
             <!-- Bottom Action -->
             <div class="flex flex-col gap-4">
                 @if (order()?.status === OrderStatus.PAYMENT_PENDING || order()?.status === OrderStatus.PAYMENT_REQUESTED) {

@@ -1,8 +1,7 @@
 import {ChangeDetectionStrategy, Component, inject, OnInit, signal, WritableSignal} from '@angular/core';
 import {NgOptimizedImage} from '@angular/common';
 import {NgxShineBorderComponent} from '@omnedia/ngx-shine-border';
-import {MatDialog} from '@angular/material/dialog';
-import QrDialog from '../qr-dialog/qr-dialog';
+import {Router} from '@angular/router';
 
 
 @Component({
@@ -14,25 +13,13 @@ import QrDialog from '../qr-dialog/qr-dialog';
 export class Hero implements OnInit {
 
 
-  qrCodeUrl: WritableSignal<string> = signal('');
   heroImg: WritableSignal<string> = signal('assets/desing.png');
-  readonly dialog = inject(MatDialog);
+  private router = inject(Router);
 
 
-  ngOnInit() {
-    this.qrCodeUrl.set("https://scaneatsqr.netlify.app/menu")
-  }
+  ngOnInit() {}
 
-  openDialog() {
-    const dialogRef = this.dialog.open(QrDialog, {
-      data: {
-        qrCode: this.qrCodeUrl(),
-      },
-      panelClass: 'qr-dialog-panel', // optional
-      autoFocus: false,
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-    });
+  getStarted() {
+    this.router.navigate(['/menu']);
   }
 }

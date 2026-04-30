@@ -3,16 +3,23 @@
   <!-- Modern Mesh Background -->
   <div class="fixed inset-0 mesh-bg -z-10 pointer-events-none"></div>
 
-  <!-- Error Message -->
+  <!-- Premium Error Banner -->
   @if (error()) {
-    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl flex items-center justify-between animate-in fade-in slide-in-from-top-4 duration-300">
-        <div class="flex items-center gap-3 text-red-600">
-            <span class="material-icons">error_outline</span>
-            <span class="font-bold text-sm">{{ error() }}</span>
+    <div class="mb-8 p-5 bg-red-50/80 backdrop-blur-md border border-red-100 rounded-[2rem] shadow-premium-subtle animate-in fade-in slide-in-from-top-6 duration-500">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-red-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-red-200">
+                    <span class="material-icons text-xl">error_outline</span>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-[10px] font-black uppercase tracking-widest text-red-400 mb-0.5">Notification</span>
+                    <span class="font-bold text-[#090A0F] text-sm leading-tight">{{ error() }}</span>
+                </div>
+            </div>
+            <button (click)="error.set(null)" class="w-8 h-8 flex items-center justify-center text-red-300 hover:text-red-600 hover:bg-red-100/50 rounded-xl transition-all cursor-pointer">
+                <span class="material-icons text-lg">close</span>
+            </button>
         </div>
-        <button (click)="error.set(null)" class="text-red-400 hover:text-red-600 cursor-pointer">
-            <span class="material-icons text-sm">close</span>
-        </button>
     </div>
   }
 
