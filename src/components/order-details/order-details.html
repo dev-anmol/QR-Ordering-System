@@ -27,18 +27,94 @@
             <!-- Unified Tracking Card -->
             <div class="bg-white/80 backdrop-blur-xl p-6 rounded-[2rem] border border-white shadow-premium mb-6 overflow-hidden relative">
                 <!-- Status Background Glow -->
-                <div class="absolute -top-24 -right-24 w-48 h-48 bg-emerald-500/5 blur-[80px] rounded-full"></div>
+                <div class="absolute -top-24 -right-24 w-48 h-48 blur-[80px] rounded-full transition-colors duration-700"
+                     [ngClass]="{
+                        'bg-emerald-500/10': getStatusColorClass() === 'emerald',
+                        'bg-yellow-500/10': getStatusColorClass() === 'yellow',
+                        'bg-indigo-500/10': getStatusColorClass() === 'indigo',
+                        'bg-red-500/10': getStatusColorClass() === 'red',
+                        'bg-gray-500/10': getStatusColorClass() === 'gray'
+                     }"></div>
 
                 <!-- Status Header -->
                 <div class="flex items-center gap-4 mb-8">
-                    <div class="w-14 h-14 bg-emerald-50 text-emerald-500 rounded-xl flex items-center justify-center shadow-sm shrink-0">
-                        <span class="material-icons text-3xl">check_circle</span>
+                    <div class="w-14 h-14 rounded-xl flex items-center justify-center shadow-sm shrink-0 transition-colors duration-500"
+                         [ngClass]="{
+                            'bg-emerald-50 text-emerald-500': getStatusColorClass() === 'emerald',
+                            'bg-yellow-50 text-yellow-600': getStatusColorClass() === 'yellow',
+                            'bg-indigo-50 text-indigo-600': getStatusColorClass() === 'indigo',
+                            'bg-red-50 text-red-500': getStatusColorClass() === 'red',
+                            'bg-gray-50 text-gray-500': getStatusColorClass() === 'gray'
+                         }">
+                        <span class="material-icons text-3xl">{{ getStatusIcon(order()!.status) }}</span>
                     </div>
                     <div>
-                        <h2 class="text-xl font-black text-[#090A0F] leading-tight">Order Confirmed</h2>
-                        <p class="text-[11px] text-gray-500 font-medium">Your food journey has begun!</p>
+                        <h2 class="text-xl font-black text-[#090A0F] leading-tight">{{ getStatusMessage() }}</h2>
+                        <p class="text-[11px] text-gray-500 font-medium">{{ getStatusSubtitle() }}</p>
                     </div>
                 </div>
+
+                @if (isCancelled() || isRejected()) {
+                    <!-- Cancelled State View -->
+                    <div class="p-6 bg-red-50 rounded-3xl border border-red-100 mb-4 animate-in fade-in zoom-in duration-500">
+                        <div class="flex items-start gap-4">
+                            <div class="p-2 bg-red-100 text-red-600 rounded-lg">
+                                <span class="material-icons">info</span>
+                            </div>
+                            <div>
+                                <p class="font-bold text-red-800 text-sm">Order could not be processed</p>
+                                <p class="text-xs text-red-600 mt-1 font-medium">
+                                    {{ order()?.reason || 'The restaurant has cancelled this order. Please contact staff for more information.' }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                } @else {
+                    <!-- Progress Steps -->
+                    <div class="space-y-8 relative">
+                        <!-- Progress Line -->
+                        <div class="absolute left-[19px] top-4 bottom-4 w-0.5 bg-gray-100 -z-0"></div>
+
+                        <!-- Step 1: Received -->
+                        <div class="flex gap-6 items-start relative">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center z-10 border-4 border-white shadow-sm transition-all duration-500"
+                                 [ngClass]="![OrderStatus.CREATED, OrderStatus.PENDING].includes(order()!.status) ? 'bg-emerald-500 text-white' : 'bg-white text-gray-300 ring-2 ring-emerald-500/20'">
+                                @if (![OrderStatus.CREATED, OrderStatus.PENDING].includes(order()!.status)) { <span class="material-icons text-base">done</span> }
+                                @else { <span class="material-icons text-base">radio_button_checked</span> }
+                            </div>
+                            <div>
+                                <p class="font-black text-base text-[#090A0F]">Order Received</p>
+                                <p class="text-xs text-gray-500 font-medium">Waiting for kitchen acceptance</p>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Preparing -->
+                        <div class="flex gap-6 items-start relative" [class.opacity-50]="[OrderStatus.CREATED, OrderStatus.PENDING].includes(order()!.status)">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center z-10 border-4 border-white shadow-sm transition-all duration-500"
+                                 [ngClass]="[OrderStatus.PAYMENT_PENDING, OrderStatus.PAYMENT_REQUESTED, OrderStatus.PAID, OrderStatus.CLOSED].includes(order()!.status) ? 'bg-emerald-500 text-white' : (order()?.status === OrderStatus.PREPARING ? 'bg-yellow-400 text-black animate-pulse' : 'bg-white text-gray-300')">
+                                @if ([OrderStatus.PAYMENT_PENDING, OrderStatus.PAYMENT_REQUESTED, OrderStatus.PAID, OrderStatus.CLOSED].includes(order()!.status)) { <span class="material-icons text-base">done</span> }
+                                @else { <span class="material-icons text-base">restaurant</span> }
+                            </div>
+                            <div>
+                                <p class="font-black text-base text-[#090A0F]">Preparing</p>
+                                <p class="text-xs text-gray-500 font-medium">Chefs are working their magic</p>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Payment & Served -->
+                        <div class="flex gap-6 items-start relative" [class.opacity-50]="[OrderStatus.CREATED, OrderStatus.PENDING, OrderStatus.PREPARING].includes(order()!.status)">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center z-10 border-4 border-white shadow-sm transition-all duration-500"
+                                 [ngClass]="[OrderStatus.PAID, OrderStatus.CLOSED].includes(order()!.status) ? 'bg-emerald-500 text-white' : ([OrderStatus.PAYMENT_PENDING, OrderStatus.PAYMENT_REQUESTED].includes(order()!.status) ? 'bg-indigo-600 text-white shadow-indigo-200 shadow-xl animate-pulse' : 'bg-white text-gray-300')">
+                                @if ([OrderStatus.PAID, OrderStatus.CLOSED].includes(order()!.status)) { <span class="material-icons text-base">done_all</span> }
+                                @else { <span class="material-icons text-base">payment</span> }
+                            </div>
+                            <div>
+                                <p class="font-black text-base text-[#090A0F]">Served & Payment</p>
+                                <p class="text-xs text-gray-500 font-medium">Please clear the bill to complete</p>
+                            </div>
+                        </div>
+                    </div>
+                }
 
             <!-- Quick Info Row -->
             <div class="grid grid-cols-2 gap-3 mb-3">
@@ -59,50 +135,6 @@
             </div>
 
 
-                <!-- Progress Steps -->
-                <div class="space-y-8 relative">
-                    <!-- Progress Line -->
-                    <div class="absolute left-[19px] top-4 bottom-4 w-0.5 bg-gray-100 -z-0"></div>
-
-                    <!-- Step 1: Received -->
-                    <div class="flex gap-6 items-start relative">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center z-10 border-4 border-white shadow-sm transition-all duration-500"
-                             [ngClass]="![OrderStatus.CREATED, OrderStatus.PENDING].includes(order()!.status) ? 'bg-emerald-500 text-white' : 'bg-white text-gray-300 ring-2 ring-emerald-500/20'">
-                            @if (![OrderStatus.CREATED, OrderStatus.PENDING].includes(order()!.status)) { <span class="material-icons text-base">done</span> }
-                            @else { <span class="material-icons text-base">radio_button_checked</span> }
-                        </div>
-                        <div>
-                            <p class="font-black text-base text-[#090A0F]">Order Received</p>
-                            <p class="text-xs text-gray-500 font-medium">Waiting for kitchen acceptance</p>
-                        </div>
-                    </div>
-
-                    <!-- Step 2: Preparing -->
-                    <div class="flex gap-6 items-start relative" [class.opacity-50]="[OrderStatus.CREATED, OrderStatus.PENDING].includes(order()!.status)">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center z-10 border-4 border-white shadow-sm transition-all duration-500"
-                             [ngClass]="[OrderStatus.PAYMENT_PENDING, OrderStatus.PAYMENT_REQUESTED, OrderStatus.PAID, OrderStatus.CLOSED].includes(order()!.status) ? 'bg-emerald-500 text-white' : (order()?.status === OrderStatus.PREPARING ? 'bg-yellow-400 text-black animate-pulse' : 'bg-white text-gray-300')">
-                            @if ([OrderStatus.PAYMENT_PENDING, OrderStatus.PAYMENT_REQUESTED, OrderStatus.PAID, OrderStatus.CLOSED].includes(order()!.status)) { <span class="material-icons text-base">done</span> }
-                            @else { <span class="material-icons text-base">restaurant</span> }
-                        </div>
-                        <div>
-                            <p class="font-black text-base text-[#090A0F]">Preparing</p>
-                            <p class="text-xs text-gray-500 font-medium">Chefs are working their magic</p>
-                        </div>
-                    </div>
-
-                    <!-- Step 3: Payment & Served -->
-                    <div class="flex gap-6 items-start relative" [class.opacity-50]="[OrderStatus.CREATED, OrderStatus.PENDING, OrderStatus.PREPARING].includes(order()!.status)">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center z-10 border-4 border-white shadow-sm transition-all duration-500"
-                             [ngClass]="[OrderStatus.PAID, OrderStatus.CLOSED].includes(order()!.status) ? 'bg-emerald-500 text-white' : ([OrderStatus.PAYMENT_PENDING, OrderStatus.PAYMENT_REQUESTED].includes(order()!.status) ? 'bg-indigo-600 text-white shadow-indigo-200 shadow-xl animate-pulse' : 'bg-white text-gray-300')">
-                            @if ([OrderStatus.PAID, OrderStatus.CLOSED].includes(order()!.status)) { <span class="material-icons text-base">done_all</span> }
-                            @else { <span class="material-icons text-base">payment</span> }
-                        </div>
-                        <div>
-                            <p class="font-black text-base text-[#090A0F]">Served & Payment</p>
-                            <p class="text-xs text-gray-500 font-medium">Please clear the bill to complete</p>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- Bottom Action -->

@@ -109,4 +109,58 @@ export class OrderDetailsComponent implements OnInit, OnDestroy {
         const s = (this.order()?.status || '').toString().toUpperCase();
         return s.includes('REJECT');
     }
+
+    getStatusMessage(): string {
+        const status = this.order()?.status;
+        if (!status) return 'Loading Order...';
+        
+        switch (status) {
+            case OrderStatus.CREATED:
+            case OrderStatus.PENDING: return 'Order Received';
+            case OrderStatus.PREPARING: return 'Preparing Your Food';
+            case OrderStatus.PAYMENT_PENDING:
+            case OrderStatus.PAYMENT_REQUESTED: return 'Order Served';
+            case OrderStatus.PAID:
+            case OrderStatus.CLOSED: return 'Order Completed';
+            case OrderStatus.CANCEL:
+            case OrderStatus.CANCELLED: return 'Order Cancelled';
+            case OrderStatus.REJECTED: return 'Order Rejected';
+            default: return 'Order Status';
+        }
+    }
+
+    getStatusSubtitle(): string {
+        const status = this.order()?.status;
+        if (!status) return 'Please wait...';
+
+        switch (status) {
+            case OrderStatus.CREATED:
+            case OrderStatus.PENDING: return 'Waiting for kitchen acceptance';
+            case OrderStatus.PREPARING: return 'Chefs are working their magic!';
+            case OrderStatus.PAYMENT_PENDING:
+            case OrderStatus.PAYMENT_REQUESTED: return 'Food is on the way to your table';
+            case OrderStatus.PAID:
+            case OrderStatus.CLOSED: return 'Hope you enjoyed your meal!';
+            case OrderStatus.CANCEL:
+            case OrderStatus.CANCELLED: return 'This order has been cancelled.';
+            case OrderStatus.REJECTED: return 'Sorry, the order was not accepted.';
+            default: return 'Your food journey continues';
+        }
+    }
+
+    getStatusColorClass(): string {
+        const status = this.order()?.status;
+        if (!status) return 'gray';
+        
+        if (this.isCancelled() || this.isRejected()) return 'red';
+        
+        switch (status) {
+            case OrderStatus.PREPARING: return 'yellow';
+            case OrderStatus.PAYMENT_PENDING:
+            case OrderStatus.PAYMENT_REQUESTED: return 'indigo';
+            case OrderStatus.PAID:
+            case OrderStatus.CLOSED: return 'emerald';
+            default: return 'emerald';
+        }
+    }
 }
