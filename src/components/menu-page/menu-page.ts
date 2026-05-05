@@ -30,7 +30,7 @@ import { CartService } from '../../services/cart/cart.service';
 import { CustomerService } from '../../services/customer/customer.service';
 import * as CartActions from '../../state/cart/cart.actions';
 import { selectCartQuantityMap, selectCart } from '../../state/cart/cart.selector';
-import { AddToCartRequest, UpdateCartItemRequest } from '../../model/cart.model';
+import { AddToCartRequest, UpdateCartItemRequest, CartItemDto } from '../../model/cart.model';
 
 
 @Component({
@@ -71,17 +71,17 @@ export class MenuPage implements OnInit, OnDestroy {
   private storeQuantities = toSignal(this.cartQuantityMap$, { initialValue: {} as Record<string, number> });
 
   // --- Basket Management ---
-  basket = signal<AddToCartRequest[]>([]);
+  basket = signal<CartItemDto[]>([]);
 
   // Total items in basket
   basketTotalCount = computed(() => {
-    return this.basket().reduce((acc: number, item: AddToCartRequest) => acc + item.quantity, 0);
+    return this.basket().reduce((acc: number, item: CartItemDto) => acc + item.quantity, 0);
   });
 
   // Total price in basket
   basketTotalPrice = computed(() => {
     let total = 0;
-    this.basket().forEach((item: AddToCartRequest) => {
+    this.basket().forEach((item: CartItemDto) => {
       const product = this.fullMenu().find(p => p.id === item.menuItemId);
       if (product) {
         let itemPrice = product.price;
@@ -105,7 +105,7 @@ export class MenuPage implements OnInit, OnDestroy {
   public displayQuantityMap = computed(() => {
     const store = this.storeQuantities();
     const basketMap: Record<string, number> = {};
-    this.basket().forEach((item: AddToCartRequest) => {
+    this.basket().forEach((item: CartItemDto) => {
       basketMap[item.menuItemId] = (basketMap[item.menuItemId] || 0) + item.quantity;
     });
 
@@ -263,10 +263,7 @@ export class MenuPage implements OnInit, OnDestroy {
         next[existingIndex] = { ...next[existingIndex], quantity: next[existingIndex].quantity + quantity };
         return next;
       } else {
-        const sessionId = this.customerService.getSessionToken() || '';
-        const newItem: AddToCartRequest = {
-          sessionId: sessionId,
-          restaurantId: parseInt(this.restaurantId!),
+        const newItem: CartItemDto = {
           imageUrl: product.image,
           menuItemId: product.id,
           quantity: quantity,
@@ -280,7 +277,7 @@ export class MenuPage implements OnInit, OnDestroy {
 
   removeFromCart(product: foodInterface) {
     // 1. Try to remove from basket first (most recent addition)
-    const basketIndex = this.basket().findLastIndex((item: AddToCartRequest) => item.menuItemId === product.id);
+    const basketIndex = this.basket().findLastIndex((item: CartItemDto) => item.menuItemId === product.id);
 
     if (basketIndex > -1) {
       this.basket.update(prev => {
@@ -322,36 +319,33 @@ export class MenuPage implements OnInit, OnDestroy {
   isSyncing = signal(false);
 
   addBasketToCart() {
-    const items = this.basket();
-    if (items.length === 0 || this.isSyncing()) return;
+    const basketItems = this.basket();
+    if (basketItems.length === 0 || this.isSyncing()) return;
 
     this.isSyncing.set(true);
 
-    // We need to add items sequentially or handle multiple requests.
-    // For simplicity, we'll use a recursive approach or a loop with concatenation.
-    // Actually, calling addItem for each item in the basket.
-    
-    let completed = 0;
-    const total = items.length;
+    const sessionId = this.customerService.getSessionToken() || '';
+    const tableId = localStorage.getItem('table_id');
+    const tableNumber = tableId ? parseInt(tableId) : 1;
 
-    items.forEach(item => {
-      this.cartService.addItem(item).subscribe({
-        next: (cart) => {
-          completed++;
-          if (completed === total) {
-            this.store.dispatch(CartActions.loadCartSuccess({ cart }));
-            this.basket.set([]);
-            this.isSyncing.set(false);
-          }
-        },
-        error: (err) => {
-          console.error('Error adding item from basket:', err);
-          completed++;
-          if (completed === total) {
-            this.isSyncing.set(false);
-          }
-        }
-      });
+    const request: AddToCartRequest = {
+      sessionId: sessionId,
+      restaurantId: parseInt(this.restaurantId!),
+      tableNumber: tableNumber,
+      items: basketItems
+    };
+
+    this.cartService.addItem(request).subscribe({
+      next: (cart) => {
+        this.store.dispatch(CartActions.loadCartSuccess({ cart }));
+        this.basket.set([]);
+        this.isSyncing.set(false);
+        this.router.navigate(['/cart']);
+      },
+      error: (err) => {
+        console.error('Error adding items from basket:', err);
+        this.isSyncing.set(false);
+      }
     });
   }
 

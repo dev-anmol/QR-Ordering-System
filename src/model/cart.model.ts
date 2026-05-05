@@ -58,14 +58,19 @@ export interface Cart {
     subtotal: number;
 }
 
-export interface AddToCartRequest {
-    sessionId: string;
-    restaurantId: number;
+export interface CartItemDto {
     imageUrl: string;
     menuItemId: string;
     variantId?: string;
     addonIds?: string[];
     quantity: number;
+}
+
+export interface AddToCartRequest {
+    sessionId: string;
+    restaurantId: number;
+    tableNumber?: number;
+    items: CartItemDto[];
 }
 
 export interface UpdateCartItemRequest {

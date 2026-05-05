@@ -25,7 +25,7 @@ body {
   overflow-x: hidden;
   /* Safe areas for mobile notches */
   padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-bottom: calc(env(safe-area-inset-bottom) + 80px); /* Extra space for bottom nav */
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
@@ -256,4 +256,14 @@ body {
 
 .animate-bounce-subtle {
   animation: bounce-subtle 2s infinite ease-in-out;
+}
+
+@keyframes cart-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.4); }
+  100% { transform: scale(1); }
+}
+
+.animate-cart-pop {
+  animation: cart-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }

@@ -12,16 +12,20 @@ import { map } from 'rxjs';
   imports: [CommonModule, RouterModule],
   templateUrl: './bottom-nav.html',
   styles: [`
+    :host {
+      display: block;
+      background: transparent !important;
+    }
     .nav-active {
-      color: #000000 !important;
-      transform: scale(1.1);
+      transform: scale(1.1) translateY(-4px);
     }
     .nav-active i {
       color: #facc15 !important;
+      text-shadow: 0 0 10px rgba(250, 204, 21, 0.4);
     }
     .nav-active span {
-      font-weight: 900;
       color: #facc15 !important;
+      font-weight: 900;
     }
   `]
 })
