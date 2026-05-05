@@ -35,14 +35,7 @@ export class OrderInitComponent implements OnInit {
             return;
         }
 
-        // If the customer already has a valid session cookie, skip re-auth and
-        // go straight to the menu — their cart/order is still alive on the backend.
-        const existingSession = this.customerService.getSessionToken();
-        if (existingSession) {
-            console.log('[OrderInit] Existing session found — skipping re-auth, resuming session.');
-            this.router.navigate(['/menu']);
-            return;
-        }
+
 
         // No existing session: start a new one.
         // We send the persistent deviceId so the backend can look up any

@@ -1,8 +1,9 @@
 import { HttpErrorResponse, HttpHandlerFn, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
 import { inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { catchError, retry, throwError, timer } from 'rxjs';
+import { catchError, retry, throwError, timer, switchMap } from 'rxjs';
 import { Router } from '@angular/router';
+import { CustomerService } from '../services/customer/customer.service';
 
 // Helper to get cookies
 function getCookie(name: string): string | null {
@@ -58,6 +59,7 @@ function getOrCreateDeviceId(): string {
 export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, next: HttpHandlerFn) => {
     const isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
     const router = inject(Router);
+    const customerService = inject(CustomerService);
 
     // Only intercept if we're in the browser
     if (!isBrowser) {
@@ -83,8 +85,8 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
         headers['X-Table-No'] = tableId;
     }
 
-    // 2. Add Authorization header for everything EXCEPT session start
-    if (token && !req.url.includes('/auth/session/start')) {
+    // 2. Add Authorization header for everything EXCEPT session start and refresh
+    if (token && !req.url.includes('/auth/session/start') && !req.url.includes('/auth/session/refresh')) {
         headers['Authorization'] = `Bearer ${token}`;
         headers['X-Session-Token'] = token;
     }
@@ -106,23 +108,38 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
             }
         }),
         catchError((error: HttpErrorResponse) => {
-            if (error.status === 401) {
-                console.warn('Session expired or unauthorized. Clearing local data and redirecting to login.');
+            if (error.status === 401 && !req.url.includes('/auth/session/refresh')) {
+                const refreshToken = getCookie('customer_refresh_token');
                 
-                if (isBrowser) {
-                    // Clear Sensitive Data
-                    localStorage.removeItem('customer_device_id');
-                    localStorage.removeItem('restaurant_id');
-                    // We don't necessarily want to clear EVERYTHING if some things are needed, 
-                    // but usually for 401 we want a clean slate.
-                    localStorage.clear(); 
-                    
-                    // Clear Auth Cookie
+                if (isBrowser && refreshToken) {
+                    console.log('Session expired, attempting to refresh token...');
+                    return customerService.refreshSessionToken(refreshToken).pipe(
+                        switchMap((res: any) => {
+                            if (res && res.sessionToken) {
+                                // Retry original request with new token
+                                const newReq = req.clone({
+                                    setHeaders: {
+                                        'Authorization': `Bearer ${res.sessionToken}`,
+                                        'X-Session-Token': res.sessionToken,
+                                        'X-Device-Id': deviceId
+                                    }
+                                });
+                                return next(newReq);
+                            }
+                            return throwError(() => error);
+                        }),
+                        catchError((refreshErr) => {
+                            console.warn('Refresh token failed or expired.');
+                            deleteCookie('customer_session');
+                            deleteCookie('customer_refresh_token');
+                            alert('Your session has expired. Please scan the QR code on your table again to continue ordering.');
+                            return throwError(() => refreshErr);
+                        })
+                    );
+                } else if (isBrowser) {
+                    console.warn('Session expired and no refresh token available.');
                     deleteCookie('customer_session');
-                    
-                    // Redirect to login
-                    // window.location.href = '/login'; is often safer for auth resets
-                    router.navigate(['/login']);
+                    alert('Your session has expired. Please scan the QR code on your table again to continue ordering.');
                 }
             }
             return throwError(() => error);

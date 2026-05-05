@@ -3,6 +3,7 @@ import { foodInterface } from '../../model/food.interface';
 
 @Component({
   selector: 'app-food-item',
+  standalone: true,
   imports: [],
   templateUrl: './food-item.html',
   styleUrl: './food-item.css'

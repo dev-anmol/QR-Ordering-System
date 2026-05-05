@@ -61,33 +61,66 @@ export class MenuPage implements OnInit, OnDestroy {
 
   categories = signal<any[]>([]);
   selectedCategoryId = signal<string | number | null>(null);
+  showCategoryMenu = signal(false);
   private restaurantId = localStorage.getItem('restaurant_id') || '101';
 
   private store = inject<Store<AppState>>(Store);
   private router = inject(Router);
 
-  // --- Optimistic UI & Debouncing ---
-  private optimisticQuantities = signal<Record<string, number>>({});
-  private quantitySync$ = new Subject<void>();
   public cartQuantityMap$ = this.store.select(selectCartQuantityMap);
   private storeQuantities = toSignal(this.cartQuantityMap$, { initialValue: {} as Record<string, number> });
 
-  // Merged signal for UI
+  // --- Basket Management ---
+  basket = signal<AddToCartRequest[]>([]);
+
+  // Total items in basket
+  basketTotalCount = computed(() => {
+    return this.basket().reduce((acc: number, item: AddToCartRequest) => acc + item.quantity, 0);
+  });
+
+  // Total price in basket
+  basketTotalPrice = computed(() => {
+    let total = 0;
+    this.basket().forEach((item: AddToCartRequest) => {
+      const product = this.fullMenu().find(p => p.id === item.menuItemId);
+      if (product) {
+        let itemPrice = product.price;
+        if (item.variantId && product.variants) {
+          const variant = product.variants.find(v => v.variantId === item.variantId);
+          if (variant) itemPrice += variant.price;
+        }
+        if (item.addonIds && product.addons) {
+          item.addonIds.forEach(id => {
+            const addon = product.addons?.find(a => a.addonId === id);
+            if (addon) itemPrice += addon.price;
+          });
+        }
+        total += itemPrice * item.quantity;
+      }
+    });
+    return total;
+  });
+
+  // Merged signal for UI quantities
   public displayQuantityMap = computed(() => {
-    return { ...this.storeQuantities(), ...this.optimisticQuantities() };
+    const store = this.storeQuantities();
+    const basketMap: Record<string, number> = {};
+    this.basket().forEach((item: AddToCartRequest) => {
+      basketMap[item.menuItemId] = (basketMap[item.menuItemId] || 0) + item.quantity;
+    });
+
+    const merged = { ...store };
+    Object.keys(basketMap).forEach(id => {
+      merged[id] = (merged[id] || 0) + basketMap[id];
+    });
+    return merged;
   });
 
   private menuCache: Record<string, foodInterface[]> = {};
   private fullMenu = signal<foodInterface[]>([]);
 
 
-  constructor() {
-    // Handle debounced sync
-    this.quantitySync$.pipe(
-      debounceTime(500),
-      takeUntilDestroyed()
-    ).subscribe(() => this.performSync());
-  }
+  constructor() { }
 
   ngOnInit() {
     this.uiCart.setShowCart(true);
@@ -160,7 +193,7 @@ export class MenuPage implements OnInit, OnDestroy {
   filteredFoodItems = computed<foodInterface[]>(() => {
     const term = this.searchTerm().toLowerCase();
     const menu = this.fullMenu();
-    
+
     if (!menu.length) return [];
 
     return menu.filter(item => {
@@ -205,7 +238,7 @@ export class MenuPage implements OnInit, OnDestroy {
   confirmAddToCart() {
     const product = this.selectedProductForCustomization();
     if (!product) return;
-    this.executeAddToCart(product, this.selectedVariant() || undefined, Array.from(this.selectedAddons()));
+    this.addToBasket(product, this.selectedVariant() || undefined, Array.from(this.selectedAddons()));
     this.closeCustomizationModal();
   }
 
@@ -213,117 +246,128 @@ export class MenuPage implements OnInit, OnDestroy {
     if ((product.variants && product.variants.length > 0) || (product.addons && product.addons.length > 0)) {
       this.openCustomizationModal(product);
     } else {
-      const currentQty = this.displayQuantityMap()[product.id] || 0;
-      this.optimisticQuantities.update(prev => ({ ...prev, [product.id]: currentQty + 1 }));
-      this.quantitySync$.next();
+      this.addToBasket(product);
     }
   }
 
-  removeFromCart(product: foodInterface) {
-    const currentQty = this.displayQuantityMap()[product.id] || 0;
-    if (currentQty <= 0) return;
+  private addToBasket(product: foodInterface, variantId?: string, addonIds: string[] = [], quantity: number = 1) {
+    this.basket.update(prev => {
+      const existingIndex = prev.findIndex(item =>
+        item.menuItemId === product.id &&
+        item.variantId === variantId &&
+        JSON.stringify([...(item.addonIds || [])].sort()) === JSON.stringify([...(addonIds || [])].sort())
+      );
 
-    this.optimisticQuantities.update(prev => ({ ...prev, [product.id]: currentQty - 1 }));
-    this.quantitySync$.next();
-  }
-
-  private performSync() {
-    const optimistic = this.optimisticQuantities();
-    const store = this.storeQuantities();
-    const sessionId = this.customerService.getSessionToken();
-    if (!sessionId || !this.restaurantId) return;
-
-    // We sync each item that has a different quantity in optimistic vs store
-    Object.keys(optimistic).forEach(productId => {
-      const targetQty = optimistic[productId];
-      const storeQty = store[productId] || 0;
-
-      if (targetQty === storeQty) return;
-
-      if (targetQty > storeQty) {
-        // Increase: use addItem with delta
-        const delta = targetQty - storeQty;
-        // We need the full product object. Let's find it in our current list.
-        const product = this.fullMenu().find(p => p.id === productId);
-        if (product) {
-          this.executeAddToCart(product, undefined, [], delta);
-        }
-
+      if (existingIndex > -1) {
+        const next = [...prev];
+        next[existingIndex] = { ...next[existingIndex], quantity: next[existingIndex].quantity + quantity };
+        return next;
       } else {
-        // Decrease: use updateItemQuantity or removeItem
-        this.store.select(selectCart).pipe(first()).subscribe(cart => {
-          if (!cart) return;
-          const item = cart.items.find(i => i.menuItemId === productId);
-          if (item) {
-            if (targetQty > 0) {
-              this.cartService.updateItemQuantity(item.cartItemId, {
-                restaurantId: parseInt(this.restaurantId!),
-                sessionId: sessionId,
-                quantity: targetQty
-              }).subscribe(updatedCart => {
-                this.store.dispatch(CartActions.loadCartSuccess({ cart: updatedCart }));
-                this.clearOptimisticIfMatched(productId, targetQty);
-              });
-            } else {
-              this.cartService.removeItem(item.cartItemId, parseInt(this.restaurantId!), sessionId).subscribe(updatedCart => {
-                this.store.dispatch(CartActions.loadCartSuccess({ cart: updatedCart }));
-                this.clearOptimisticIfMatched(productId, 0);
-              });
-            }
-          }
-        });
+        const sessionId = this.customerService.getSessionToken() || '';
+        const newItem: AddToCartRequest = {
+          sessionId: sessionId,
+          restaurantId: parseInt(this.restaurantId!),
+          imageUrl: product.image,
+          menuItemId: product.id,
+          quantity: quantity,
+          addonIds: addonIds,
+          variantId: variantId
+        };
+        return [...prev, newItem];
       }
     });
   }
 
-  private clearOptimisticIfMatched(productId: string, targetQty: number) {
-    // If the optimistic value is still what we just synced, we can clear it
-    // If the user clicked more while we were syncing, we keep the new optimistic value
-    if (this.optimisticQuantities()[productId] === targetQty) {
-      this.optimisticQuantities.update(prev => {
-        const next = { ...prev };
-        delete next[productId];
+  removeFromCart(product: foodInterface) {
+    // 1. Try to remove from basket first (most recent addition)
+    const basketIndex = this.basket().findLastIndex((item: AddToCartRequest) => item.menuItemId === product.id);
+
+    if (basketIndex > -1) {
+      this.basket.update(prev => {
+        const next = [...prev];
+        if (next[basketIndex].quantity > 1) {
+          next[basketIndex] = { ...next[basketIndex], quantity: next[basketIndex].quantity - 1 };
+        } else {
+          next.splice(basketIndex, 1);
+        }
         return next;
+      });
+    } else {
+      // 2. If not in basket, decrease from cart directly (immediate sync for removal from cart)
+      this.store.select(selectCart).pipe(first()).subscribe(cart => {
+        if (!cart) return;
+        const item = cart.items.find(i => i.menuItemId === product.id);
+        if (item) {
+          const sessionId = this.customerService.getSessionToken();
+          if (!sessionId || !this.restaurantId) return;
+
+          if (item.quantity > 1) {
+            this.cartService.updateItemQuantity(item.cartItemId, {
+              restaurantId: parseInt(this.restaurantId!),
+              sessionId: sessionId,
+              quantity: item.quantity - 1
+            }).subscribe(updatedCart => {
+              this.store.dispatch(CartActions.loadCartSuccess({ cart: updatedCart }));
+            });
+          } else {
+            this.cartService.removeItem(item.cartItemId, parseInt(this.restaurantId!), sessionId).subscribe(updatedCart => {
+              this.store.dispatch(CartActions.loadCartSuccess({ cart: updatedCart }));
+            });
+          }
+        }
       });
     }
   }
 
-  executeAddToCart(product: foodInterface, variantId?: string, addonIds: string[] = [], delta: number = 1) {
-    const sessionId = this.customerService.getSessionToken();
-    if (!sessionId) {
-      alert('Your session has expired. Please scan the QR code again.');
-      return;
-    }
+  isSyncing = signal(false);
 
-    const request: AddToCartRequest = {
-      sessionId: sessionId,
-      restaurantId: parseInt(this.restaurantId!),
-      imageUrl: product.image,
-      menuItemId: product.id,
-      quantity: delta,
-      addonIds: addonIds,
-      variantId: variantId
-    };
+  addBasketToCart() {
+    const items = this.basket();
+    if (items.length === 0 || this.isSyncing()) return;
 
-    this.cartService.addItem(request).subscribe({
-      next: (cart) => {
-        this.store.dispatch(CartActions.loadCartSuccess({ cart }));
-        this.clearOptimisticIfMatched(product.id, (this.storeQuantities()[product.id] || 0) + delta);
-      },
-      error: (err) => {
-        console.error('Error syncing cart:', err);
-        // On error, we might want to revert the optimistic state
-        this.optimisticQuantities.update(prev => {
-          const next = { ...prev };
-          delete next[product.id];
-          return next;
-        });
-      }
+    this.isSyncing.set(true);
+
+    // We need to add items sequentially or handle multiple requests.
+    // For simplicity, we'll use a recursive approach or a loop with concatenation.
+    // Actually, calling addItem for each item in the basket.
+    
+    let completed = 0;
+    const total = items.length;
+
+    items.forEach(item => {
+      this.cartService.addItem(item).subscribe({
+        next: (cart) => {
+          completed++;
+          if (completed === total) {
+            this.store.dispatch(CartActions.loadCartSuccess({ cart }));
+            this.basket.set([]);
+            this.isSyncing.set(false);
+          }
+        },
+        error: (err) => {
+          console.error('Error adding item from basket:', err);
+          completed++;
+          if (completed === total) {
+            this.isSyncing.set(false);
+          }
+        }
+      });
     });
   }
 
 
+
   ngOnDestroy() {
     this.uiCart.setShowCart(false);
+  }
+
+  toggleCategoryMenu() {
+    this.showCategoryMenu.update(v => !v);
+  }
+
+  scrollToCategory(categoryId: string | number) {
+    this.selectCategory(categoryId);
+    this.showCategoryMenu.set(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }

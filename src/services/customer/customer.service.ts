@@ -26,11 +26,23 @@ export class CustomerService {
                 // response: { sessionToken: string, expiresIn: number }
                 if (response && response.sessionToken) {
                     this.setCookie('customer_session', response.sessionToken, 1); // 1 day expire
+                    if (response.refreshToken) this.setCookie('customer_refresh_token', response.refreshToken, 1);
                     if (response.restaurantId) localStorage.setItem('restaurant_id', response.restaurantId);
                     if (response.tableNumber) localStorage.setItem('table_id', response.tableNumber.toString());
                 }
             })
 
+        );
+    }
+
+    refreshSessionToken(refreshToken: string): Observable<any> {
+        return this.http.post(`${environment.authUrl}/session/refresh`, { refreshToken }).pipe(
+            tap((response: any) => {
+                if (response && response.sessionToken) {
+                    this.setCookie('customer_session', response.sessionToken, 1);
+                    if (response.refreshToken) this.setCookie('customer_refresh_token', response.refreshToken, 1);
+                }
+            })
         );
     }
 
@@ -55,8 +67,13 @@ export class CustomerService {
         return this.getCookie('customer_session');
     }
 
+    getRefreshToken(): string | null {
+        return this.getCookie('customer_refresh_token');
+    }
+
     clearSession(): void {
         this.deleteCookie('customer_session');
+        this.deleteCookie('customer_refresh_token');
         localStorage.removeItem('restaurant_id');
         localStorage.removeItem('table_id');
     }
