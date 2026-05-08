@@ -8,7 +8,7 @@
             <button routerLink="/orders" class="w-10 h-10 flex items-center justify-center bg-white rounded-xl border border-gray-100 shadow-sm active:scale-90 transition-transform">
                 <span class="material-icons text-gray-800">arrow_back</span>
             </button>
-            <h1 class="text-2xl font-black text-[#090A0F]">Order Details</h1>
+            <h1 class="text-2xl font-black text-[#090A0F]">{{ userName ? userName + "'s" : 'Order' }} Details</h1>
         </div>
 
         @if (loading()) {
@@ -115,6 +115,40 @@
                         </div>
                     </div>
                 }
+
+            <!-- Order Items List -->
+            <div class="bg-white/80 backdrop-blur-xl p-6 rounded-[2rem] border border-white shadow-premium mb-6">
+                <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Your Selection</h3>
+                <div class="space-y-4">
+                    @for (item of order()?.items; track $index) {
+                        <div class="flex justify-between items-start">
+                            <div class="flex gap-3">
+                                <span class="font-black text-[#090A0F] bg-gray-100 px-2 py-0.5 rounded-md text-[10px] h-fit mt-0.5">{{ item.quantity }}x</span>
+                                <div class="flex flex-col">
+                                    <span class="font-bold text-gray-800 text-sm">{{ item.name || item.menuItemName }}</span>
+                                    
+                                    @if (item.variantName) {
+                                        <span class="text-[9px] font-black text-orange-500 uppercase tracking-tighter mt-0.5">
+                                            {{ item.variantName }}
+                                        </span>
+                                    }
+
+                                    @if (item.addonNames && item.addonNames.length > 0) {
+                                        <div class="flex flex-wrap gap-1 mt-1">
+                                            @for (addon of item.addonNames; track addon) {
+                                                <span class="text-[8px] bg-indigo-50 text-indigo-500 px-1.5 py-0.5 rounded-md font-bold">
+                                                    + {{ addon }}
+                                                </span>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <span class="font-bold text-[#090A0F] text-sm whitespace-nowrap ml-4">₹{{ ((item.unitPrice || item.price || 0) * (item.quantity || 1)).toFixed(2) }}</span>
+                        </div>
+                    }
+                </div>
+            </div>
 
             <!-- Quick Info Row -->
             <div class="grid grid-cols-2 gap-3 mb-3">

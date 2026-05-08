@@ -27,6 +27,8 @@ export class Cart implements OnInit {
 
   public isCheckingOut = signal(false);
   public error = signal<string | null>(null);
+  public showNameModal = signal(false);
+  public userName = signal(localStorage.getItem('user_name') || '');
 
   private router = inject(Router);
 
@@ -104,6 +106,11 @@ export class Cart implements OnInit {
     const newQty = currentQty + delta;
     this.optimisticQuantities.update(prev => ({ ...prev, [item.cartItemId]: newQty }));
     this.quantitySync$.next();
+  }
+
+  onNameInput(event: Event) {
+    const value = (event.target as HTMLInputElement).value;
+    this.userName.set(value.slice(0, 15));
   }
 
   private performSync() {
@@ -189,11 +196,19 @@ export class Cart implements OnInit {
     const tableNumber = tableId ? parseInt(tableId) : 1;
 
     if (sessionId && this.restaurantId && !this.isCheckingOut()) {
+      // 1. Check if name exists
+      const storedName = localStorage.getItem('user_name');
+      if (!storedName) {
+        this.showNameModal.set(true);
+        return;
+      }
+
       this.isCheckingOut.set(true);
       this.cartService.checkout({
         restaurantId: parseInt(this.restaurantId),
         sessionId: sessionId,
         tableNumber: tableNumber,
+        userName: storedName,
         items: this.rawCart()?.items.map(item => ({
           menuItemId: item.menuItemId,
           variantId: item.variant?.variantId,
@@ -217,6 +232,15 @@ export class Cart implements OnInit {
           if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
         }
       });
+    }
+  }
+
+  confirmName() {
+    const name = this.userName().trim();
+    if (name.length >= 2) {
+      localStorage.setItem('user_name', name);
+      this.showNameModal.set(false);
+      this.checkout(); // Proceed with checkout
     }
   }
 

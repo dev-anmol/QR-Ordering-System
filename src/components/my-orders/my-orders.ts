@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { OrderService } from '../../services/order/order.service';
+import { CustomerService } from '../../services/customer/customer.service';
 import { CheckoutResponse, OrderStatus } from '../../model/cart.model';
 
 @Component({
@@ -13,11 +14,14 @@ import { CheckoutResponse, OrderStatus } from '../../model/cart.model';
 })
 export class MyOrdersComponent implements OnInit {
     private orderService = inject(OrderService);
+    private customerService = inject(CustomerService);
     
     public orders = signal<CheckoutResponse[]>([]);
+    public activeBill = signal<any | null>(null);
     public loading = signal(true);
     public error = signal<string | null>(null);
     public OrderStatus = OrderStatus;
+    public userName = localStorage.getItem('user_name');
 
     public expandedOrderId = signal<string | null>(null);
     private isFetching = false;
@@ -33,6 +37,7 @@ export class MyOrdersComponent implements OnInit {
 
     ngOnInit() {
         this.fetchMyOrders(true);
+        this.fetchMyBill();
     }
 
     fetchMyOrders(showLoading = true) {
@@ -55,6 +60,21 @@ export class MyOrdersComponent implements OnInit {
                 this.error.set('Failed to load your orders.');
                 this.loading.set(false);
                 this.isFetching = false;
+            }
+        });
+    }
+
+    fetchMyBill() {
+        this.customerService.getMyBill().subscribe({
+            next: (bill) => {
+                this.activeBill.set(bill);
+            },
+            error: (err) => {
+                // Bill might not be generated yet, which is fine (404)
+                if (err.status !== 404) {
+                    console.error('Error fetching bill:', err);
+                }
+                this.activeBill.set(null);
             }
         });
     }

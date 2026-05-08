@@ -21,6 +21,7 @@ export class OrderDetailsComponent implements OnInit, OnDestroy {
     public loading = signal(true);
     public error = signal<string | null>(null);
     public tableId = localStorage.getItem('table_id');
+    public userName = localStorage.getItem('user_name');
 
 
     public OrderStatus = OrderStatus;
@@ -83,16 +84,17 @@ export class OrderDetailsComponent implements OnInit, OnDestroy {
 
     getStatusIcon(status: OrderStatus): string {
         switch (status) {
-            case OrderStatus.CREATED: return 'hourglass_empty';
-            case OrderStatus.PENDING: return 'pending_actions';
+            case OrderStatus.CREATED:
+            case OrderStatus.PENDING: return 'hourglass_empty';
             case OrderStatus.PREPARING: return 'restaurant';
-            case OrderStatus.PAYMENT_PENDING:
-            case OrderStatus.PAYMENT_REQUESTED: return 'payment';
-            case OrderStatus.PAID: return 'check_circle';
-            case OrderStatus.CLOSED: return 'done_all';
+            case OrderStatus.PAYMENT_PENDING: return 'flatware';
+            case OrderStatus.PAYMENT_REQUESTED: return 'receipt_long';
+            case OrderStatus.PAID:
+            case OrderStatus.CLOSED: return 'check_circle';
             case OrderStatus.CANCEL:
             case OrderStatus.CANCELLED:
             case OrderStatus.REJECTED: return 'cancel';
+            default: return 'help_outline';
         }
     }
 
@@ -118,14 +120,14 @@ export class OrderDetailsComponent implements OnInit, OnDestroy {
             case OrderStatus.CREATED:
             case OrderStatus.PENDING: return 'Order Received';
             case OrderStatus.PREPARING: return 'Preparing Your Food';
-            case OrderStatus.PAYMENT_PENDING:
-            case OrderStatus.PAYMENT_REQUESTED: return 'Order Served';
+            case OrderStatus.PAYMENT_PENDING: return 'Order Served';
+            case OrderStatus.PAYMENT_REQUESTED: return 'Bill Generated';
             case OrderStatus.PAID:
             case OrderStatus.CLOSED: return 'Order Completed';
             case OrderStatus.CANCEL:
             case OrderStatus.CANCELLED: return 'Order Cancelled';
             case OrderStatus.REJECTED: return 'Order Rejected';
-            default: return 'Order Status';
+            default: return 'Order Update';
         }
     }
 
@@ -137,8 +139,8 @@ export class OrderDetailsComponent implements OnInit, OnDestroy {
             case OrderStatus.CREATED:
             case OrderStatus.PENDING: return 'Waiting for kitchen acceptance';
             case OrderStatus.PREPARING: return 'Chefs are working their magic!';
-            case OrderStatus.PAYMENT_PENDING:
-            case OrderStatus.PAYMENT_REQUESTED: return 'Food is on the way to your table';
+            case OrderStatus.PAYMENT_PENDING: return 'Food is on your table. Enjoy!';
+            case OrderStatus.PAYMENT_REQUESTED: return 'Please review and settle the bill';
             case OrderStatus.PAID:
             case OrderStatus.CLOSED: return 'Hope you enjoyed your meal!';
             case OrderStatus.CANCEL:
@@ -155,12 +157,14 @@ export class OrderDetailsComponent implements OnInit, OnDestroy {
         if (this.isCancelled() || this.isRejected()) return 'red';
         
         switch (status) {
+            case OrderStatus.CREATED:
+            case OrderStatus.PENDING: return 'yellow';
             case OrderStatus.PREPARING: return 'yellow';
-            case OrderStatus.PAYMENT_PENDING:
+            case OrderStatus.PAYMENT_PENDING: return 'indigo';
             case OrderStatus.PAYMENT_REQUESTED: return 'indigo';
             case OrderStatus.PAID:
             case OrderStatus.CLOSED: return 'emerald';
-            default: return 'emerald';
+            default: return 'gray';
         }
     }
 }

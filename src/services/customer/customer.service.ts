@@ -15,6 +15,10 @@ export class CustomerService {
         return this.http.get(`${environment.baseUrl}${environment.restaurant}/${restaurantId}/status`);
     }
 
+    getMyBill(): Observable<any> {
+        return this.http.get(`${environment.baseUrl}${environment.order}/my/bill`);
+    }
+
     // Generate session token for the customer using secure QR ID.
     // Passing deviceId allows the backend to restore any prior order/cart
     // for this physical device even if the session cookie expired.

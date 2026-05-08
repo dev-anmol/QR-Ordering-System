@@ -13,7 +13,7 @@
             </button>
         </div>
         <h1 class="text-4xl md:text-8xl font-black text-[#090A0F] tracking-tight leading-[0.9]">
-            My <br class="hidden md:block"> <span class="title-gradient-modern">Orders.</span>
+            {{ userName ? userName + "'s" : 'My' }} <br class="hidden md:block"> <span class="title-gradient-modern">Orders.</span>
         </h1>
         <p class="text-gray-500 font-medium text-sm md:text-lg mt-4 max-w-lg">
             Keep track of your latest cravings and active food preparations.
@@ -49,6 +49,82 @@
             </a>
         </div>
     } @else {
+        <!-- Active Bill Section -->
+        @if (activeBill()) {
+            <div class="mb-10 animate-in fade-in slide-in-from-top-4 duration-700">
+                <div class="glass-effect-dark p-6 md:p-10 rounded-[3rem] border-2 border-[#090A0F]/5 shadow-2xl relative overflow-hidden group bg-gradient-to-br from-white/80 to-white/50 backdrop-blur-3xl">
+                    <!-- Premium Badge -->
+                    <div class="absolute -top-1 -right-1">
+                        <div class="bg-[#090A0F] text-white px-6 py-2 rounded-bl-3xl font-black text-[10px] uppercase tracking-[0.3em] flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse"></span>
+                            {{ activeBill().status === 'PAID' ? 'PAID' : 'Pending Payment' }}
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+                        <div class="flex-1 w-full">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="w-12 h-12 bg-[#090A0F]/5 rounded-2xl flex items-center justify-center text-[#090A0F]">
+                                    <span class="material-icons text-2xl">receipt</span>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-0.5">Invoice Number</p>
+                                    <h2 class="text-xl font-black text-[#090A0F] tracking-tight">{{ activeBill().billId }}</h2>
+                                </div>
+                            </div>
+
+                            <!-- Detailed Itemized List for Bill -->
+                            <div class="mb-8 space-y-3 bg-white/40 p-4 rounded-2xl border border-white/50">
+                                <p class="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-2">Itemized Breakdown</p>
+                                @for (item of activeBill().items; track $index) {
+                                    <div class="flex justify-between items-start text-xs border-b border-gray-100/30 pb-2 last:border-0 last:pb-0">
+                                        <div class="flex gap-2">
+                                            <span class="font-black text-gray-400">{{ item.quantity }}x</span>
+                                            <div class="flex flex-col">
+                                                <span class="font-bold text-gray-700">{{ item.name || item.menuItemName }}</span>
+                                                @if (item.variantName) {
+                                                    <span class="text-[9px] font-black text-orange-500 uppercase tracking-tighter">{{ item.variantName }}</span>
+                                                }
+                                                @if (item.addonNames && item.addonNames.length > 0) {
+                                                    <span class="text-[8px] text-indigo-500 font-medium">+ {{ item.addonNames.join(', ') }}</span>
+                                                }
+                                            </div>
+                                        </div>
+                                        <span class="font-bold text-gray-600">₹{{ ((item.unitPrice || 0) * item.quantity).toFixed(2) }}</span>
+                                    </div>
+                                }
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4 md:gap-8">
+                                <div>
+                                    <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Items Total</p>
+                                    <p class="text-2xl font-black text-[#090A0F]">₹{{ activeBill().baseAmount }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">GST (5%)</p>
+                                    <p class="text-2xl font-black text-[#090A0F]">₹{{ activeBill().gstAmount }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="w-full md:w-auto text-center md:text-right flex flex-col items-center md:items-end gap-3">
+                            <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">Total Payable</p>
+                            <h2 class="text-5xl md:text-7xl font-black text-[#090A0F] tracking-tighter leading-none mb-2">₹{{ activeBill().totalAmount }}</h2>
+                            
+                            @if (activeBill().status === 'PAID') {
+                                <div class="flex items-center gap-2 text-emerald-600 bg-emerald-50 px-4 py-2 rounded-xl border border-emerald-100/50">
+                                    <span class="material-icons text-sm">verified</span>
+                                    <span class="font-black text-xs uppercase tracking-widest">Payment Success</span>
+                                </div>
+                            } @else {
+                                <p class="text-xs font-bold text-gray-400 italic">Please pay at the restaurant counter</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
         <!-- Order List -->
         <div class="space-y-4">
             @for (order of orders(); track order.orderId; let i = $index) {
@@ -114,19 +190,35 @@
                     @if (expandedOrderId() === order.orderId) {
 
                         <div class="mt-5 pt-4 border-t border-gray-100/50 animate-in fade-in slide-in-from-top-2 duration-300">
-                            <div class="space-y-3 mb-6">
                                 @if (order.items && order.items.length > 0) {
                                     @for (item of order.items; track item.menuItemId || $index) {
-                                        <div class="flex justify-between items-center text-sm md:text-base">
-                                            <div class="flex items-center gap-2.5">
-                                                <span class="font-black text-[#090A0F] bg-gray-100 px-2 py-0.5 rounded-md text-xs">{{ item.quantity }}x</span>
-                                                <span class="font-semibold text-gray-700">{{ item.name || item.menuItemName || 'Item' }}</span>
+                                        <div class="flex justify-between items-start text-sm md:text-base border-b border-gray-50 pb-3 last:border-0 last:pb-0">
+                                            <div class="flex items-start gap-3">
+                                                <span class="font-black text-[#090A0F] bg-gray-100 px-2 py-0.5 rounded-md text-[10px] mt-0.5">{{ item.quantity }}x</span>
+                                                <div class="flex flex-col">
+                                                    <span class="font-bold text-gray-800">{{ item.name || item.menuItemName || 'Item' }}</span>
+                                                    
+                                                    @if (item.variantName) {
+                                                        <span class="text-[10px] font-black text-orange-500 uppercase tracking-tighter mt-0.5">
+                                                            {{ item.variantName }}
+                                                        </span>
+                                                    }
+
+                                                    @if (item.addonNames && item.addonNames.length > 0) {
+                                                        <div class="flex flex-wrap gap-1 mt-1">
+                                                            @for (addon of item.addonNames; track addon) {
+                                                                <span class="text-[9px] bg-indigo-50 text-indigo-500 px-1.5 py-0.5 rounded-md font-bold">
+                                                                    + {{ addon }}
+                                                                </span>
+                                                            }
+                                                        </div>
+                                                    }
+                                                </div>
                                             </div>
-                                            <span class="font-bold text-[#090A0F]">₹{{ ((item.unitPrice || item.price || 0) * (item.quantity || 1)).toFixed(2) }}</span>
+                                            <span class="font-bold text-[#090A0F] whitespace-nowrap ml-4">₹{{ ((item.unitPrice || item.price || 0) * (item.quantity || 1)).toFixed(2) }}</span>
                                         </div>
                                     }
                                 }
-                            </div>
                             
                             <a [routerLink]="['/order', order.orderId]" class="flex items-center justify-center gap-2 w-full py-3 bg-[#090A0F] text-white rounded-2xl font-bold text-sm hover:bg-gray-800 transition-all active:scale-[0.98]">
                                 <span class="material-icons text-sm">bolt</span>
