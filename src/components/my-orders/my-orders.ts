@@ -37,7 +37,6 @@ export class MyOrdersComponent implements OnInit {
 
     ngOnInit() {
         this.fetchMyOrders(true);
-        this.fetchMyBill();
     }
 
     fetchMyOrders(showLoading = true) {
@@ -54,6 +53,19 @@ export class MyOrdersComponent implements OnInit {
                 this.orders.set(ordersList);
                 this.loading.set(false);
                 this.isFetching = false;
+
+                // Only fetch bill if there are active orders (not rejected or cancelled)
+                const hasActiveOrders = ordersList.some(order => 
+                    order.status !== OrderStatus.REJECTED && 
+                    order.status !== OrderStatus.CANCEL && 
+                    order.status !== OrderStatus.CANCELLED
+                );
+
+                if (hasActiveOrders) {
+                    this.fetchMyBill();
+                } else {
+                    this.activeBill.set(null);
+                }
             },
             error: (err) => {
                 console.error('Error fetching orders:', err);
