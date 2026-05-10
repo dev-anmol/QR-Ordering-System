@@ -13,6 +13,7 @@
 html,
 body {
   height: 100%;
+  overflow: visible !important;
 }
 
 body {
@@ -21,14 +22,21 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #fafafa;
-  /* Prevent scrolling overflow-x */
-  overflow-x: hidden;
   /* Safe areas for mobile notches */
   padding-top: env(safe-area-inset-top);
   padding-bottom: calc(env(safe-area-inset-bottom) + 80px); /* Extra space for bottom nav */
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
+
+app-root,
+app-app-shell,
+app-header {
+  display: block !important;
+  width: 100% !important;
+}
+
+
 
 .bebas-neue-regular {
   font-family: "Bebas Neue", sans-serif;
@@ -68,15 +76,18 @@ body {
   text-transform: lowercase;
 }
 .category-btn {
-  background: white;
-  color: #666;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.8);
+  color: #64748b;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  backdrop-filter: blur(8px);
 }
 
 .category-btn-active {
   background: #090A0F;
   color: white;
-  transform: scale(1.05);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.4);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .scrollbar-hide::-webkit-scrollbar {
@@ -281,4 +292,22 @@ body {
 
 .animate-cart-pop {
   animation: cart-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* FINAL STICKY HEADER FIX */
+html, body {
+  overflow: visible !important;
+  height: auto !important; /* Allow body to grow */
+  min-height: 100%;
+}
+
+app-root, app-app-shell, app-header {
+  display: block !important;
+  width: 100% !important;
+}
+
+header.sticky {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 100 !important;
 }
