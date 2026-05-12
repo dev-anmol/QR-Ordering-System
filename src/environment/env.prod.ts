@@ -1,4 +1,4 @@
-const GATEWAY_URL = import.meta.env.VITE_GATEWAY_URL;
+const GATEWAY_URL = import.meta.env['VITE_GATEWAY_URL'];
 
 export const environment = {
   production: true,
