@@ -1,7 +1,7 @@
 <section style="backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);"
-  class="flex items-center justify-center flex-col w-full text-center bg-white/70 border-b border-gray-200/50 shadow-lg glass-texture">
+  class="flex items-center justify-center flex-col w-full text-center bg-[#090A0F]/90 border-b border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
   <!-- Top Announcement Bar -->
-  <div class="w-full bg-transparent text-gray-500 py-2 px-4 border-b border-gray-100 hidden md:block">
+  <div class="w-full bg-transparent text-gray-400 py-2 px-4 border-b border-white/5 hidden md:block">
     <div
       class="max-w-7xl mx-auto flex justify-center items-center gap-4 text-[11px] font-bold uppercase tracking-[0.2em]">
       <span class="flex items-center gap-1.5">
@@ -9,7 +9,7 @@
         Live Menu
       </span>
       <span class="opacity-30">|</span>
-      <span>Quick Ordering Enabled</span>
+      <span class="text-white/70">Quick Ordering Enabled</span>
       <span class="opacity-30">|</span>
       <span class="text-yellow-400">Scan. Order. Enjoy.</span>
     </div>
@@ -26,18 +26,18 @@
       <!-- Mobile Controls -->
       <div class="flex items-center gap-3 md:hidden">
         <button routerLink="/orders"
-          class="bg-indigo-600/10 text-indigo-600 p-2 rounded-xl active:scale-95 transition-all">
+          class="bg-white/10 text-white p-2 rounded-xl active:scale-95 transition-all">
           <i class="material-icons text-xl">receipt_long</i>
         </button>
 
 
         @if (!isCartPage() && (ui.showCart() || (cartCount$ | async))) {
         <button routerLink="cart"
-          class="relative bg-white/50 backdrop-blur-md text-[#090A0F] border border-gray-200 p-2 rounded-xl active:scale-95 transition-all shadow-sm">
+          class="relative bg-white/10 backdrop-blur-md text-white border border-white/20 p-2 rounded-xl active:scale-95 transition-all shadow-sm">
           <i class="material-icons text-xl">shopping_cart</i>
           @if (cartCount$ | async) {
           <span
-            class="absolute -top-1.5 -right-1.5 bg-yellow-400 text-black text-[10px] font-black rounded-full h-5 w-5 flex items-center justify-center border-2 border-white">
+            class="absolute -top-1.5 -right-1.5 bg-yellow-400 text-black text-[10px] font-black rounded-full h-5 w-5 flex items-center justify-center border-2 border-[#090A0F]">
             {{ cartCount$ | async }}
           </span>
           }
@@ -48,17 +48,17 @@
 
       <!-- Desktop Navigation -->
       <nav class="hidden md:flex gap-8 items-center">
-        <div class="flex gap-6 text-sm font-semibold text-gray-500">
-          <a routerLink="/menu" class="hover:text-black transition-colors cursor-pointer capitalize">Menu</a>
-          <a routerLink="/orders" class="hover:text-black transition-colors cursor-pointer capitalize">Orders</a>
+        <div class="flex gap-6 text-sm font-semibold text-gray-400">
+          <a routerLink="/menu" class="hover:text-white transition-colors cursor-pointer capitalize">Menu</a>
+          <a routerLink="/orders" class="hover:text-white transition-colors cursor-pointer capitalize">Orders</a>
         </div>
 
-        <div class="h-6 w-[1px] bg-gray-200 mx-2"></div>
+        <div class="h-6 w-[1px] bg-white/20 mx-2"></div>
 
         <div class="flex items-center gap-4">
           @if (getLastOrderId()) {
           <button [routerLink]="['/order', getLastOrderId()]"
-            class="text-xs font-bold uppercase tracking-wider text-indigo-600 hover:text-indigo-700 transition-colors flex items-center gap-2">
+            class="text-xs font-bold uppercase tracking-wider text-yellow-400 hover:text-yellow-300 transition-colors flex items-center gap-2">
             <span class="material-icons text-sm">receipt_long</span>
             My Order
           </button>
@@ -66,12 +66,12 @@
 
           @if (!isCartPage() && (ui.showCart() || (cartCount$ | async))) {
           <button routerLink="cart"
-            class="relative flex items-center gap-2 bg-white/50 backdrop-blur-md text-[#090A0F] border border-gray-200 px-5 py-2.5 rounded-2xl font-bold text-sm hover:bg-gray-50 transition-all active:scale-95 shadow-sm">
+            class="relative flex items-center gap-2 bg-white/10 backdrop-blur-md text-white border border-white/20 px-5 py-2.5 rounded-2xl font-bold text-sm hover:bg-white/20 transition-all active:scale-95 shadow-sm">
             <i class="material-icons text-lg">shopping_cart</i>
             <span>Cart</span>
             @if (cartCount$ | async) {
             <span
-              class="bg-yellow-400 text-black text-[10px] font-black rounded-full h-5 px-1.5 flex items-center justify-center">
+              class="bg-yellow-400 text-black text-[10px] font-black rounded-full h-5 px-1.5 flex items-center justify-center border border-[#090A0F]">
               {{ cartCount$ | async }}
             </span>
             }
