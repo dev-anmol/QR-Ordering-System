@@ -19,20 +19,20 @@
     <div class="flex flex-row justify-between items-center">
       <!-- Logo with True Transparency -->
       <div class="flex items-center cursor-pointer group" routerLink="/">
-        <img src="assets/images/dinesphere_hd_transparent.png" alt="DineSphere Logo" 
-             class="h-14 md:h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-105" />
+        <img src="assets/images/dinesphere_hd_transparent.png" alt="DineSphere Logo"
+          class="h-14 md:h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-105" />
       </div>
 
       <!-- Mobile Controls -->
       <div class="flex items-center gap-3 md:hidden">
-        <button routerLink="/orders"
-          class="bg-white/10 text-white p-2 rounded-xl active:scale-95 transition-all">
+        @if (!isOrdersPage()) {
+        <button routerLink="/orders" class="bg-white/10 text-white p-2 rounded-xl active:scale-95 transition-all">
           <i class="material-icons text-xl">receipt_long</i>
         </button>
+        }
 
-
-        @if (!isCartPage() && (ui.showCart() || (cartCount$ | async))) {
-        <button routerLink="cart"
+        @if (!isCartPage()) {
+        <button routerLink="/cart"
           class="relative bg-white/10 backdrop-blur-md text-white border border-white/20 p-2 rounded-xl active:scale-95 transition-all shadow-sm">
           <i class="material-icons text-xl">shopping_cart</i>
           @if (cartCount$ | async) {
@@ -43,7 +43,6 @@
           }
         </button>
         }
-
       </div>
 
       <!-- Desktop Navigation -->
@@ -59,7 +58,7 @@
           @if (getLastOrderId()) {
           <button [routerLink]="['/order', getLastOrderId()]"
             class="text-xs font-bold uppercase tracking-wider text-yellow-400 hover:text-yellow-300 transition-colors flex items-center gap-2">
-            <span class="material-icons text-sm">receipt_long</span>
+            <span class="material-icons text-sm">shopping_cart</span>
             My Order
           </button>
           }
