@@ -1,7 +1,7 @@
 <section style="backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);"
   class="flex items-center justify-center flex-col w-full text-center bg-white/70 border-b border-gray-200/50 shadow-lg glass-texture">
   <!-- Top Announcement Bar -->
-  <div class="w-full bg-[#090A0F] text-white py-2 px-4 shadow-sm hidden md:block">
+  <div class="w-full bg-transparent text-gray-500 py-2 px-4 border-b border-gray-100 hidden md:block">
     <div
       class="max-w-7xl mx-auto flex justify-center items-center gap-4 text-[11px] font-bold uppercase tracking-[0.2em]">
       <span class="flex items-center gap-1.5">
@@ -19,21 +19,9 @@
     <div class="flex flex-row justify-between items-center">
       <!-- Logo with Advanced Luminance Filter -->
       <div class="flex items-center cursor-pointer group" routerLink="/">
-        <svg width="0" height="0" class="absolute pointer-events-none">
-          <filter id="remove-black-and-recolor" color-interpolation-filters="sRGB">
-            <!-- This matrix converts the image to pure black (first 3 rows) 
-                 and uses the original RGB values to determine transparency (4th row).
-                 White pixels in the image become solid black, while black pixels become transparent. -->
-            <feColorMatrix type="matrix" values="
-              0 0 0 0 0.035
-              0 0 0 0 0.04
-              0 0 0 0 0.06
-              3 3 3 0 -1
-            " />
-          </filter>
-        </svg>
-        <img src="assets/images/dinesphere_hd.png" alt="DineSphere Logo" style="filter: url(#remove-black-and-recolor);"
-          class="h-12 md:h-14 w-auto object-contain transition-transform duration-300 group-hover:scale-105" />
+        <img src="assets/images/dinesphere_hd.png" alt="DineSphere Logo" 
+             style="filter: invert(1) hue-rotate(180deg) contrast(1.2); mix-blend-mode: multiply;"
+             class="h-14 md:h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-105" />
       </div>
 
       <!-- Mobile Controls -->
@@ -46,7 +34,7 @@
 
         @if (!isCartPage() && (ui.showCart() || (cartCount$ | async))) {
         <button routerLink="cart"
-          class="relative bg-[#090A0F] text-white p-2 rounded-xl active:scale-95 transition-all">
+          class="relative bg-white/50 backdrop-blur-md text-[#090A0F] border border-gray-200 p-2 rounded-xl active:scale-95 transition-all shadow-sm">
           <i class="material-icons text-xl">shopping_cart</i>
           @if (cartCount$ | async) {
           <span
@@ -79,7 +67,7 @@
 
           @if (!isCartPage() && (ui.showCart() || (cartCount$ | async))) {
           <button routerLink="cart"
-            class="relative flex items-center gap-2 bg-[#090A0F] text-white px-5 py-2.5 rounded-2xl font-bold text-sm hover:bg-gray-800 transition-all active:scale-95 shadow-lg shadow-black/10">
+            class="relative flex items-center gap-2 bg-white/50 backdrop-blur-md text-[#090A0F] border border-gray-200 px-5 py-2.5 rounded-2xl font-bold text-sm hover:bg-gray-50 transition-all active:scale-95 shadow-sm">
             <i class="material-icons text-lg">shopping_cart</i>
             <span>Cart</span>
             @if (cartCount$ | async) {

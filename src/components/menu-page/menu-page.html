@@ -35,7 +35,7 @@
 
   <!-- Premium Category Navigation -->
   <section
-    class="w-full mb-6 sticky top-[80px] md:top-[120px] z-20 py-4 backdrop-blur-[32px] bg-white/60 border-b border-gray-100 shadow-[0_4px_30px_rgba(0,0,0,0.05)] transition-all duration-300">
+    class="w-full mb-6 sticky top-[80px] md:top-[120px] z-20 py-4 backdrop-blur-[32px] bg-white/60 border-b border-gray-100 shadow-[0_4px_30px_rgba(0,0,0,0.05)] transform-gpu">
     <div class="flex gap-4 overflow-x-auto scrollbar-hide pb-1 scroll-smooth px-4 md:px-8">
         @for (category of categories(); track category.categoryId) {
         <button (click)="selectCategory(category.categoryId)"
