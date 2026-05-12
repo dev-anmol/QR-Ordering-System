@@ -1,4 +1,4 @@
-const GATEWAY_URL = 'https://scan-eat-admin.onrender.com';
+const GATEWAY_URL = process.env["VITE_GATEWAY_URL"];
 
 export const environment = {
   production: true,
