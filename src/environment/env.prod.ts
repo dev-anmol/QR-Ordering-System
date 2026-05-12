@@ -1,4 +1,4 @@
-const GATEWAY_URL = 'http://localhost:8083'; // This will be dynamically replaced by set-env.js during Vercel build
+const GATEWAY_URL = ''; // This will be dynamically replaced by set-env.js during Vercel build
 
 export const environment = {
   production: true,
