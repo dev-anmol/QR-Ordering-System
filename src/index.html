@@ -15,7 +15,8 @@
     content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#ffffff">
+  <meta name="theme-color" content="#090A0F">
+  <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" href="assets/images/logo.png">
   <script>
     // Dynamic Favicon Transparency Fix
@@ -98,6 +99,13 @@
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js');
+      });
+    }
+  </script>
 </head>
 
 <body class="mat-typography">

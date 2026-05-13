@@ -11,10 +11,12 @@ import { Subject, debounceTime, first } from 'rxjs';
 import * as CartActions from '../../state/cart/cart.actions';
 import { Router, RouterModule } from '@angular/router';
 
+import { InstallBannerComponent } from '../install-banner/install-banner.component';
+
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, InstallBannerComponent],
   templateUrl: './cart.html',
 
   styleUrl: './cart.css'
@@ -85,11 +87,9 @@ export class Cart implements OnInit {
     if (sessionId && this.restaurantId) {
       this.cartService.getCart(parseInt(this.restaurantId), sessionId, tableNumber).subscribe({
         next: (cart) => {
-          console.log('Cart loaded successfully:', cart);
           this.store.dispatch(CartActions.loadCartSuccess({ cart }));
         },
         error: (err) => {
-          console.error('Error loading cart:', err);
           this.error.set(err.error?.message || 'Failed to load cart. Ensure Cart Service is running.');
         }
       });
@@ -137,7 +137,6 @@ export class Cart implements OnInit {
             this.clearOptimisticIfMatched(cartItemId, targetQty);
           },
           error: (err) => {
-            console.error('Error syncing quantity:', err);
             this.optimisticQuantities.update(prev => {
               const next = { ...prev };
               delete next[cartItemId];

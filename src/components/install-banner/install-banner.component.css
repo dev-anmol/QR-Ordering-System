@@ -1,0 +1,117 @@
+.install-banner-wrapper {
+    margin: 0.5rem 0 1.5rem 0;
+    padding: 0;
+}
+
+.install-banner {
+    position: relative;
+    background: linear-gradient(105deg, #FFD700 0%, #FFB900 100%);
+    border-radius: 1.5rem;
+    padding: 1rem 1.25rem;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 12px 30px rgba(255, 185, 0, 0.15);
+}
+
+.banner-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* ─── Icon Section (Slimmer) ─── */
+.icon-container {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.install-icon {
+    font-size: 24px;
+    color: #FFB900;
+}
+
+/* ─── Text Section (Horizontal) ─── */
+.text-container {
+    flex: 1;
+    min-width: 0;
+}
+
+.badge {
+    display: none; /* Hide recommended badge to save space */
+}
+
+.banner-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #090A0F;
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.banner-description {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #4B3F00;
+    opacity: 0.8;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.features-row {
+    display: none; /* Hide features row on mobile to stay slim */
+}
+
+/* ─── Action Section (Compact) ─── */
+.install-btn {
+    background: #090A0F;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.25rem;
+    border-radius: 0.8rem;
+    font-weight: 800;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.install-btn:active {
+    transform: scale(0.95);
+}
+
+.close-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    opacity: 0.5;
+    background: transparent;
+    border: none;
+    color: #4B3F00;
+    cursor: pointer;
+}
+
+@media (min-width: 769px) {
+    .features-row {
+        display: flex;
+        margin-top: 0.25rem;
+    }
+    .banner-title {
+        font-size: 1.1rem;
+    }
+}
+
