@@ -5,10 +5,12 @@ import { OrderService } from '../../services/order/order.service';
 import { CustomerService } from '../../services/customer/customer.service';
 import { CheckoutResponse, OrderStatus } from '../../model/cart.model';
 
+import { NotificationBannerComponent } from '../notification-banner/notification-banner.component';
+
 @Component({
     selector: 'app-my-orders',
     standalone: true,
-    imports: [CommonModule, RouterLink],
+    imports: [CommonModule, RouterLink, NotificationBannerComponent],
     templateUrl: './my-orders.html',
     styleUrls: ['./my-orders.css']
 })

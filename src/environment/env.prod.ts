@@ -1,4 +1,5 @@
-const GATEWAY_URL = ''; // This will be dynamically replaced by set-env.js during Vercel build
+
+const GATEWAY_URL = 'undefined';
 
 export const environment = {
   production: true,

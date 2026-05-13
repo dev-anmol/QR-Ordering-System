@@ -55,13 +55,11 @@ export class Signup {
 
     this.registerService.registerUser(signupForm).subscribe({
       next: (res) => {
-        console.log("Register successful", res);
         if(res.data === 'Registered') {
           // this.toastr.success('Please check your Email for verification for Login', 'Registered Successfully', {toastClass: 'custom-toastr custom-toastr-success'})
         }
       },
       error: (err) => {
-        console.log("Error in register", err);
       }
     })
 

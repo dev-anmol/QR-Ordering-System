@@ -25,6 +25,22 @@
 
       <!-- Mobile Controls -->
       <div class="flex items-center gap-3 md:hidden">
+        <button (click)="toggleNotifications($event)" 
+                class="relative bg-white/10 text-white p-2 rounded-xl active:scale-95 transition-all">
+          <i class="material-icons text-xl">
+            {{ notificationService.permissionStatus() === 'granted' ? 'notifications_active' : (notificationService.permissionStatus() === 'denied' ? 'notifications_off' : 'notifications') }}
+          </i>
+          @if (notificationService.unreadCount() > 0) {
+            <span class="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-[9px] font-black rounded-full flex items-center justify-center border border-[#090A0F]">
+              {{ notificationService.unreadCount() }}
+            </span>
+          }
+          @else if (notificationService.permissionStatus() === 'default') {
+            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-yellow-400 rounded-full animate-ping"></span>
+            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-yellow-400 rounded-full"></span>
+          }
+        </button>
+
         @if (!isOrdersPage()) {
         <button routerLink="/orders" class="bg-white/10 text-white p-2 rounded-xl active:scale-95 transition-all">
           <i class="material-icons text-xl">receipt_long</i>
@@ -55,6 +71,22 @@
         <div class="h-6 w-[1px] bg-white/20 mx-2"></div>
 
         <div class="flex items-center gap-4">
+          <button (click)="toggleNotifications($event)" 
+                  class="group relative flex items-center justify-center bg-white/10 text-white p-2.5 rounded-2xl hover:bg-white/20 transition-all active:scale-95">
+            <i class="material-icons text-xl">
+              {{ notificationService.permissionStatus() === 'granted' ? 'notifications_active' : (notificationService.permissionStatus() === 'denied' ? 'notifications_off' : 'notifications') }}
+            </i>
+            @if (notificationService.unreadCount() > 0) {
+              <span class="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-[#090A0F]">
+                {{ notificationService.unreadCount() }}
+              </span>
+            }
+            @else if (notificationService.permissionStatus() === 'default') {
+              <span class="absolute top-2 right-2 w-2 h-2 bg-yellow-400 rounded-full"></span>
+              <span class="absolute top-2 right-2 w-2 h-2 bg-yellow-400 rounded-full animate-ping"></span>
+            }
+          </button>
+
           @if (getLastOrderId()) {
           <button [routerLink]="['/order', getLastOrderId()]"
             class="text-xs font-bold uppercase tracking-wider text-yellow-400 hover:text-yellow-300 transition-colors flex items-center gap-2">
@@ -80,4 +112,71 @@
       </nav>
     </div>
   </div>
+
+  <!-- Notification Inbox Panel -->
+  @if (showNotifications()) {
+    <div class="fixed inset-0 z-[100] md:relative md:inset-auto" (click)="showNotifications.set(false)">
+      <!-- Mobile Backdrop -->
+      <div class="absolute inset-0 bg-black/40 backdrop-blur-sm md:hidden"></div>
+      
+      <!-- Panel Content -->
+      <div class="absolute right-4 top-20 w-[calc(100vw-32px)] max-w-[380px] bg-white rounded-[2rem] shadow-2xl border border-gray-100 overflow-hidden animate-in slide-in-from-top-4 duration-300"
+           (click)="$event.stopPropagation()">
+        
+        <div class="p-5 border-b border-gray-50 flex items-center justify-between bg-gray-50/50">
+          <h3 class="font-black text-[#090A0F] text-lg">Inbox</h3>
+          <div class="flex gap-2">
+            <button (click)="notificationService.clearAll()" class="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-red-500 transition-colors">Clear All</button>
+            <button (click)="showNotifications.set(false)" class="md:hidden text-gray-400"><i class="material-icons">close</i></button>
+          </div>
+        </div>
+
+        <div class="max-h-[450px] overflow-y-auto">
+          @if (notificationService.notifications().length === 0) {
+            <div class="p-12 text-center">
+              <div class="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <i class="material-icons text-gray-200 text-3xl">notifications_none</i>
+              </div>
+              <p class="text-sm font-bold text-gray-400">Your inbox is empty</p>
+            </div>
+          } @else {
+            <div class="divide-y divide-gray-50">
+              @for (n of notificationService.notifications(); track n.id) {
+                <div class="p-4 hover:bg-gray-50/80 transition-colors relative group">
+                  <div class="flex gap-4">
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                         [ngClass]="{
+                           'bg-emerald-50 text-emerald-500': n.type === 'success',
+                           'bg-indigo-50 text-indigo-500': n.type === 'status',
+                           'bg-blue-50 text-blue-500': n.type === 'info'
+                         }">
+                      <i class="material-icons text-xl">
+                        {{ n.type === 'success' ? 'check_circle' : (n.type === 'status' ? 'restaurant' : 'info') }}
+                      </i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <div class="flex justify-between items-start mb-0.5">
+                        <h4 class="font-black text-sm text-[#090A0F] truncate">{{ n.title }}</h4>
+                        <span class="text-[9px] font-bold text-gray-400 whitespace-nowrap ml-2">{{ n.time | date:'shortTime' }}</span>
+                      </div>
+                      <p class="text-xs text-gray-500 font-medium leading-relaxed">{{ n.message }}</p>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        @if (notificationService.permissionStatus() !== 'granted') {
+          <div class="p-4 bg-indigo-600">
+            <button (click)="notificationService.requestPermission()" 
+                    class="w-full py-3 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all">
+              Enable Push Notifications
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  }
 </section>

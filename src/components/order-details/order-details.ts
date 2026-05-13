@@ -3,24 +3,22 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { OrderService } from '../../services/order/order.service';
 import { CheckoutResponse, OrderStatus } from '../../model/cart.model';
-import { Subscription, switchMap, timer } from 'rxjs';
-import { Client } from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
-import { environment } from '../../environment/env';
+import { OrderTrackingService } from '../../services/order-tracking.service';
+import { NotificationBannerComponent } from '../notification-banner/notification-banner.component';
 
 @Component({
     selector: 'app-order-details',
     standalone: true,
-    imports: [CommonModule, RouterLink],
+    imports: [CommonModule, RouterLink, NotificationBannerComponent],
     templateUrl: './order-details.html',
     styleUrls: ['./order-details.css']
 })
 export class OrderDetailsComponent implements OnInit, OnDestroy {
     private route = inject(ActivatedRoute);
     private orderService = inject(OrderService);
-    private stompClient?: Client;
+    public trackingService = inject(OrderTrackingService);
 
-    public order = signal<CheckoutResponse | null>(null);
+    public order = this.trackingService.activeOrder;
     public loading = signal(true);
     public error = signal<string | null>(null);
     public tableId = localStorage.getItem('table_id');
@@ -41,65 +39,27 @@ export class OrderDetailsComponent implements OnInit, OnDestroy {
             return;
         }
 
-        // Initial fetch
         this.orderService.getOrder(orderId).subscribe({
             next: (fetchedOrder) => {
                 if (fetchedOrder) {
-                    this.order.set(fetchedOrder);
+                    // Set baseline for notifications
+                    localStorage.setItem(`last_status_${orderId}`, fetchedOrder.status);
+                    this.trackingService.startTracking(orderId);
                     this.loading.set(false);
-                    this.setupWebSocket(orderId);
                 } else {
                     this.error.set('Order not found.');
                     this.loading.set(false);
                 }
             },
             error: (err) => {
-                console.error('Fetch error:', err);
-                this.error.set('Could not load order details. Please refresh or check back later.');
+                this.error.set('Could not load order details.');
                 this.loading.set(false);
             }
         });
     }
 
-    setupWebSocket(orderId: string) {
-        this.stompClient = new Client({
-            webSocketFactory: () => new SockJS(`${environment.gatewayUrl}/ws`),
-            reconnectDelay: 5000,
-        });
-
-        this.stompClient.onConnect = () => {
-            console.log('Connected to WebSocket for order updates');
-            this.stompClient?.subscribe(`/topic/orders/${orderId}`, (message) => {
-                const updatedOrder = JSON.parse(message.body);
-                this.order.set(updatedOrder);
-                
-                const stopPollingStatuses = [
-                    OrderStatus.CLOSED,
-                    OrderStatus.PAID,
-                    OrderStatus.CANCEL,
-                    OrderStatus.CANCELLED,
-                    OrderStatus.REJECTED,
-                    'CANCELED' as OrderStatus,
-                    'REJECT' as OrderStatus
-                ];
-                if (stopPollingStatuses.includes(updatedOrder.status)) {
-                    this.stompClient?.deactivate();
-                }
-            });
-        };
-
-        this.stompClient.onStompError = (frame) => {
-            console.error('Broker reported error: ' + frame.headers['message']);
-            console.error('Additional details: ' + frame.body);
-        };
-
-        this.stompClient.activate();
-    }
-
     ngOnDestroy() {
-        if (this.stompClient) {
-            this.stompClient.deactivate();
-        }
+        // We don't stop tracking here because we want it to continue in the background/header
     }
 
     getStatusIcon(status: OrderStatus): string {

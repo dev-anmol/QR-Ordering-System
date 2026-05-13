@@ -11,6 +11,9 @@
             <h1 class="text-2xl font-black text-[#090A0F]">{{ userName ? userName + "'s" : 'Order' }} Details</h1>
         </div>
 
+        <!-- Notification Permission Banner -->
+        <app-notification-banner></app-notification-banner>
+
         @if (loading()) {
             <div class="flex flex-col items-center justify-center p-20 glass-effect rounded-[2.5rem] border border-white/50 shadow-premium animate-pulse">
                 <span class="loading loading-spinner loading-lg text-[#090A0F] mb-4"></span>
