@@ -4,6 +4,9 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { OrderService } from '../../services/order/order.service';
 import { CheckoutResponse, OrderStatus } from '../../model/cart.model';
 import { Subscription, switchMap, timer } from 'rxjs';
+import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
+import { environment } from '../../environment/env';
 
 @Component({
     selector: 'app-order-details',
@@ -15,7 +18,7 @@ import { Subscription, switchMap, timer } from 'rxjs';
 export class OrderDetailsComponent implements OnInit, OnDestroy {
     private route = inject(ActivatedRoute);
     private orderService = inject(OrderService);
-    private pollingSubscription?: Subscription;
+    private stompClient?: Client;
 
     public order = signal<CheckoutResponse | null>(null);
     public loading = signal(true);
@@ -38,47 +41,64 @@ export class OrderDetailsComponent implements OnInit, OnDestroy {
             return;
         }
 
-        // Using timer(0, 5000) runs immediately, then waits 5 seconds between calls
-        this.pollingSubscription = timer(0, 5000)
-            .pipe(
-                switchMap(() => this.orderService.getOrder(orderId))
-            )
-            .subscribe({
-                next: (fetchedOrder) => {
-                    if (fetchedOrder) {
-                        this.order.set(fetchedOrder);
-                        this.loading.set(false);
-                        // Stop polling if finalized
-                        const stopPollingStatuses = [
-                            OrderStatus.CLOSED,
-                            OrderStatus.PAID,
-                            OrderStatus.CANCEL,
-                            OrderStatus.CANCELLED,
-                            OrderStatus.REJECTED,
-                            'CANCELED' as OrderStatus,
-                            'REJECT' as OrderStatus
-                        ];
-                        if (stopPollingStatuses.includes(fetchedOrder.status)) {
-                            this.pollingSubscription?.unsubscribe();
-                        }
-                    } else {
-                        this.error.set('Order not found.');
-                        this.loading.set(false);
-                        this.pollingSubscription?.unsubscribe();
-                    }
-                },
-                error: (err) => {
-                    console.error('Polling error:', err);
-                    this.error.set('Could not load order details. Please refresh or check back later.');
+        // Initial fetch
+        this.orderService.getOrder(orderId).subscribe({
+            next: (fetchedOrder) => {
+                if (fetchedOrder) {
+                    this.order.set(fetchedOrder);
                     this.loading.set(false);
-                    this.pollingSubscription?.unsubscribe();
+                    this.setupWebSocket(orderId);
+                } else {
+                    this.error.set('Order not found.');
+                    this.loading.set(false);
+                }
+            },
+            error: (err) => {
+                console.error('Fetch error:', err);
+                this.error.set('Could not load order details. Please refresh or check back later.');
+                this.loading.set(false);
+            }
+        });
+    }
+
+    setupWebSocket(orderId: string) {
+        this.stompClient = new Client({
+            webSocketFactory: () => new SockJS(`${environment.gatewayUrl}/ws`),
+            reconnectDelay: 5000,
+        });
+
+        this.stompClient.onConnect = () => {
+            console.log('Connected to WebSocket for order updates');
+            this.stompClient?.subscribe(`/topic/orders/${orderId}`, (message) => {
+                const updatedOrder = JSON.parse(message.body);
+                this.order.set(updatedOrder);
+                
+                const stopPollingStatuses = [
+                    OrderStatus.CLOSED,
+                    OrderStatus.PAID,
+                    OrderStatus.CANCEL,
+                    OrderStatus.CANCELLED,
+                    OrderStatus.REJECTED,
+                    'CANCELED' as OrderStatus,
+                    'REJECT' as OrderStatus
+                ];
+                if (stopPollingStatuses.includes(updatedOrder.status)) {
+                    this.stompClient?.deactivate();
                 }
             });
+        };
+
+        this.stompClient.onStompError = (frame) => {
+            console.error('Broker reported error: ' + frame.headers['message']);
+            console.error('Additional details: ' + frame.body);
+        };
+
+        this.stompClient.activate();
     }
 
     ngOnDestroy() {
-        if (this.pollingSubscription) {
-            this.pollingSubscription.unsubscribe();
+        if (this.stompClient) {
+            this.stompClient.deactivate();
         }
     }
 

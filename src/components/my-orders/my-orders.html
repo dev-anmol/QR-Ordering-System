@@ -148,9 +148,9 @@
     <div class="space-y-4">
         @for (order of orders(); track order.orderId; let i = $index) {
         <div class="block p-5 md:p-6 rounded-[2rem] border border-white bg-white/70 backdrop-blur-xl shadow-premium hover:shadow-2xl transition-all duration-300 group cursor-pointer active:scale-[0.98]"
-            [style.animation-delay]="(i * 100) + 'ms'">
+            [style.animation-delay]="(i * 100) + 'ms'" (click)="toggleExpandedOrder(order.orderId, $event)">
 
-            <div class="flex items-center justify-between gap-4" (click)="toggleExpandedOrder(order.orderId, $event)">
+            <div class="flex items-center justify-between gap-4">
                 <!-- Left: Status Icon + Order Info -->
                 <div class="flex items-center gap-4">
                     <div class="w-14 h-14 rounded-2xl flex items-center justify-center font-bold shadow-sm transition-transform group-hover:scale-105"
@@ -247,10 +247,10 @@
                 }
                 }
 
-                <a [routerLink]="['/order', order.orderId]"
+                <a [routerLink]="['/order', order.orderId]" (click)="$event.stopPropagation()"
                     class="flex items-center justify-center gap-2 w-full py-3 bg-[#090A0F] text-white rounded-2xl font-bold text-sm hover:bg-gray-800 transition-all active:scale-[0.98]">
                     <span class="material-icons text-sm">bolt</span>
-                    View Life Tracking
+                    View Live Tracking
                 </a>
             </div>
             }
