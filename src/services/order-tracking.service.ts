@@ -1,5 +1,6 @@
 import { Injectable, inject, signal, OnDestroy, PLATFORM_ID, NgZone } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { Router } from '@angular/router';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { environment } from '../environment/env';
@@ -13,6 +14,7 @@ export class OrderTrackingService implements OnDestroy {
   private notificationService = inject(NotificationService);
   private platformId = inject(PLATFORM_ID);
   private ngZone = inject(NgZone);
+  private router = inject(Router);
   
   private stompClient?: Client;
   
@@ -103,8 +105,11 @@ export class OrderTrackingService implements OnDestroy {
 
     // Trigger notification if status actually changed
     if (previousStatus !== status) {
-      console.log('[WS] Status changed! Sending notification...');
-      this.notifyStatusChange(orderId, status);
+      // Only send browser notification when NOT on the live tracking page
+      // (no point notifying when user can already see the live update)
+      const isOnTrackingPage = this.router.url.includes('/order/');
+      console.log('[WS] Status changed! On tracking page:', isOnTrackingPage);
+      this.notifyStatusChange(orderId, status, !isOnTrackingPage);
     }
     
     // Store the new status immediately
@@ -129,7 +134,7 @@ export class OrderTrackingService implements OnDestroy {
     }
   }
 
-  private notifyStatusChange(orderId: string, status: OrderStatus) {
+  private notifyStatusChange(orderId: string, status: OrderStatus, showBrowserNotification: boolean = true) {
     let title = 'Order Update! 🍽️';
     let message = `Your order status is now: ${this.getFriendlyName(status)}`;
 
@@ -162,7 +167,7 @@ export class OrderTrackingService implements OnDestroy {
         break;
     }
 
-    this.notificationService.addNotification(title, message, this.getType(status));
+    this.notificationService.addNotification(title, message, this.getType(status), showBrowserNotification);
   }
 
   private getFriendlyName(status: OrderStatus): string {

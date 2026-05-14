@@ -16,19 +16,23 @@ export class PwaService {
 
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
-      // Check if the banner was dismissed recently (within 24 hours)
+      // If user has dismissed the banner, never show it again
       const dismissed = localStorage.getItem('pwa-banner-dismissed');
       if (dismissed) {
-        const dismissedAt = parseInt(dismissed, 10);
-        if (Date.now() - dismissedAt < 24 * 60 * 60 * 1000) {
-          return; // Don't set up listeners if dismissed recently
-        }
-        localStorage.removeItem('pwa-banner-dismissed');
+        return;
       }
 
       // DEBUG: Force show for testing if URL has ?testPwa=true
       if (window.location.search.includes('testPwa=true')) {
         this.isInstallable.set(true);
+      }
+
+      // Check if beforeinstallprompt was captured EARLY (before Angular booted)
+      // This handles the SSR hydration race condition
+      if ((window as any).__pwaInstallPrompt) {
+        this.deferredPrompt = (window as any).__pwaInstallPrompt;
+        this.isInstallable.set(true);
+        console.log('[PWA] Picked up early-captured install prompt');
       }
 
       // The beforeinstallprompt event may fire before Angular hydration.
@@ -74,7 +78,7 @@ export class PwaService {
 
   dismissInstall() {
     this.isInstallable.set(false);
-    // Store timestamp so we can show again after 24 hours
-    localStorage.setItem('pwa-banner-dismissed', Date.now().toString());
+    // Permanently dismiss — user clicked X, respect their choice
+    localStorage.setItem('pwa-banner-dismissed', 'true');
   }
 }

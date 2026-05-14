@@ -126,8 +126,10 @@
     }
   </div>
 
-  <!-- Install App Banner -->
+  <!-- Install App Banner (after cart items) -->
   <app-install-banner class="block mt-4 mb-8 px-2"></app-install-banner>
+
+
 
   <!-- Sticky Summary Bar -->
   <div class="summary-card">
@@ -172,6 +174,9 @@
     </div>
   </div>
   } @else {
+  <!-- Install App Banner (top of empty cart) -->
+  <app-install-banner class="block mb-6 px-2"></app-install-banner>
+
   <!-- Empty State -->
   <div
     class="glass-effect text-center p-12 rounded-[2.5rem] border border-white/50 max-w-lg mx-auto shadow-premium transform transition-all hover:scale-[1.02]">

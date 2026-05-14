@@ -65,7 +65,7 @@ export class NotificationService {
     }
   }
 
-  addNotification(title: string, message: string, type: 'status' | 'info' | 'success' = 'info') {
+  addNotification(title: string, message: string, type: 'status' | 'info' | 'success' = 'info', sendBrowserNotification: boolean = true) {
     const newNotify: InAppNotification = {
       id: Math.random().toString(36).substring(2),
       title,
@@ -75,12 +75,15 @@ export class NotificationService {
       type
     };
 
-    // Update list
+    // Always update the in-app notification list (bell icon)
     this.notifications.update(prev => [newNotify, ...prev].slice(0, 20)); // Keep last 20
     this.saveToStorage();
 
-    // Show browser notification if granted
-    this.showBrowserNotification(title, message);
+    // Only show browser push notification if requested
+    // (e.g., skip when user is already on the live tracking page)
+    if (sendBrowserNotification) {
+      this.showBrowserNotification(title, message);
+    }
   }
 
   private async showBrowserNotification(title: string, body: string) {
