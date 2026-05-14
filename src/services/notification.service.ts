@@ -45,12 +45,24 @@ export class NotificationService {
 
   async requestPermission(): Promise<boolean> {
     if (!isPlatformBrowser(this.platformId) || !('Notification' in window)) {
+      console.warn('[Notification] Not supported in this environment');
       return false;
     }
 
-    const permission = await Notification.requestPermission();
-    this.permissionStatus.set(permission);
-    return permission === 'granted';
+    try {
+      const permission = await Notification.requestPermission();
+      this.permissionStatus.set(permission);
+      console.log('[Notification] Permission result:', permission);
+      
+      if (permission === 'denied') {
+        console.warn('[Notification] Permission denied. User must reset in browser settings.');
+      }
+      
+      return permission === 'granted';
+    } catch (error) {
+      console.error('[Notification] Error requesting permission:', error);
+      return false;
+    }
   }
 
   addNotification(title: string, message: string, type: 'status' | 'info' | 'success' = 'info') {
@@ -72,25 +84,39 @@ export class NotificationService {
   }
 
   private async showBrowserNotification(title: string, body: string) {
-    if (isPlatformBrowser(this.platformId) && 'Notification' in window && this.permissionStatus() === 'granted') {
-      const options = {
-        body,
-        icon: 'assets/images/logo.png',
-        badge: 'assets/images/logo.png',
-        vibrate: [200, 100, 200]
-      };
+    if (!isPlatformBrowser(this.platformId)) return;
+    
+    // Check if we have permission
+    if (!('Notification' in window) || this.permissionStatus() !== 'granted') {
+      console.log('[Notification] Skipping browser notification — permission:', this.permissionStatus());
+      return;
+    }
 
-      // Prefer Service Worker notification if available (better for PWA/Mobile)
+    const options: any = {
+      body,
+      icon: '/assets/images/icon-192x192.png',
+      badge: '/assets/images/icon-192x192.png',
+      vibrate: [200, 100, 200],
+      tag: 'dinesphere-order-update', // Replaces previous notification instead of stacking
+      renotify: true
+    };
+
+    try {
+      // Prefer Service Worker notification (works when tab is in background / on mobile)
       if ('serviceWorker' in navigator) {
         const registration = await navigator.serviceWorker.ready;
         if (registration && 'showNotification' in registration) {
-          registration.showNotification(title, options);
+          await registration.showNotification(title, options);
+          console.log('[Notification] Sent via Service Worker');
           return;
         }
       }
 
-      // Fallback to legacy Notification API
+      // Fallback to legacy Notification API (desktop foreground only)
       new Notification(title, options);
+      console.log('[Notification] Sent via legacy Notification API');
+    } catch (error) {
+      console.error('[Notification] Failed to show notification:', error);
     }
   }
 

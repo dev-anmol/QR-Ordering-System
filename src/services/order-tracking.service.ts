@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, OnDestroy, PLATFORM_ID } from '@angular/core';
+import { Injectable, inject, signal, OnDestroy, PLATFORM_ID, NgZone } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
@@ -12,6 +12,7 @@ import { CheckoutResponse, OrderStatus } from '../model/cart.model';
 export class OrderTrackingService implements OnDestroy {
   private notificationService = inject(NotificationService);
   private platformId = inject(PLATFORM_ID);
+  private ngZone = inject(NgZone);
   
   private stompClient?: Client;
   
@@ -46,47 +47,97 @@ export class OrderTrackingService implements OnDestroy {
     this.currentOrderId = orderId;
     localStorage.setItem('last_order_id', orderId);
 
+    console.log('[WS] Connecting to WebSocket for order:', orderId);
+    console.log('[WS] Gateway URL:', environment.gatewayUrl);
+
     this.stompClient = new Client({
       webSocketFactory: () => new SockJS(`${environment.gatewayUrl}/ws`),
       reconnectDelay: 5000,
+      debug: (msg) => {
+        // Only log connection-related messages, not heartbeats
+        if (msg.includes('CONNECTED') || msg.includes('SUBSCRIBE') || msg.includes('ERROR')) {
+          console.log('[WS]', msg);
+        }
+      },
       onConnect: () => {
+        console.log('[WS] Connected! Subscribing to /topic/orders/' + orderId);
         this.stompClient?.subscribe(`/topic/orders/${orderId}`, (message) => {
           const updatedOrder = JSON.parse(message.body);
-          this.processUpdate(updatedOrder);
+          console.log('[WS] Received order update:', updatedOrder.status || updatedOrder.orderStatus);
+          
+          // Run inside NgZone so Angular detects the signal change
+          this.ngZone.run(() => {
+            this.processUpdate(updatedOrder);
+          });
         });
+      },
+      onStompError: (frame) => {
+        console.error('[WS] STOMP error:', frame.headers?.['message'] || frame.body);
+      },
+      onWebSocketError: (event) => {
+        console.error('[WS] WebSocket error:', event);
+      },
+      onDisconnect: () => {
+        console.log('[WS] Disconnected');
       }
     });
 
     this.stompClient.activate();
   }
 
-  private processUpdate(order: CheckoutResponse) {
-    const statusKey = `last_status_${order.orderId}`;
+  private processUpdate(order: any) {
+    // The backend sends the full Order object. Map the status field.
+    // Backend Order model uses 'status' field with values like 'PENDING', 'PREPARING', etc.
+    const status = order.status as OrderStatus;
+    const orderId = order.orderId;
+    
+    if (!orderId || !status) {
+      console.warn('[WS] Received order update with missing orderId or status:', order);
+      return;
+    }
+
+    const statusKey = `last_status_${orderId}`;
     const previousStatus = localStorage.getItem(statusKey);
     
-    // Trigger notification if status changed from what we last knew
-    if (previousStatus && previousStatus !== order.status) {
-      this.notify(order);
+    console.log('[WS] Status change:', previousStatus, '->', status);
+
+    // Trigger notification if status actually changed
+    if (previousStatus !== status) {
+      console.log('[WS] Status changed! Sending notification...');
+      this.notifyStatusChange(orderId, status);
     }
     
     // Store the new status immediately
-    localStorage.setItem(statusKey, order.status);
+    localStorage.setItem(statusKey, status);
     
-    // Update the signal for UI components
-    this.activeOrder.set(order);
+    // Update the signal for UI components — map backend Order to CheckoutResponse shape
+    const mapped: CheckoutResponse = {
+      orderId: order.orderId,
+      status: status,
+      totalAmount: order.totalAmount,
+      items: order.items,
+      paymentStatus: order.paymentStatus,
+      reason: order.reason
+    };
+    this.activeOrder.set(mapped);
 
     // Auto-stop if final
     const finalStatuses = [OrderStatus.CLOSED, OrderStatus.PAID, OrderStatus.CANCELLED, OrderStatus.REJECTED];
-    if (finalStatuses.includes(order.status)) {
+    if (finalStatuses.includes(status)) {
+      console.log('[WS] Final status reached, deactivating WebSocket');
       this.stompClient?.deactivate();
     }
   }
 
-  private notify(order: CheckoutResponse) {
+  private notifyStatusChange(orderId: string, status: OrderStatus) {
     let title = 'Order Update! 🍽️';
-    let message = `Your order status is now: ${this.getFriendlyName(order.status)}`;
+    let message = `Your order status is now: ${this.getFriendlyName(status)}`;
 
-    switch (order.status) {
+    switch (status) {
+      case OrderStatus.PENDING:
+        title = 'Order Received! ✅';
+        message = 'Your order has been received and is being reviewed.';
+        break;
       case OrderStatus.PREPARING:
         title = 'Cooking in progress! 🍳';
         message = 'The chef has started preparing your delicious meal.';
@@ -104,9 +155,14 @@ export class OrderTrackingService implements OnDestroy {
         title = 'Thank You! ❤️';
         message = 'Order completed. We hope to see you again soon!';
         break;
+      case OrderStatus.CANCELLED:
+      case OrderStatus.REJECTED:
+        title = 'Order Update ⚠️';
+        message = 'Your order status has changed. Please check the details.';
+        break;
     }
 
-    this.notificationService.addNotification(title, message, this.getType(order.status));
+    this.notificationService.addNotification(title, message, this.getType(status));
   }
 
   private getFriendlyName(status: OrderStatus): string {

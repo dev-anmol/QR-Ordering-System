@@ -168,12 +168,18 @@
           }
         </div>
 
-        @if (notificationService.permissionStatus() !== 'granted') {
+        @if (notificationService.permissionStatus() === 'default') {
           <div class="p-4 bg-indigo-600">
             <button (click)="notificationService.requestPermission()" 
                     class="w-full py-3 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all">
               Enable Push Notifications
             </button>
+          </div>
+        } @else if (notificationService.permissionStatus() === 'denied') {
+          <div class="p-4 bg-red-600/10 border-t border-red-100">
+            <p class="text-[10px] text-red-500 font-bold text-center leading-tight">
+              Notifications are blocked. Please reset permission in your browser settings to get updates.
+            </p>
           </div>
         }
       </div>

@@ -1,28 +1,36 @@
 {
   "name": "DineSphere",
   "short_name": "DineSphere",
+  "description": "Scan. Order. Enjoy. A seamless QR-based food ordering experience.",
   "theme_color": "#090A0F",
   "background_color": "#ffffff",
   "display": "standalone",
   "orientation": "portrait",
   "scope": "/",
   "start_url": "/",
+  "id": "/",
   "icons": [
     {
-      "src": "assets/images/logo.png",
-      "sizes": "1024x1024",
+      "src": "assets/images/icon-192x192.png",
+      "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "assets/images/logo.png",
+      "src": "assets/images/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "assets/images/logo.png",
+      "src": "assets/images/icon-192x192.png",
       "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "assets/images/icon-512x512.png",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
     }
