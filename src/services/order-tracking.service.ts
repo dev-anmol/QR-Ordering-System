@@ -26,6 +26,13 @@ export class OrderTrackingService implements OnDestroy {
     if (isPlatformBrowser(this.platformId)) {
       const lastOrder = localStorage.getItem('last_order_id');
       if (lastOrder) {
+        // Don't reconnect to completed orders
+        const lastStatus = localStorage.getItem(`last_status_${lastOrder}`);
+        const finalStatuses = ['CLOSED', 'PAID', 'CANCELLED', 'REJECTED'];
+        if (lastStatus && finalStatuses.includes(lastStatus)) {
+          console.log('[WS] Skipping completed order:', lastOrder, lastStatus);
+          return;
+        }
         this.startTracking(lastOrder);
       }
     }
@@ -126,11 +133,15 @@ export class OrderTrackingService implements OnDestroy {
     };
     this.activeOrder.set(mapped);
 
-    // Auto-stop if final
+    // Auto-stop if final — clean up properly so next order can connect
     const finalStatuses = [OrderStatus.CLOSED, OrderStatus.PAID, OrderStatus.CANCELLED, OrderStatus.REJECTED];
     if (finalStatuses.includes(status)) {
-      console.log('[WS] Final status reached, deactivating WebSocket');
-      this.stompClient?.deactivate();
+      console.log('[WS] Final status reached, cleaning up WebSocket');
+      if (this.stompClient) {
+        this.stompClient.deactivate();
+        this.stompClient = undefined;
+      }
+      this.currentOrderId = null;
     }
   }
 
