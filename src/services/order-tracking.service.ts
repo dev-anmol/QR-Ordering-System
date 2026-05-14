@@ -28,8 +28,14 @@ export class OrderTrackingService implements OnDestroy {
     }
   }
 
-  startTracking(orderId: string) {
+  startTracking(orderId: string, initialOrder?: CheckoutResponse) {
     if (!isPlatformBrowser(this.platformId)) return;
+
+    // If initial order is provided, set it if we don't have one yet or it's a different order
+    if (initialOrder && (!this.activeOrder() || this.activeOrder()?.orderId !== orderId)) {
+      this.activeOrder.set(initialOrder);
+      localStorage.setItem(`last_status_${orderId}`, initialOrder.status);
+    }
 
     // If already tracking this order, just return
     if (this.currentOrderId === orderId && this.stompClient?.active) {

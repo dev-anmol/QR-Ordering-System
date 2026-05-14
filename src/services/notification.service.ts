@@ -71,13 +71,26 @@ export class NotificationService {
     this.showBrowserNotification(title, message);
   }
 
-  private showBrowserNotification(title: string, body: string) {
+  private async showBrowserNotification(title: string, body: string) {
     if (isPlatformBrowser(this.platformId) && 'Notification' in window && this.permissionStatus() === 'granted') {
-      new Notification(title, {
+      const options = {
         body,
         icon: 'assets/images/logo.png',
-        badge: 'assets/images/logo.png'
-      });
+        badge: 'assets/images/logo.png',
+        vibrate: [200, 100, 200]
+      };
+
+      // Prefer Service Worker notification if available (better for PWA/Mobile)
+      if ('serviceWorker' in navigator) {
+        const registration = await navigator.serviceWorker.ready;
+        if (registration && 'showNotification' in registration) {
+          registration.showNotification(title, options);
+          return;
+        }
+      }
+
+      // Fallback to legacy Notification API
+      new Notification(title, options);
     }
   }
 

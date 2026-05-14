@@ -42,9 +42,7 @@ export class OrderDetailsComponent implements OnInit, OnDestroy {
         this.orderService.getOrder(orderId).subscribe({
             next: (fetchedOrder) => {
                 if (fetchedOrder) {
-                    // Set baseline for notifications
-                    localStorage.setItem(`last_status_${orderId}`, fetchedOrder.status);
-                    this.trackingService.startTracking(orderId);
+                    this.trackingService.startTracking(orderId, fetchedOrder);
                     this.loading.set(false);
                 } else {
                     this.error.set('Order not found.');
