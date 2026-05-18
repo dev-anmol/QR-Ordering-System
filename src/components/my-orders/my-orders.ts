@@ -59,7 +59,6 @@ export class MyOrdersComponent implements OnInit {
                 // Only fetch bill if there are active orders (not rejected or cancelled)
                 const hasActiveOrders = ordersList.some(order => 
                     order.status !== OrderStatus.REJECTED && 
-                    order.status !== OrderStatus.CANCEL && 
                     order.status !== OrderStatus.CANCELLED
                 );
 

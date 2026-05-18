@@ -112,11 +112,11 @@ export class OrderTrackingService implements OnDestroy {
 
     // Trigger notification if status actually changed
     if (previousStatus !== status) {
-      // Only send browser notification when NOT on the live tracking page
-      // (no point notifying when user can already see the live update)
-      const isOnTrackingPage = this.router.url.includes('/order/');
-      console.log('[WS] Status changed! On tracking page:', isOnTrackingPage);
-      this.notifyStatusChange(orderId, status, !isOnTrackingPage);
+      // Only send browser notification when NOT on the specific live tracking page for this order
+      // (no point notifying when user can already see this specific live update)
+      const isLookingAtThisOrder = this.router.url.includes(`/order/${orderId}`);
+      console.log('[WS] Status changed! Looking at this order:', isLookingAtThisOrder);
+      this.notifyStatusChange(orderId, status, !isLookingAtThisOrder);
     }
     
     // Store the new status immediately

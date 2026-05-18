@@ -12,6 +12,7 @@ import * as CartActions from '../../state/cart/cart.actions';
 import { Router, RouterModule } from '@angular/router';
 
 import { InstallBannerComponent } from '../install-banner/install-banner.component';
+import { OrderTrackingService } from '../../services/order-tracking.service';
 
 @Component({
   selector: 'app-cart',
@@ -26,6 +27,7 @@ export class Cart implements OnInit {
   private cartService = inject(CartService);
   private customerService = inject(CustomerService);
   private destroyRef = inject(DestroyRef);
+  private orderTrackingService = inject(OrderTrackingService);
 
   public isCheckingOut = signal(false);
   public error = signal<string | null>(null);
@@ -219,6 +221,10 @@ export class Cart implements OnInit {
           this.error.set(null); // Clear any previous errors
           localStorage.setItem('last_order_id', res.orderId);
           this.store.dispatch(CartActions.loadCartSuccess({ cart: null as any }));
+          
+          // Start tracking the order immediately so notifications work on other pages/in background
+          this.orderTrackingService.startTracking(res.orderId, res);
+          
           // Navigate to the full orders list since downstream processing takes time
           this.router.navigate(['/orders']);
         },

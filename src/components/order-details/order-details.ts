@@ -69,7 +69,6 @@ export class OrderDetailsComponent implements OnInit, OnDestroy {
             case OrderStatus.PAYMENT_REQUESTED: return 'receipt_long';
             case OrderStatus.PAID:
             case OrderStatus.CLOSED: return 'check_circle';
-            case OrderStatus.CANCEL:
             case OrderStatus.CANCELLED:
             case OrderStatus.REJECTED: return 'cancel';
             default: return 'help_outline';
@@ -102,7 +101,6 @@ export class OrderDetailsComponent implements OnInit, OnDestroy {
             case OrderStatus.PAYMENT_REQUESTED: return 'Bill Generated';
             case OrderStatus.PAID:
             case OrderStatus.CLOSED: return 'Order Completed';
-            case OrderStatus.CANCEL:
             case OrderStatus.CANCELLED: return 'Order Cancelled';
             case OrderStatus.REJECTED: return 'Order Rejected';
             default: return 'Order Update';
@@ -121,7 +119,6 @@ export class OrderDetailsComponent implements OnInit, OnDestroy {
             case OrderStatus.PAYMENT_REQUESTED: return 'Please review and settle the bill';
             case OrderStatus.PAID:
             case OrderStatus.CLOSED: return 'Hope you enjoyed your meal!';
-            case OrderStatus.CANCEL:
             case OrderStatus.CANCELLED: return 'This order has been cancelled.';
             case OrderStatus.REJECTED: return 'Sorry, the order was not accepted.';
             default: return 'Your food journey continues';
