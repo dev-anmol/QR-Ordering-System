@@ -45,6 +45,7 @@ export interface CartItem {
     unitPrice: number;
     quantity: number;
     totalPrice: number;
+    gstPrice?: number;
 }
 
 export interface Cart {
@@ -55,6 +56,7 @@ export interface Cart {
     updatedAt: number;
     items: CartItem[];
     subtotal: number;
+    gstPrice?: number;
 }
 
 export interface CartItemDto {

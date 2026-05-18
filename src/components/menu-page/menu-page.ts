@@ -64,6 +64,31 @@ export class MenuPage implements OnInit, OnDestroy {
   selectedVariant = signal<string | null>(null);
   selectedAddons = signal<Set<string>>(new Set());
 
+  customizationPrice = computed(() => {
+    const product = this.selectedProductForCustomization();
+    if (!product) return 0;
+
+    let price = product.price;
+
+    const variantId = this.selectedVariant();
+    if (variantId && product.variants) {
+      const variant = product.variants.find(v => v.variantId === variantId);
+      if (variant) {
+        price = variant.price;
+      }
+    }
+
+    const addonIds = this.selectedAddons();
+    if (addonIds.size > 0 && product.addons) {
+      addonIds.forEach(id => {
+        const addon = product.addons?.find(a => a.addonId === id);
+        if (addon) price += addon.price;
+      });
+    }
+
+    return price;
+  });
+
   categories = signal<any[]>([]);
   selectedCategoryId = signal<string | number | null>('all');
   showCategoryMenu = signal(false);
@@ -92,7 +117,7 @@ export class MenuPage implements OnInit, OnDestroy {
         let itemPrice = product.price;
         if (item.variantId && product.variants) {
           const variant = product.variants.find(v => v.variantId === item.variantId);
-          if (variant) itemPrice += variant.price;
+          if (variant) itemPrice = variant.price;
         }
         if (item.addonIds && product.addons) {
           item.addonIds.forEach(id => {

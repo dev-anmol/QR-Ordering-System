@@ -103,9 +103,14 @@
 
           <!-- Bottom: Price + Quantity -->
           <div class="mt-auto flex items-center justify-between pt-4">
-            <div class="flex items-baseline gap-0.5">
-              <span class="text-sm font-bold text-gray-400">₹</span>
-              <span class="text-xl font-black text-[#090A0F]">{{ item.unitPrice * item.quantity }}</span>
+            <div class="flex flex-col">
+              <div class="flex items-baseline gap-0.5">
+                <span class="text-sm font-bold text-gray-400">₹</span>
+                <span class="text-xl font-black text-[#090A0F]">{{ item.unitPrice * item.quantity }}</span>
+              </div>
+              @if (item.gstPrice !== undefined && item.gstPrice > 0) {
+              <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">GST: ₹{{ item.gstPrice | number:'1.2-2' }}</span>
+              }
             </div>
 
             <div class="flex items-center bg-gray-50 hover:bg-gray-100 rounded-2xl p-1 transition-colors">
@@ -139,10 +144,12 @@
         <span class="summary-value">₹{{ cart.subtotal || 0 }}</span>
       </div>
 
+      @if (cart.gstPrice && cart.gstPrice > 0) {
       <div class="summary-row">
-        <span class="summary-label">GST ({{ gstRate * 100 }}%)</span>
-        <span class="summary-value">₹{{ calculateTax(cart.subtotal || 0) | number:'1.2-2' }}</span>
+        <span class="summary-label">GST ({{ ((cart.gstPrice / (cart.subtotal || 1)) * 100) | number:'1.0-1' }}%)</span>
+        <span class="summary-value">₹{{ cart.gstPrice | number:'1.2-2' }}</span>
       </div>
+      }
 
       <div class="summary-divider"></div>
 
@@ -150,7 +157,7 @@
         <div class="summary-total">
           <span class="total-label">To Pay</span>
           <span class="total-amount">
-            <span class="total-symbol">₹</span>{{ calculateGrandTotal(cart.subtotal || 0) | number:'1.2-2' }}
+            <span class="total-symbol">₹</span>{{ (cart.subtotal + (cart.gstPrice || 0)) | number:'1.2-2' }}
           </span>
         </div>
 

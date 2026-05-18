@@ -53,19 +53,31 @@ export class Cart implements OnInit {
     if (!cart) return null;
 
     const optimistic = this.optimisticQuantities();
+    
+    // Determine the actual GST rate from the backend's latest cart data
+    let actualGstRate = this.gstRate;
+    if (cart.subtotal > 0 && cart.gstPrice !== undefined) {
+      actualGstRate = cart.gstPrice / cart.subtotal;
+    }
+
     const updatedItems = cart.items.map(item => {
+      let qty = item.quantity;
       if (optimistic[item.cartItemId] !== undefined) {
-        return { ...item, quantity: optimistic[item.cartItemId] };
+        qty = optimistic[item.cartItemId];
       }
-      return item;
+      const totalPrice = item.unitPrice * qty;
+      const gstPrice = totalPrice * actualGstRate;
+      return { ...item, quantity: qty, totalPrice, gstPrice };
     }).filter(item => item.quantity > 0);
 
-    const subtotal = updatedItems.reduce((acc, item) => acc + (item.unitPrice * item.quantity), 0);
+    const subtotal = updatedItems.reduce((acc, item) => acc + item.totalPrice, 0);
+    const gstPrice = subtotal * actualGstRate;
 
     return {
       ...cart,
       items: updatedItems,
-      subtotal: subtotal
+      subtotal: subtotal,
+      gstPrice: gstPrice
     };
   });
 
