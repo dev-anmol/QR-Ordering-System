@@ -53,14 +53,19 @@ export class MenuPage implements OnInit, OnDestroy {
   foodItem: WritableSignal<foodInterface[]> = signal<foodInterface[]>([]);
   isLoading: WritableSignal<boolean> = signal(true);
   hasError: WritableSignal<boolean> = signal(false);
+  
+  // Search and Filter Signals
   searchTerm: WritableSignal<string> = signal('');
+  vegFilter: WritableSignal<'all' | 'veg' | 'non-veg'> = signal<'all' | 'veg' | 'non-veg'>('all');
+  priceSort: WritableSignal<'none' | 'low-to-high' | 'high-to-low'> = signal<'none' | 'low-to-high' | 'high-to-low'>('none');
+  showFilters: WritableSignal<boolean> = signal(false);
 
   selectedProductForCustomization = signal<foodInterface | null>(null);
   selectedVariant = signal<string | null>(null);
   selectedAddons = signal<Set<string>>(new Set());
 
   categories = signal<any[]>([]);
-  selectedCategoryId = signal<string | number | null>(null);
+  selectedCategoryId = signal<string | number | null>('all');
   showCategoryMenu = signal(false);
   private restaurantId = localStorage.getItem('restaurant_id') || '101';
 
@@ -147,28 +152,29 @@ export class MenuPage implements OnInit, OnDestroy {
     this.foodApi.getCategories(this.restaurantId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => {
         this.categories.set(data);
-        if (data.length > 0) {
-          const firstCatId = data[0].categoryId;
-          this.selectedCategoryId.set(firstCatId);
-          this.loadFoodItems(firstCatId);
-        }
+        // Default to "all" and prefetch the full menu of the restaurant
+        this.selectedCategoryId.set('all');
+        this.loadFoodItems(null);
       },
       error: (err) => console.error('Error fetching categories:', err)
     });
   }
 
   loadFoodItems(categoryId: string | number | null) {
-    if (!this.restaurantId || !categoryId) return;
+    if (!this.restaurantId) return;
 
     // Check cache for optimization
-    const cacheKey = categoryId.toString();
+    const cacheKey = categoryId ? categoryId.toString() : 'all';
     if (this.menuCache[cacheKey]) {
       this.fullMenu.set(this.menuCache[cacheKey]);
       return;
     }
 
     this.isLoading.set(true);
-    this.foodApi.getFoodItems(this.restaurantId, categoryId)
+    // If categoryId is null or 'all', we pass undefined to fetch all items for this restaurant
+    const apiCategoryId = (categoryId === 'all' || categoryId === null) ? undefined : categoryId;
+
+    this.foodApi.getFoodItems(this.restaurantId, apiCategoryId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {
@@ -187,25 +193,71 @@ export class MenuPage implements OnInit, OnDestroy {
 
   selectCategory(id: string | number) {
     this.selectedCategoryId.set(id);
-    this.loadFoodItems(id);
   }
 
   filteredFoodItems = computed<foodInterface[]>(() => {
-    const term = this.searchTerm().toLowerCase();
+    const term = this.searchTerm().toLowerCase().trim();
     const menu = this.fullMenu();
+    const activeCatId = this.selectedCategoryId();
+    const vegF = this.vegFilter();
+    const priceS = this.priceSort();
 
     if (!menu.length) return [];
 
-    return menu.filter(item => {
-      const matchesSearch = item.name.toLowerCase().includes(term);
-      return matchesSearch && item.enabled;
+    let result = menu.filter(item => {
+      // 1. Category Filter
+      if (activeCatId !== 'all' && String(item.categoryId) !== String(activeCatId)) {
+        return false;
+      }
+
+      // 2. Food Type (Veg / Non-Veg) Filter
+      if (vegF === 'veg' && !item.veg) return false;
+      if (vegF === 'non-veg' && item.veg) return false;
+
+      // 3. Search Term Filter
+      if (term) {
+        const matchesName = item.name.toLowerCase().includes(term);
+        const matchesDesc = item.description?.toLowerCase().includes(term) || false;
+        if (!matchesName && !matchesDesc) return false;
+      }
+
+      return item.enabled;
     });
+
+    // 4. Price Sorting
+    if (priceS === 'low-to-high') {
+      result = [...result].sort((a, b) => a.price - b.price);
+    } else if (priceS === 'high-to-low') {
+      result = [...result].sort((a, b) => b.price - a.price);
+    }
+
+    return result;
   });
 
-
-
   searchMenu(event: any) {
-    this.searchTerm.set(event.target.value.toLowerCase());
+    this.searchTerm.set(event.target.value);
+  }
+
+  clearSearch() {
+    this.searchTerm.set('');
+  }
+
+  toggleFilters() {
+    this.showFilters.update(v => !v);
+  }
+
+  setVegFilter(filter: 'all' | 'veg' | 'non-veg') {
+    this.vegFilter.set(filter);
+  }
+
+  setPriceSort(sort: 'none' | 'low-to-high' | 'high-to-low') {
+    this.priceSort.set(sort);
+  }
+
+  resetFilters() {
+    this.vegFilter.set('all');
+    this.priceSort.set('none');
+    this.searchTerm.set('');
   }
 
   private cartService = inject(CartService);

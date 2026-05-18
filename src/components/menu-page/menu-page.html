@@ -16,27 +16,123 @@
         </h1>
       </div>
 
-      <!-- Compact Search bar -->
-      <div class="w-full md:w-[400px]">
-        <div
-          class="glass-effect flex items-center gap-3 p-1.5 pl-5 rounded-2xl border border-gray-100 shadow-premium focus-within:border-black transition-all">
-          <span class="material-icons text-gray-400 text-lg">search</span>
-          <input type="text" (input)="searchMenu($event)" placeholder="Search menu..."
-            class="text-sm font-semibold placeholder:text-gray-300 focus:outline-hidden w-full bg-transparent border-none">
-          <button
-            class="bg-[#090A0F] text-xs font-bold text-white px-5 py-2.5 cursor-pointer rounded-xl hover:bg-gray-800 transition-all active:scale-95">
-            Find
-          </button>
+      <!-- Search & Filters Header Controls -->
+      <div class="flex items-center gap-2 w-full md:w-[450px]">
+        <!-- Compact Search bar -->
+        <div class="flex-grow">
+          <div
+            class="glass-effect flex items-center gap-3 p-2.5 pl-4 rounded-2xl border border-gray-100 shadow-premium focus-within:border-black transition-all bg-white/70">
+            <span class="material-icons text-gray-400 text-lg">search</span>
+            <input type="text" [value]="searchTerm()" (input)="searchMenu($event)" placeholder="Search dishes..."
+              class="text-xs font-semibold placeholder:text-gray-300 focus:outline-hidden w-full bg-transparent border-none">
+            
+            @if (searchTerm()) {
+            <button (click)="clearSearch()" class="text-gray-400 hover:text-black transition-colors cursor-pointer mr-1 flex items-center justify-center border-none bg-transparent p-0 shrink-0">
+              <span class="material-icons text-lg">close</span>
+            </button>
+            }
+          </div>
         </div>
+
+        <!-- Toggle Filters Button -->
+        <button
+          (click)="toggleFilters()"
+          [class]="showFilters() ? 'bg-[#090A0F] text-white border-[#090A0F] shadow-lg' : 'bg-white border-gray-100 text-gray-500 hover:text-black hover:bg-white'"
+          class="w-10 h-10 rounded-2xl border transition-all duration-300 flex items-center justify-center shadow-sm cursor-pointer active:scale-95 shrink-0"
+          title="Toggle Filters">
+          <span class="material-icons text-lg">tune</span>
+        </button>
       </div>
     </div>
     </header>
   </div>
 
+  <!-- Premium Filters Panel -->
+  @if (showFilters()) {
+  <div class="max-w-7xl mx-auto px-4 md:px-8 mb-6 fade-in">
+    <div class="glass-effect p-4 rounded-[2rem] border border-gray-100 shadow-premium flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/80">
+      
+      <div class="flex flex-wrap items-center gap-6">
+        <!-- Food Type Filter -->
+        <div class="flex flex-col gap-1.5">
+          <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Food Type</span>
+          <div class="flex bg-gray-100/50 p-1 rounded-xl border border-gray-100">
+            <button
+              (click)="setVegFilter('all')"
+              [class]="vegFilter() === 'all' ? 'bg-[#090A0F] text-white shadow-sm font-black' : 'text-gray-500 hover:text-black bg-transparent'"
+              class="px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer border-none">
+              All
+            </button>
+            <button
+              (click)="setVegFilter('veg')"
+              [class]="vegFilter() === 'veg' ? 'bg-green-600 text-white shadow-sm font-black' : 'text-gray-500 hover:text-green-600 bg-transparent'"
+              class="px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1 border-none">
+              <span class="w-1.5 h-1.5 bg-green-300 rounded-full"></span>
+              Veg
+            </button>
+            <button
+              (click)="setVegFilter('non-veg')"
+              [class]="vegFilter() === 'non-veg' ? 'bg-red-600 text-white shadow-sm font-black' : 'text-gray-500 hover:text-red-600 bg-transparent'"
+              class="px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1 border-none">
+              <span class="w-1.5 h-1.5 bg-red-300 rounded-full"></span>
+              Non-Veg
+            </button>
+          </div>
+        </div>
+
+        <!-- Price Sorting Filter -->
+        <div class="flex flex-col gap-1.5">
+          <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Sort by Price</span>
+          <div class="flex bg-gray-100/50 p-1 rounded-xl border border-gray-100">
+            <button
+              (click)="setPriceSort('none')"
+              [class]="priceSort() === 'none' ? 'bg-[#090A0F] text-white shadow-sm font-black' : 'text-gray-500 hover:text-black bg-transparent'"
+              class="px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer border-none">
+              Default
+            </button>
+            <button
+              (click)="setPriceSort('low-to-high')"
+              [class]="priceSort() === 'low-to-high' ? 'bg-[#090A0F] text-white shadow-sm font-black' : 'text-gray-500 hover:text-black bg-transparent'"
+              class="px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1 border-none">
+              <span class="material-icons text-[12px]">arrow_upward</span>
+              Low-High
+            </button>
+            <button
+              (click)="setPriceSort('high-to-low')"
+              [class]="priceSort() === 'high-to-low' ? 'bg-[#090A0F] text-white shadow-sm font-black' : 'text-gray-500 hover:text-black bg-transparent'"
+              class="px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1 border-none">
+              <span class="material-icons text-[12px]">arrow_downward</span>
+              High-Low
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reset Filters Button -->
+      @if (vegFilter() !== 'all' || priceSort() !== 'none' || searchTerm()) {
+      <button
+        (click)="resetFilters()"
+        class="text-[10px] text-yellow-600 hover:text-yellow-700 font-black uppercase tracking-widest cursor-pointer transition-colors border-none bg-transparent self-end md:self-center mb-1 flex items-center gap-1">
+        <span class="material-icons text-[12px]">restart_alt</span>
+        Reset
+      </button>
+      }
+    </div>
+  </div>
+  }
+
   <!-- Premium Category Navigation -->
   <section
     class="w-full mb-6 sticky top-[80px] md:top-[120px] z-20 py-4 backdrop-blur-[32px] bg-white/60 border-b border-gray-100 shadow-[0_4px_30px_rgba(0,0,0,0.05)] transform-gpu">
     <div class="flex gap-4 overflow-x-auto scrollbar-hide pb-1 scroll-smooth px-4 md:px-8">
+        <!-- ALL Category Button -->
+        <button (click)="selectCategory('all')"
+          [class.category-btn-active]="selectedCategoryId() === 'all'"
+          [class.category-btn]="selectedCategoryId() !== 'all'"
+          class="whitespace-nowrap px-8 py-3.5 rounded-2xl font-black transition-all duration-300 cursor-pointer shadow-sm text-xs uppercase tracking-widest border border-transparent">
+          All
+        </button>
+
         @for (category of categories(); track category.categoryId) {
         <button (click)="selectCategory(category.categoryId)"
           [class.category-btn-active]="selectedCategoryId() === category.categoryId"
