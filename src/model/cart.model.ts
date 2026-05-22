@@ -84,6 +84,7 @@ export interface CheckoutRequest {
     restaurantId: number;
     sessionId: string;
     tableNumber: number;
+    seatingType?: string;
     userName?: string;
     items?: {
         menuItemId: string;

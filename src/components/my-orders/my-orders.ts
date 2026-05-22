@@ -24,6 +24,7 @@ export class MyOrdersComponent implements OnInit {
     public error = signal<string | null>(null);
     public OrderStatus = OrderStatus;
     public userName = localStorage.getItem('user_name');
+    public activeTab = signal<'active' | 'history'>('active');
 
     public expandedOrderId = signal<string | null>(null);
     private isFetching = false;
@@ -35,6 +36,13 @@ export class MyOrdersComponent implements OnInit {
         } else {
             this.expandedOrderId.set(orderId);
         }
+    }
+
+    setTab(tab: 'active' | 'history') {
+        if (this.activeTab() === tab) return;
+        this.activeTab.set(tab);
+        this.expandedOrderId.set(null);
+        this.fetchMyOrders(true);
     }
 
     ngOnInit() {
@@ -49,7 +57,9 @@ export class MyOrdersComponent implements OnInit {
             this.loading.set(true);
         }
 
-        this.orderService.getMyOrders().subscribe({
+        const activeOnly = this.activeTab() === 'active';
+
+        this.orderService.getMyOrders(activeOnly).subscribe({
             next: (data) => {
                 const ordersList = data || [];
                 this.orders.set(ordersList);
