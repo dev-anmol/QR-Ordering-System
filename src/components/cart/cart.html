@@ -44,7 +44,7 @@
         </h1>
       </div>
       <p class="text-gray-500 font-medium text-sm md:text-lg mt-2 max-w-lg">
-        {{ (displayCart())?.items?.length || 0 }} items · Table #{{ tableId || 'N/A' }}
+        {{ (displayCart())?.items?.length || 0 }} items · {{ seatingLabel }} #{{ tableId || 'N/A' }}
       </p>
     </div>
 
@@ -176,7 +176,11 @@
       </div>
 
       <p class="summary-note">
-        Food will be served at Table #{{ tableId || 'N/A' }}
+        @if (seatingType === 'HOTEL_ROOM') {
+          Food will be delivered to Room {{ hotelRoom() || 'Pending' }}@if (hotelFloor()) { (Floor {{ hotelFloor() }}) }
+        } @else {
+          Food will be served at {{ seatingLabel }} #{{ tableId || 'N/A' }}
+        }
       </p>
     </div>
   </div>
@@ -239,6 +243,76 @@
 
     <p class="text-center mt-6 text-[10px] font-black uppercase tracking-widest text-gray-400">
       This helps us identify your orders.
+    </p>
+  </div>
+</div>
+}
+
+<!-- Premium Hotel Details Prompt Modal -->
+@if (showHotelModal()) {
+<div class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-[#090A0F]/60 backdrop-blur-md animate-in fade-in duration-500"
+    (click)="showHotelModal.set(false)"></div>
+
+  <!-- Modal Content -->
+  <div
+    class="bg-white rounded-[2.5rem] p-8 md:p-12 w-full max-w-md relative z-10 shadow-2xl animate-in zoom-in slide-in-from-bottom-8 duration-500">
+    <div class="text-center mb-8">
+      <div
+        class="w-20 h-20 bg-yellow-400/10 text-yellow-600 rounded-[2rem] flex items-center justify-center mx-auto mb-6">
+        <span class="material-icons text-4xl">room_service</span>
+      </div>
+      <h2 class="text-3xl font-black text-[#090A0F] mb-3 tracking-tight">Room Service</h2>
+      <p class="text-gray-500 font-medium leading-relaxed">
+        Please complete details to deliver order to your room.
+      </p>
+    </div>
+
+    <div class="space-y-4 mb-8">
+      <!-- Name Input -->
+      <div class="relative">
+        <span class="material-icons absolute left-5 top-1/2 -translate-y-1/2 text-gray-400">face</span>
+        <input type="text" [value]="userName()" (input)="onNameInput($event)" placeholder="Your Name"
+          maxlength="15"
+          class="w-full h-16 bg-gray-50 border-2 border-transparent focus:border-[#090A0F] rounded-2xl pl-14 pr-6 font-bold text-base transition-all outline-none" />
+      </div>
+
+      <!-- Mobile Number Input -->
+      <div class="relative">
+        <span class="material-icons absolute left-5 top-1/2 -translate-y-1/2 text-gray-400">phone_iphone</span>
+        <input type="tel" [value]="hotelMobile()" (input)="onMobileInput($event)" placeholder="Mobile Number (10 Digits)"
+          maxlength="10"
+          class="w-full h-16 bg-gray-50 border-2 border-transparent focus:border-[#090A0F] rounded-2xl pl-14 pr-6 font-bold text-base transition-all outline-none" />
+      </div>
+
+      <!-- Room & Floor Inputs Grid -->
+      <div class="grid grid-cols-2 gap-4">
+        <!-- Room Input -->
+        <div class="relative">
+          <span class="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">meeting_room</span>
+          <input type="text" [value]="hotelRoom()" (input)="onRoomInput($event)" placeholder="Room No."
+            maxlength="10"
+            class="w-full h-16 bg-gray-50 border-2 border-transparent focus:border-[#090A0F] rounded-2xl pl-12 pr-4 font-bold text-base transition-all outline-none" />
+        </div>
+
+        <!-- Floor Input -->
+        <div class="relative">
+          <span class="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">layers</span>
+          <input type="text" [value]="hotelFloor()" (input)="onFloorInput($event)" placeholder="Floor (Optional)"
+            maxlength="5"
+            class="w-full h-16 bg-gray-50 border-2 border-transparent focus:border-[#090A0F] rounded-2xl pl-12 pr-4 font-bold text-base transition-all outline-none" />
+        </div>
+      </div>
+    </div>
+
+    <button (click)="confirmHotelDetails()" [disabled]="userName().trim().length < 2 || hotelMobile().trim().length !== 10 || hotelRoom().trim().length < 1"
+      class="w-full bg-[#090A0F] text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-black/10 hover:bg-gray-800 transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed">
+      Confirm & Place Order
+    </button>
+
+    <p class="text-center mt-6 text-[10px] font-black uppercase tracking-widest text-gray-400">
+      Your details are secure and used only for delivery.
     </p>
   </div>
 </div>

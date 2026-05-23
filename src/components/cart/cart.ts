@@ -32,7 +32,11 @@ export class Cart implements OnInit {
   public isCheckingOut = signal(false);
   public error = signal<string | null>(null);
   public showNameModal = signal(false);
+  public showHotelModal = signal(false);
   public userName = signal(localStorage.getItem('user_name') || '');
+  public hotelMobile = signal(localStorage.getItem('hotel_mobile') || '');
+  public hotelRoom = signal(localStorage.getItem('hotel_room') || '');
+  public hotelFloor = signal(localStorage.getItem('hotel_floor') || '');
 
   private router = inject(Router);
 
@@ -40,6 +44,8 @@ export class Cart implements OnInit {
   private rawCart = toSignal(this.cart$);
   public foodItemLength: WritableSignal<any> = signal(0);
   public tableId = localStorage.getItem('table_id');
+  public seatingType = localStorage.getItem('seating_type') || 'TABLE';
+  public seatingLabel = (this.seatingType === 'ROOM' || this.seatingType === 'HOTEL_ROOM') ? 'Room' : 'Table';
   private restaurantId = localStorage.getItem('restaurant_id') || '101';
   
   public gstRate = 0.05; // 5% GST for restaurants
@@ -207,27 +213,49 @@ export class Cart implements OnInit {
     const sessionId = this.customerService.getSessionToken();
     const tableId = localStorage.getItem('table_id');
     const tableNumber = tableId ? parseInt(tableId) : 1;
+    const hotelConfigId = localStorage.getItem('hotel_config_id') || '';
 
     if (sessionId && this.restaurantId && !this.isCheckingOut()) {
-      // 1. Check if name exists
       const storedName = localStorage.getItem('user_name');
-      if (!storedName) {
-        this.showNameModal.set(true);
-        return;
+
+      if (this.seatingType === 'HOTEL_ROOM') {
+        const storedMobile = localStorage.getItem('hotel_mobile');
+        const storedRoom = localStorage.getItem('hotel_room');
+        if (!storedName || !storedMobile || !storedRoom) {
+          this.showHotelModal.set(true);
+          return;
+        }
+      } else {
+        if (!storedName) {
+          this.showNameModal.set(true);
+          return;
+        }
       }
 
       this.isCheckingOut.set(true);
-      this.cartService.checkout({
+
+      const checkoutPayload: any = {
         restaurantId: parseInt(this.restaurantId),
         sessionId: sessionId,
-        tableNumber: tableNumber,
+        tableNumber: this.seatingType === 'HOTEL_ROOM' ? 0 : tableNumber,
+        seatingType: this.seatingType,
         userName: storedName,
         items: this.rawCart()?.items.map(item => ({
           menuItemId: item.menuItemId,
           variantId: item.variant?.variantId,
           quantity: item.quantity
         }))
-      }).subscribe({
+      };
+
+      if (this.seatingType === 'HOTEL_ROOM') {
+        checkoutPayload.hotelConfigId = hotelConfigId;
+        checkoutPayload.mobileNumber = localStorage.getItem('hotel_mobile');
+        const room = localStorage.getItem('hotel_room');
+        const floor = localStorage.getItem('hotel_floor');
+        checkoutPayload.roomNumber = floor ? `${room} (Floor ${floor})` : room;
+      }
+
+      this.cartService.checkout(checkoutPayload).subscribe({
         next: (res) => {
           this.isCheckingOut.set(false);
           this.error.set(null); // Clear any previous errors
@@ -257,6 +285,41 @@ export class Cart implements OnInit {
     if (name.length >= 2) {
       localStorage.setItem('user_name', name);
       this.showNameModal.set(false);
+      this.checkout(); // Proceed with checkout
+    }
+  }
+
+  onMobileInput(event: Event) {
+    const value = (event.target as HTMLInputElement).value;
+    this.hotelMobile.set(value.replace(/\D/g, '').slice(0, 10)); // numbers only, max 10 digits
+  }
+
+  onRoomInput(event: Event) {
+    const value = (event.target as HTMLInputElement).value;
+    this.hotelRoom.set(value.slice(0, 10)); // max 10 chars
+  }
+
+  onFloorInput(event: Event) {
+    const value = (event.target as HTMLInputElement).value;
+    this.hotelFloor.set(value.slice(0, 5)); // max 5 chars
+  }
+
+  confirmHotelDetails() {
+    const name = this.userName().trim();
+    const mobile = this.hotelMobile().trim();
+    const room = this.hotelRoom().trim();
+    const floor = this.hotelFloor().trim();
+
+    if (name.length >= 2 && mobile.length === 10 && room.length >= 1) {
+      localStorage.setItem('user_name', name);
+      localStorage.setItem('hotel_mobile', mobile);
+      localStorage.setItem('hotel_room', room);
+      if (floor) {
+        localStorage.setItem('hotel_floor', floor);
+      } else {
+        localStorage.removeItem('hotel_floor');
+      }
+      this.showHotelModal.set(false);
       this.checkout(); // Proceed with checkout
     }
   }

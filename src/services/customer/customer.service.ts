@@ -33,6 +33,8 @@ export class CustomerService {
                     if (response.refreshToken) this.setCookie('customer_refresh_token', response.refreshToken, 1);
                     if (response.restaurantId) localStorage.setItem('restaurant_id', response.restaurantId);
                     if (response.tableNumber) localStorage.setItem('table_id', response.tableNumber.toString());
+                    if (response.seatingType) localStorage.setItem('seating_type', response.seatingType);
+                    if (response.hotelConfigId) localStorage.setItem('hotel_config_id', response.hotelConfigId);
                 }
             })
 
@@ -80,6 +82,11 @@ export class CustomerService {
         this.deleteCookie('customer_refresh_token');
         localStorage.removeItem('restaurant_id');
         localStorage.removeItem('table_id');
+        localStorage.removeItem('seating_type');
+        localStorage.removeItem('hotel_config_id');
+        localStorage.removeItem('hotel_mobile');
+        localStorage.removeItem('hotel_room');
+        localStorage.removeItem('hotel_floor');
     }
 
     private setCookie(name: string, value: string, days: number): void {

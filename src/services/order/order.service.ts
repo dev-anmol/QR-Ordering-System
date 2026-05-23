@@ -17,7 +17,7 @@ export class OrderService {
         return this.http.get<CheckoutResponse>(`${this.orderUrl}/${orderId}`);
     }
 
-    getMyOrders(): Observable<CheckoutResponse[]> {
-        return this.http.get<CheckoutResponse[]>(`${this.orderUrl}/my`);
+    getMyOrders(activeOnly: boolean = false): Observable<CheckoutResponse[]> {
+        return this.http.get<CheckoutResponse[]>(`${this.orderUrl}/my?activeOnly=${activeOnly}`);
     }
 }
