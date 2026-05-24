@@ -216,17 +216,17 @@ export class Cart implements OnInit {
     const hotelConfigId = localStorage.getItem('hotel_config_id') || '';
 
     if (sessionId && this.restaurantId && !this.isCheckingOut()) {
-      const storedName = localStorage.getItem('user_name');
+      const currentName = this.userName().trim();
 
       if (this.seatingType === 'HOTEL_ROOM') {
-        const storedMobile = localStorage.getItem('hotel_mobile');
-        const storedRoom = localStorage.getItem('hotel_room');
-        if (!storedName || !storedMobile || !storedRoom) {
+        const currentMobile = this.hotelMobile().trim();
+        const currentRoom = this.hotelRoom().trim();
+        if (!currentName || currentMobile.length !== 10 || !currentRoom) {
           this.showHotelModal.set(true);
           return;
         }
       } else {
-        if (!storedName) {
+        if (!currentName) {
           this.showNameModal.set(true);
           return;
         }
@@ -239,7 +239,7 @@ export class Cart implements OnInit {
         sessionId: sessionId,
         tableNumber: this.seatingType === 'HOTEL_ROOM' ? 0 : tableNumber,
         seatingType: this.seatingType,
-        userName: storedName,
+        userName: currentName,
         items: this.rawCart()?.items.map(item => ({
           menuItemId: item.menuItemId,
           variantId: item.variant?.variantId,
@@ -248,17 +248,38 @@ export class Cart implements OnInit {
       };
 
       if (this.seatingType === 'HOTEL_ROOM') {
+        const currentMobile = this.hotelMobile().trim();
+        const currentRoom = this.hotelRoom().trim();
         checkoutPayload.hotelConfigId = hotelConfigId;
-        checkoutPayload.mobileNumber = localStorage.getItem('hotel_mobile');
-        const room = localStorage.getItem('hotel_room');
-        const floor = localStorage.getItem('hotel_floor');
-        checkoutPayload.roomNumber = floor ? `${room} (Floor ${floor})` : room;
+        checkoutPayload.mobileNumber = currentMobile;
+        // Do not append "(Floor X)" as it breaks backend exact-match validation
+        checkoutPayload.roomNumber = currentRoom;
       }
 
       this.cartService.checkout(checkoutPayload).subscribe({
         next: (res) => {
           this.isCheckingOut.set(false);
           this.error.set(null); // Clear any previous errors
+
+          // Save to localStorage only on success
+          const currentName = this.userName().trim();
+          localStorage.setItem('user_name', currentName);
+          if (this.seatingType === 'HOTEL_ROOM') {
+            const currentMobile = this.hotelMobile().trim();
+            const currentRoom = this.hotelRoom().trim();
+            const currentFloor = this.hotelFloor().trim();
+            localStorage.setItem('hotel_mobile', currentMobile);
+            localStorage.setItem('hotel_room', currentRoom);
+            if (currentFloor) {
+              localStorage.setItem('hotel_floor', currentFloor);
+            } else {
+              localStorage.removeItem('hotel_floor');
+            }
+          }
+          
+          this.showHotelModal.set(false);
+          this.showNameModal.set(false);
+
           localStorage.setItem('last_order_id', res.orderId);
           this.store.dispatch(CartActions.loadCartSuccess({ cart: null as any }));
           
@@ -283,9 +304,7 @@ export class Cart implements OnInit {
   confirmName() {
     const name = this.userName().trim();
     if (name.length >= 2) {
-      localStorage.setItem('user_name', name);
-      this.showNameModal.set(false);
-      this.checkout(); // Proceed with checkout
+      this.checkout(); // Proceed with checkout, will set localStorage on success
     }
   }
 
@@ -308,25 +327,21 @@ export class Cart implements OnInit {
     const name = this.userName().trim();
     const mobile = this.hotelMobile().trim();
     const room = this.hotelRoom().trim();
-    const floor = this.hotelFloor().trim();
 
     if (name.length >= 2 && mobile.length === 10 && room.length >= 1) {
-      localStorage.setItem('user_name', name);
-      localStorage.setItem('hotel_mobile', mobile);
-      localStorage.setItem('hotel_room', room);
-      if (floor) {
-        localStorage.setItem('hotel_floor', floor);
-      } else {
-        localStorage.removeItem('hotel_floor');
-      }
-      this.showHotelModal.set(false);
-      this.checkout(); // Proceed with checkout
+      this.checkout(); // Proceed with checkout, will set localStorage on success
     }
   }
 
   private getFriendlyErrorMessage(err: any): string {
-    const errorMsg = err.error?.message || '';
+    const errorMsg = err.error?.message || (typeof err.error === 'string' ? err.error : '');
     
+    if (errorMsg.includes('Please check your room number') || (errorMsg.toLowerCase().includes('not found in') && errorMsg.toLowerCase().includes('room'))) {
+      return 'The room number you entered is not valid for this hotel. Please check and try again.';
+    }
+    if (errorMsg.includes('java.lang.Exception') && errorMsg.toLowerCase().includes('room')) {
+      return 'The room number you entered is not valid. Please check and try again.';
+    }
     if (errorMsg.includes('INSUFFICIENT_STOCK')) {
       return 'Oops! Some items in your cart just ran out of stock. Please check availability.';
     }

@@ -17,6 +17,10 @@ export interface CheckoutResponse {
     totalAmount: number;
     items?: any[];
     reason?: string;
+    seatingType?: string;
+    tableNumber?: number;
+    roomNumber?: string;
+    hotelName?: string;
 }
 
 

@@ -236,9 +236,14 @@
         autofocus />
     </div>
 
-    <button (click)="confirmName()" [disabled]="userName().trim().length < 2"
-      class="w-full bg-[#090A0F] text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-black/10 hover:bg-gray-800 transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed">
-      Continue to Checkout
+    <button (click)="confirmName()" [disabled]="userName().trim().length < 2 || isCheckingOut()"
+      class="w-full bg-[#090A0F] text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-black/10 hover:bg-gray-800 transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+      @if (isCheckingOut()) {
+        <span class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+        Processing...
+      } @else {
+        Continue to Checkout
+      }
     </button>
 
     <p class="text-center mt-6 text-[10px] font-black uppercase tracking-widest text-gray-400">
@@ -268,6 +273,13 @@
         Please complete details to deliver order to your room.
       </p>
     </div>
+
+    @if (error()) {
+    <div class="mb-6 p-4 bg-red-50 text-red-600 rounded-2xl text-sm font-bold border border-red-100 flex items-start gap-3">
+      <span class="material-icons text-red-500">error_outline</span>
+      <span>{{ error() }}</span>
+    </div>
+    }
 
     <div class="space-y-4 mb-8">
       <!-- Name Input -->
@@ -306,9 +318,14 @@
       </div>
     </div>
 
-    <button (click)="confirmHotelDetails()" [disabled]="userName().trim().length < 2 || hotelMobile().trim().length !== 10 || hotelRoom().trim().length < 1"
-      class="w-full bg-[#090A0F] text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-black/10 hover:bg-gray-800 transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed">
-      Confirm & Place Order
+    <button (click)="confirmHotelDetails()" [disabled]="userName().trim().length < 2 || hotelMobile().trim().length !== 10 || hotelRoom().trim().length < 1 || isCheckingOut()"
+      class="w-full bg-[#090A0F] text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-black/10 hover:bg-gray-800 transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+      @if (isCheckingOut()) {
+        <span class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+        Processing...
+      } @else {
+        Confirm & Place Order
+      }
     </button>
 
     <p class="text-center mt-6 text-[10px] font-black uppercase tracking-widest text-gray-400">
