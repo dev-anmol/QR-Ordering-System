@@ -182,11 +182,11 @@
                     class="bg-white/60 p-5 rounded-3xl border border-white flex flex-col items-center justify-center text-center">
                     @if (order()?.seatingType === 'ROOM') {
                     <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Room</span>
-                    <span class="text-lg font-black text-indigo-600">{{ order()?.roomNumber || 'N/A' }}</span>
+                    <span class="text-lg font-black text-indigo-600">{{ order()?.roomNumber || order()?.tableNumber || 'N/A' }}</span>
                     } @else if (order()?.seatingType === 'HOTEL_ROOM') {
                     <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Hotel Room</span>
                     <span class="text-sm font-black text-indigo-600 leading-tight">
-                        {{ order()?.hotelName ? order()?.hotelName + ' - ' : '' }}Rm {{ order()?.roomNumber || 'N/A' }}
+                        {{ order()?.hotelName ? order()?.hotelName + ' - ' : '' }}Rm {{ order()?.roomNumber || order()?.tableNumber || 'N/A' }}
                     </span>
                     } @else {
                     <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Table</span>
