@@ -28,7 +28,7 @@
 
   <div class="p-3 md:p-5 flex flex-col flex-grow gap-2">
     <div class="flex justify-between items-start gap-2">
-      <h3 class="item-name text-lg font-bold leading-tight line-clamp-1">{{ foodItem.name }}</h3>
+      <h3 class="item-name text-sm md:text-base lg:text-lg font-bold leading-tight line-clamp-2 min-h-[40px] md:min-h-[56px] flex-grow">{{ foodItem.name }}</h3>
       <!-- Veg/Non-Veg Icon -->
       <div [class]="foodItem.veg ? 'veg-indicator-container' : 'non-veg-indicator-container'" class="mt-1 shrink-0">
         <div [class]="foodItem.veg ? 'bg-green-600' : 'bg-red-600'" class="w-2 h-2 rounded-full"></div>
