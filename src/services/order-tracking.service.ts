@@ -41,10 +41,14 @@ export class OrderTrackingService implements OnDestroy {
   startTracking(orderId: string, initialOrder?: CheckoutResponse) {
     if (!isPlatformBrowser(this.platformId)) return;
 
-    // If initial order is provided, set it if we don't have one yet or it's a different order
-    if (initialOrder && (!this.activeOrder() || this.activeOrder()?.orderId !== orderId)) {
-      this.activeOrder.set(initialOrder);
-      localStorage.setItem(`last_status_${orderId}`, initialOrder.status);
+    // If initial order is provided, set it if we don't have one yet, it's a different order,
+    // or if the new one contains more complete details (like totalAmount or seatingType)
+    if (initialOrder) {
+      const current = this.activeOrder();
+      if (!current || current.orderId !== orderId || (!current.totalAmount && initialOrder.totalAmount) || (!current.seatingType && initialOrder.seatingType)) {
+        this.activeOrder.set(initialOrder);
+        localStorage.setItem(`last_status_${orderId}`, initialOrder.status);
+      }
     }
 
     // If already tracking this order, just return
@@ -129,7 +133,12 @@ export class OrderTrackingService implements OnDestroy {
       totalAmount: order.totalAmount,
       items: order.items,
       paymentStatus: order.paymentStatus,
-      reason: order.reason
+      reason: order.reason,
+      seatingType: order.seatingType,
+      tableNumber: order.tableNumber,
+      roomNumber: order.roomNumber,
+      hotelName: order.hotelName,
+      hotelMobile: order.hotelMobile
     };
     this.activeOrder.set(mapped);
 

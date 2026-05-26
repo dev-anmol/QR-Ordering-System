@@ -286,8 +286,8 @@ export class Cart implements OnInit {
           // Start tracking the order immediately so notifications work on other pages/in background
           this.orderTrackingService.startTracking(res.orderId, res);
           
-          // Navigate to the full orders list since downstream processing takes time
-          this.router.navigate(['/orders']);
+          // Navigate directly to the live order tracking details page
+          this.router.navigate(['/order', res.orderId]);
         },
         error: (err) => {
           this.isCheckingOut.set(false);
