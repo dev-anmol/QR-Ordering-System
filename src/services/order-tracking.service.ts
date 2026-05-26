@@ -138,7 +138,7 @@ export class OrderTrackingService implements OnDestroy {
       tableNumber: order.tableNumber,
       roomNumber: order.roomNumber,
       hotelName: order.hotelName,
-      hotelMobile: order.hotelMobile
+      restaurantMobile: order.restaurantMobile
     };
     this.activeOrder.set(mapped);
 

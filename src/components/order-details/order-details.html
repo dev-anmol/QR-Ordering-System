@@ -208,7 +208,7 @@
         </div>
 
         @if (order()?.seatingType === 'ROOM' || order()?.seatingType === 'HOTEL_ROOM') {
-        @if (order()?.hotelMobile) {
+        @if (order()?.restaurantMobile) {
         <!-- Gorgeous Room Service Assistance Card -->
         <div
             class="bg-gradient-to-r from-indigo-50/90 to-purple-50/90 backdrop-blur-xl p-6 rounded-[2rem] border border-white shadow-premium mb-6 overflow-hidden relative group transition-all duration-300 hover:shadow-xl hover:border-indigo-100">
@@ -233,11 +233,11 @@
                         <!-- <p
                             class="text-[10px] bg-indigo-100/60 text-indigo-700 font-bold px-2 py-0.5 rounded-md w-fit mt-2 flex items-center gap-1">
                             <span class="material-icons text-[10px]">call</span>
-                            {{ order()?.hotelMobile }}
+                            {{ order()?.restaurantMobile }}
                         </p> -->
                     </div>
                 </div>
-                <a [href]="'tel:' + order()?.hotelMobile"
+                <a [href]="'tel:' + order()?.restaurantMobile"
                     class="flex items-center gap-2 bg-[#090A0F] text-white px-5 py-3 rounded-2xl font-bold hover:bg-indigo-600 active:scale-95 transition-all duration-300 shadow-md shadow-black/5 hover:shadow-indigo-500/20 whitespace-nowrap shrink-0">
                     <span class="material-icons text-base">phone</span>
                     <span class="text-xs leading-none">Call Staff</span>
