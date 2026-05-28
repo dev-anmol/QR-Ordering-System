@@ -28,6 +28,7 @@ import { CartService } from '../../services/cart/cart.service';
 
 
 import { CustomerService } from '../../services/customer/customer.service';
+import { GoogleAnalyticsService } from '../../services/google-analytics.service';
 import * as CartActions from '../../state/cart/cart.actions';
 import { selectCartQuantityMap, selectCart } from '../../state/cart/cart.selector';
 import { AddToCartRequest, UpdateCartItemRequest, CartItemDto } from '../../model/cart.model';
@@ -156,6 +157,13 @@ export class MenuPage implements OnInit, OnDestroy {
     this.uiCart.setShowCart(true);
     this.loadCategories();
     this.loadCart();
+
+    const tableId = localStorage.getItem('table_id');
+    const tableNumber = tableId ? parseInt(tableId) : 1;
+    this.analyticsService.trackEvent('menu_view', {
+      restaurant_id: this.restaurantId,
+      table_number: tableNumber
+    });
   }
 
   loadCart() {
@@ -287,6 +295,7 @@ export class MenuPage implements OnInit, OnDestroy {
 
   private cartService = inject(CartService);
   private customerService = inject(CustomerService);
+  private analyticsService = inject(GoogleAnalyticsService);
 
   openCustomizationModal(product: foodInterface) {
     this.selectedProductForCustomization.set(product);
@@ -328,6 +337,27 @@ export class MenuPage implements OnInit, OnDestroy {
   }
 
   private addToBasket(product: foodInterface, variantId?: string, addonIds: string[] = [], quantity: number = 1) {
+    let itemPrice = product.price;
+    if (variantId && product.variants) {
+      const variant = product.variants.find(v => v.variantId === variantId);
+      if (variant) {
+        itemPrice = variant.price;
+      }
+    }
+    if (addonIds && product.addons) {
+      addonIds.forEach(id => {
+        const addon = product.addons?.find(a => a.addonId === id);
+        if (addon) {
+          itemPrice += addon.price;
+        }
+      });
+    }
+
+    this.analyticsService.trackEvent('add_to_cart', {
+      item_name: product.name,
+      price: itemPrice
+    });
+
     this.basket.update(prev => {
       const existingIndex = prev.findIndex(item =>
         item.menuItemId === product.id &&

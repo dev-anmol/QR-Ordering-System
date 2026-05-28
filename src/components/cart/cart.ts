@@ -7,6 +7,7 @@ import { CartService } from '../../services/cart/cart.service';
 import { CustomerService } from '../../services/customer/customer.service';
 import { toSignal, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subject, debounceTime, first } from 'rxjs';
+import { GoogleAnalyticsService } from '../../services/google-analytics.service';
 
 import * as CartActions from '../../state/cart/cart.actions';
 import { Router, RouterModule } from '@angular/router';
@@ -28,6 +29,7 @@ export class Cart implements OnInit {
   private customerService = inject(CustomerService);
   private destroyRef = inject(DestroyRef);
   private orderTrackingService = inject(OrderTrackingService);
+  private analyticsService = inject(GoogleAnalyticsService);
 
   public isCheckingOut = signal(false);
   public error = signal<string | null>(null);
@@ -258,6 +260,11 @@ export class Cart implements OnInit {
 
       this.cartService.checkout(checkoutPayload).subscribe({
         next: (res) => {
+          this.analyticsService.trackEvent('order_placed', {
+            order_id: res.orderId,
+            total_amount: res.totalAmount
+          });
+
           this.isCheckingOut.set(false);
           this.error.set(null); // Clear any previous errors
 
