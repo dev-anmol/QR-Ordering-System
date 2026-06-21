@@ -298,6 +298,10 @@ export class MenuPage implements OnInit, OnDestroy {
   private analyticsService = inject(GoogleAnalyticsService);
 
   openCustomizationModal(product: foodInterface) {
+    this.analyticsService.trackEvent('view_item', {
+      item_name: product.name,
+      price: product.price
+    });
     this.selectedProductForCustomization.set(product);
     if (product.variants && product.variants.length > 0) {
       this.selectedVariant.set(product.variants[0].variantId); // Auto-select first option

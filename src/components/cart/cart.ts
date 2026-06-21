@@ -101,6 +101,9 @@ export class Cart implements OnInit {
 
   ngOnInit() {
     this.loadCart();
+    
+    // Track begin checkout when viewing the cart
+    this.analyticsService.trackEvent('begin_checkout');
   }
 
   loadCart() {
@@ -260,9 +263,10 @@ export class Cart implements OnInit {
 
       this.cartService.checkout(checkoutPayload).subscribe({
         next: (res) => {
-          this.analyticsService.trackEvent('order_placed', {
-            order_id: res.orderId,
-            total_amount: res.totalAmount
+          this.analyticsService.trackEvent('purchase', {
+            transaction_id: res.orderId,
+            value: res.totalAmount,
+            currency: 'USD'
           });
 
           this.isCheckingOut.set(false);

@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CustomerService } from '../../services/customer/customer.service';
+import { GoogleAnalyticsService } from '../../services/google-analytics.service';
 import { catchError, of } from 'rxjs';
 
 @Component({
@@ -15,6 +16,7 @@ export class OrderInitComponent implements OnInit {
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private customerService = inject(CustomerService);
+    private analyticsService = inject(GoogleAnalyticsService);
 
     // State Signals
     restaurantId = signal<string | null>(null);
@@ -50,6 +52,7 @@ export class OrderInitComponent implements OnInit {
             next: (res: any) => {
                 if (res && res.sessionToken) {
                     // Success! Redirect to menu page (via API Gateway)
+                    this.analyticsService.trackEvent('qr_scanned', { method: 'qr_code' });
                     this.router.navigate(['/menu']);
                 }
             }
