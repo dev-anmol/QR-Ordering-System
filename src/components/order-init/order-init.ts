@@ -86,7 +86,7 @@ export class OrderInitComponent implements OnInit {
         // Reset styles for safe re-runs on retry
         gsap.set('.book-cover', { rotateY: 0 });
         gsap.set('.book-page', { rotateY: 0 });
-        gsap.set('.table-badge-glow', { scale: 0, opacity: 0, xPercent: -50, yPercent: -50, y: 30 });
+        gsap.set('.table-badge-glow', { scale: 0, opacity: 0, xPercent: -50, yPercent: -50, y: 30, z: 0 });
         gsap.set('.progress-bar', { width: '0%' });
 
         // 1. Success badge animation
@@ -113,10 +113,10 @@ export class OrderInitComponent implements OnInit {
             { rotateY: 135, duration: 1.1, stagger: 0.12, ease: 'power2.inOut', delay: 0.45 }
         );
 
-        // 5. Table Number badge scale & elastic bounce emerging in 3D center
+        // 5. Table Number badge scale & elastic bounce emerging in 3D center (Z translated forward)
         gsap.fromTo('.table-badge-glow',
-            { scale: 0, opacity: 0, xPercent: -50, yPercent: -50, y: 30 },
-            { scale: 1, opacity: 1, xPercent: -50, yPercent: -50, y: -45, duration: 0.9, ease: 'elastic.out(1.0, 0.65)', delay: 0.8 }
+            { scale: 0, opacity: 0, xPercent: -50, yPercent: -50, y: 30, z: 0 },
+            { scale: 1, opacity: 1, xPercent: -50, yPercent: -50, y: -45, z: 80, duration: 0.9, ease: 'elastic.out(1.0, 0.65)', delay: 0.8 }
         );
 
         // 6. Progress bar loader filling
