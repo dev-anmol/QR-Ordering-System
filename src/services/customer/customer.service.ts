@@ -32,6 +32,7 @@ export class CustomerService {
                     this.setCookie('customer_session', response.sessionToken, 1); // 1 day expire
                     if (response.refreshToken) this.setCookie('customer_refresh_token', response.refreshToken, 1);
                     if (response.restaurantId) localStorage.setItem('restaurant_id', response.restaurantId);
+                    if (response.restaurantName) localStorage.setItem('restaurant_name', response.restaurantName);
                     if (response.tableNumber) localStorage.setItem('table_id', response.tableNumber.toString());
                     if (response.seatingType) localStorage.setItem('seating_type', response.seatingType);
                     if (response.hotelConfigId) localStorage.setItem('hotel_config_id', response.hotelConfigId);
