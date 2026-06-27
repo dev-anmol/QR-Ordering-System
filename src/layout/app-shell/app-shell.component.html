@@ -1,15 +1,15 @@
-<header class="sticky top-0 z-50 w-full bg-white/60 backdrop-blur-[32px]">
+<header *ngIf="!isOrderInitPage()" class="sticky top-0 z-50 w-full bg-white/60 backdrop-blur-[32px]">
   <app-header></app-header>
 </header>
-<main class="min-h-screen pb-16">
+<main class="min-h-screen" [ngClass]="{'pb-16': !isOrderInitPage()}">
   <router-outlet></router-outlet>
 </main>
-<app-footer *ngIf="!isCartPage()"></app-footer>
-<app-bottom-nav></app-bottom-nav>
+<app-footer *ngIf="!isCartPage() && !isOrderInitPage()"></app-footer>
+<app-bottom-nav *ngIf="!isOrderInitPage()"></app-bottom-nav>
 
 <!-- Floating Call Waiter Button -->
 <button #bellBtn
-        *ngIf="isWaiterAllowed()"
+        *ngIf="isWaiterAllowed() && !isOrderInitPage()"
         (mousedown)="onDragStart($event, bellBtn)"
         (touchstart)="onDragStart($event, bellBtn)"
         [style.left.px]="buttonX"

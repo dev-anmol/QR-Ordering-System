@@ -257,6 +257,10 @@ export class AppShellComponent implements OnInit {
     return this.router.url.includes('/cart');
   }
 
+  isOrderInitPage(): boolean {
+    return this.router.url.includes('/order-init');
+  }
+
   isWaiterAllowed(): boolean {
     if (typeof localStorage !== 'undefined') {
       const type = localStorage.getItem('seating_type');
