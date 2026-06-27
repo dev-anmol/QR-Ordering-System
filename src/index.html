@@ -129,8 +129,102 @@
   </script>
 </head>
 
-<body class="mat-typography">
-  <app-root></app-root>
+<body class="mat-typography" style="background-color: #fafafa; margin: 0;">
+  <app-root>
+    <style>
+      .initial-loader-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background-color: #fafafa;
+        font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
+        color: #090A0F;
+        text-align: center;
+      }
+      .initial-loader-radar {
+        position: relative;
+        width: 112px;
+        height: 112px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 24px;
+      }
+      .initial-loader-circle {
+        position: absolute;
+        inset: 0;
+        border: 1px solid rgba(9, 10, 15, 0.1);
+        border-radius: 50%;
+        animation: initial-ping 1.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+      }
+      .initial-loader-circle:nth-child(2) {
+        animation-delay: 0.3s;
+      }
+      .initial-loader-circle:nth-child(3) {
+        animation-delay: 0.6s;
+      }
+      .initial-loader-center {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background-color: rgba(9, 10, 15, 0.04);
+        border: 1px solid rgba(9, 10, 15, 0.08);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .initial-loader-spinner {
+        position: absolute;
+        inset: 0;
+        border: 4px dashed rgba(9, 10, 15, 0.15);
+        border-radius: 50%;
+        animation: initial-spin 15s linear infinite;
+      }
+      @keyframes initial-ping {
+        75%, 100% {
+          transform: scale(2);
+          opacity: 0;
+        }
+      }
+      @keyframes initial-spin {
+        to { transform: rotate(360deg); }
+      }
+      .initial-loader-title {
+        font-size: 30px;
+        font-weight: 900;
+        letter-spacing: -0.025em;
+        margin: 0 0 8px 0;
+        background: linear-gradient(135deg, #090A0F 0%, #2B1E5A 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .initial-loader-subtitle {
+        font-size: 14px;
+        color: rgba(9, 10, 15, 0.6);
+        font-weight: 500;
+        margin: 0;
+      }
+    </style>
+    <div class="initial-loader-container">
+      <div class="initial-loader-radar">
+        <div class="initial-loader-circle"></div>
+        <div class="initial-loader-circle"></div>
+        <div class="initial-loader-circle"></div>
+        <div class="initial-loader-spinner"></div>
+        <div class="initial-loader-center">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#090A0F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.7;">
+            <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+            <rect width="6" height="6" x="7" y="7"/>
+            <rect width="6" height="6" x="7" y="11" style="display:none;"/>
+            <path d="M7 17h.01M17 7h.01M12 12h.01M17 12h.01M12 17h.01M17 17h.01"/>
+          </svg>
+        </div>
+      </div>
+      <h2 class="initial-loader-title">DineSphere</h2>
+      <p class="initial-loader-subtitle">Securing table connection...</p>
+    </div>
+  </app-root>
 </body>
-
 </html>
