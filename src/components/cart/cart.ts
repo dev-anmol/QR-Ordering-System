@@ -119,7 +119,7 @@ export class Cart implements OnInit {
           const errorMsg = err.error?.message || (typeof err.error === 'string' ? err.error : '');
           const errorCode = err.error?.errorCode || err.error?.code || err.status;
 
-          if (errorCode === 'SUBSCRIPTION_EXPIRED' || errorMsg.includes('not accepting orders right now')) {
+          if (errorCode === 'SUBSCRIPTION_EXPIRED' || errorMsg.includes('SUBSCRIPTION_EXPIRED') || errorMsg.includes('not accepting orders right now')) {
             this.isSubscriptionExpired.set(true);
             return;
           }
@@ -315,7 +315,7 @@ export class Cart implements OnInit {
           const errorMsg = err.error?.message || (typeof err.error === 'string' ? err.error : '');
           const errorCode = err.error?.errorCode || err.error?.code || err.status;
 
-          if (errorCode === 'SUBSCRIPTION_EXPIRED' || errorMsg.includes('not accepting orders right now')) {
+          if (errorCode === 'SUBSCRIPTION_EXPIRED' || errorMsg.includes('SUBSCRIPTION_EXPIRED') || errorMsg.includes('not accepting orders right now')) {
             this.isSubscriptionExpired.set(true);
             this.showNameModal.set(false);
             this.showHotelModal.set(false);
