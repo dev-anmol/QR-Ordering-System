@@ -116,6 +116,13 @@ export class Cart implements OnInit {
           this.store.dispatch(CartActions.loadCartSuccess({ cart }));
         },
         error: (err) => {
+          const errorMsg = err.error?.message || (typeof err.error === 'string' ? err.error : '');
+          const errorCode = err.error?.errorCode || err.error?.code || err.status;
+
+          if (errorCode === 'SUBSCRIPTION_EXPIRED' || errorMsg.includes('not accepting orders right now')) {
+            this.isSubscriptionExpired.set(true);
+            return;
+          }
           this.error.set(err.error?.message || 'Failed to load cart. Ensure Cart Service is running.');
         }
       });
@@ -310,6 +317,8 @@ export class Cart implements OnInit {
 
           if (errorCode === 'SUBSCRIPTION_EXPIRED' || errorMsg.includes('not accepting orders right now')) {
             this.isSubscriptionExpired.set(true);
+            this.showNameModal.set(false);
+            this.showHotelModal.set(false);
             return;
           }
 
