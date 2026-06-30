@@ -7,6 +7,7 @@ import { CartService } from '../../services/cart/cart.service';
 import { CustomerService } from '../../services/customer/customer.service';
 import { toSignal, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subject, debounceTime, first } from 'rxjs';
+import { GoogleAnalyticsService } from '../../services/google-analytics.service';
 
 import * as CartActions from '../../state/cart/cart.actions';
 import { Router, RouterModule } from '@angular/router';
@@ -28,6 +29,7 @@ export class Cart implements OnInit {
   private customerService = inject(CustomerService);
   private destroyRef = inject(DestroyRef);
   private orderTrackingService = inject(OrderTrackingService);
+  private analyticsService = inject(GoogleAnalyticsService);
 
   public isCheckingOut = signal(false);
   public error = signal<string | null>(null);
@@ -100,6 +102,9 @@ export class Cart implements OnInit {
 
   ngOnInit() {
     this.loadCart();
+    
+    // Track begin checkout when viewing the cart
+    this.analyticsService.trackEvent('begin_checkout');
   }
 
   loadCart() {
@@ -259,6 +264,12 @@ export class Cart implements OnInit {
 
       this.cartService.checkout(checkoutPayload).subscribe({
         next: (res) => {
+          this.analyticsService.trackEvent('purchase', {
+            transaction_id: res.orderId,
+            value: res.totalAmount,
+            currency: 'USD'
+          });
+
           this.isCheckingOut.set(false);
           this.error.set(null); // Clear any previous errors
 
@@ -287,8 +298,8 @@ export class Cart implements OnInit {
           // Start tracking the order immediately so notifications work on other pages/in background
           this.orderTrackingService.startTracking(res.orderId, res);
           
-          // Navigate to the full orders list since downstream processing takes time
-          this.router.navigate(['/orders']);
+          // Navigate directly to the live order tracking details page
+          this.router.navigate(['/order', res.orderId]);
         },
         error: (err) => {
           this.isCheckingOut.set(false);

@@ -4,6 +4,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { catchError, retry, throwError, timer, switchMap } from 'rxjs';
 import { Router } from '@angular/router';
 import { CustomerService } from '../services/customer/customer.service';
+import { AlertService } from '../services/alert/alert.service';
 
 // Helper to get cookies
 function getCookie(name: string): string | null {
@@ -60,6 +61,7 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
     const isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
     const router = inject(Router);
     const customerService = inject(CustomerService);
+    const alertService = inject(AlertService);
 
     // Only intercept if we're in the browser
     if (!isBrowser) {
@@ -132,14 +134,14 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
                             console.warn('Refresh token failed or expired.');
                             deleteCookie('customer_session');
                             deleteCookie('customer_refresh_token');
-                            alert('Your session has expired. Please scan the QR code on your table again to continue ordering.');
+                            alertService.show('Session Expired', 'Your session has expired. Please scan the QR code on your table again to continue ordering.', 'warning');
                             return throwError(() => refreshErr);
                         })
                     );
                 } else if (isBrowser) {
                     console.warn('Session expired and no refresh token available.');
                     deleteCookie('customer_session');
-                    alert('Your session has expired. Please scan the QR code on your table again to continue ordering.');
+                    alertService.show('Session Expired', 'Your session has expired. Please scan the QR code on your table again to continue ordering.', 'warning');
                 }
             }
             return throwError(() => error);

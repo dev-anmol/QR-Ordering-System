@@ -1,15 +1,78 @@
-<header class="sticky top-0 z-50 w-full bg-white/60 backdrop-blur-[32px]">
+<header *ngIf="!isOrderInitPage()" class="sticky top-0 z-50 w-full bg-white/60 backdrop-blur-[32px]">
   <app-header></app-header>
 </header>
-<main class="min-h-screen pb-16">
+<main class="min-h-screen" [ngClass]="{'pb-16': !isOrderInitPage()}">
   <router-outlet></router-outlet>
 </main>
-<app-footer *ngIf="!isCartPage()"></app-footer>
-<app-bottom-nav></app-bottom-nav>
+<app-footer *ngIf="!isCartPage() && !isOrderInitPage()"></app-footer>
+<app-bottom-nav *ngIf="!isOrderInitPage()"></app-bottom-nav>
 
-<!-- Floating Call Waiter Button 
-<button class="fixed bottom-6 right-6 z-50 bg-indigo-600 text-white p-3 md:px-5 md:py-3 rounded-2xl shadow-xl shadow-indigo-600/30 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 group cursor-pointer border-2 border-transparent hover:border-indigo-400">
+<!-- Floating Call Waiter Button -->
+<button #bellBtn
+        *ngIf="isWaiterAllowed() && !isOrderInitPage()"
+        (mousedown)="onDragStart($event, bellBtn)"
+        (touchstart)="onDragStart($event, bellBtn)"
+        [style.left.px]="buttonX"
+        [style.top.px]="buttonY"
+        [style.bottom]="buttonX !== null ? 'auto' : ''"
+        [style.right]="buttonY !== null ? 'auto' : ''"
+        [class.transition-all]="!isDragging"
+        class="fixed bottom-6 right-6 z-[9999] bg-indigo-600 text-white p-3.5 md:px-5 md:py-3 rounded-2xl shadow-xl shadow-indigo-600/30 hover:scale-105 active:scale-95 flex items-center justify-center gap-2 group cursor-grab active:cursor-grabbing touch-none select-none border border-white/10 hover:border-indigo-400">
   <span class="text-xl group-hover:animate-bounce">🛎️</span>
   <span class="font-bold text-sm hidden md:block">Call Waiter</span>
 </button>
--->
+
+<!-- Bottom Drawer Selector -->
+<div *ngIf="showDrawer" class="fixed inset-0 z-50 flex items-end justify-center">
+  <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300" (click)="closeRequestDrawer()"></div>
+  
+  <div class="relative bg-white w-full max-w-md rounded-t-[2.5rem] p-6 pb-8 border-t border-gray-100 shadow-[0_-15px_30px_rgba(0,0,0,0.1)] transition-transform duration-300 transform translate-y-0 z-10">
+    <div class="w-12 h-1 bg-gray-200 rounded-full mx-auto mb-6"></div>
+    
+    <h3 class="text-xl font-black text-[#090A0F] mb-1 text-center">How can we assist you?</h3>
+    <p class="text-xs text-gray-500 font-semibold mb-6 text-center">Select request type for Table #{{ getTableNumber() }}</p>
+    
+    <div class="space-y-3.5">
+      <button (click)="submitRequest('CALL_WAITER')" class="w-full flex items-center gap-4 p-4 rounded-2xl border border-gray-100 hover:bg-indigo-50/50 hover:border-indigo-200 transition-all text-left active:scale-[0.98]">
+        <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-2xl font-bold">🛎️</div>
+        <div>
+          <h4 class="font-black text-sm text-gray-800">Call Waiter</h4>
+          <p class="text-[10px] text-gray-400 font-semibold">Request a staff member to assist you</p>
+        </div>
+      </button>
+
+      <button (click)="submitRequest('WATER')" class="w-full flex items-center gap-4 p-4 rounded-2xl border border-gray-100 hover:bg-blue-50/50 hover:border-blue-200 transition-all text-left active:scale-[0.98]">
+        <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center text-2xl font-bold">💧</div>
+        <div>
+          <h4 class="font-black text-sm text-gray-800">Request Water</h4>
+          <p class="text-[10px] text-gray-400 font-semibold">Get drinking water delivered to your table</p>
+        </div>
+      </button>
+
+      <button (click)="submitRequest('BILL')" class="w-full flex items-center gap-4 p-4 rounded-2xl border border-gray-100 hover:bg-emerald-50/50 hover:border-emerald-200 transition-all text-left active:scale-[0.98]">
+        <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-2xl font-bold">💰</div>
+        <div>
+          <h4 class="font-black text-sm text-gray-800">Request Bill</h4>
+          <p class="text-[10px] text-gray-400 font-semibold">Ready to pay? Generate final invoice</p>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Premium Floating Toast Notification -->
+<div *ngIf="toast" class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] w-full max-w-sm px-4 pointer-events-none">
+  <div class="pointer-events-auto flex items-center gap-3.5 px-5 py-4 rounded-2xl border backdrop-blur-xl shadow-2xl transition-all duration-300 transform scale-100"
+       [ngClass]="{
+         'bg-emerald-500/90 border-emerald-500/20 text-white shadow-emerald-500/10': toast.type === 'success',
+         'bg-amber-500/90 border-amber-500/20 text-black shadow-amber-500/10': toast.type === 'warning',
+         'bg-red-500/90 border-red-500/20 text-white shadow-red-500/10': toast.type === 'error'
+       }">
+    <span class="text-xl shrink-0">
+      <span *ngIf="toast.type === 'success'">✅</span>
+      <span *ngIf="toast.type === 'warning'">⚠️</span>
+      <span *ngIf="toast.type === 'error'">🚨</span>
+    </span>
+    <p class="text-xs font-bold leading-tight">{{ toast.message }}</p>
+  </div>
+</div>

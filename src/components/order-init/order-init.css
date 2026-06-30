@@ -6,3 +6,104 @@
 .animate-fade-in {
   animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
+
+/* Premium Lighting Backdrop */
+.bg-radial {
+  background: radial-gradient(circle at center, var(--tw-gradient-from) 0%, var(--tw-gradient-to) 100%);
+}
+
+/* 3D Book Layout and Perspective */
+.book-perspective-wrapper {
+  perspective: 1600px;
+  perspective-origin: center center;
+}
+
+.book-container {
+  transform-style: preserve-3d;
+  position: relative;
+  box-shadow: 0 45px 85px -15px rgba(0, 0, 0, 0.65);
+  border-radius: 12px;
+  background: transparent;
+}
+
+/* Central spine split line */
+.book-spine {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 100%;
+  background: linear-gradient(to right, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.05) 50%, rgba(0,0,0,0.35) 100%);
+  box-shadow: inset 1px 0 0 rgba(255,255,255,0.05), inset -1px 0 0 rgba(255,255,255,0.05);
+  z-index: 15;
+  pointer-events: none;
+}
+
+/* Front Cover Container - flips open to the left around center spine axis */
+.book-cover {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  z-index: 10;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+}
+
+/* Front face of the cover (leather look, gold design) */
+.cover-front {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  transform: rotateY(0deg);
+  border-radius: 0 12px 12px 0;
+  box-shadow: inset -4px 0 8px rgba(0, 0, 0, 0.3), 3px 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+}
+
+/* Back face of the cover (inside lining page) */
+.cover-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  transform: rotateY(180deg);
+  border-radius: 12px 0 0 12px;
+  box-shadow: inset 4px 0 8px rgba(0, 0, 0, 0.15), -3px 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+}
+
+/* Inside flipping pages - rotates Y to right around center spine axis */
+.book-page {
+  position: absolute;
+  top: 6px;
+  right: 50%;
+  width: calc(50% - 6px);
+  height: calc(100% - 12px);
+  z-index: 5;
+  transform-origin: right center;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  border-radius: 6px 0 0 6px;
+  box-shadow: inset -3px 0 6px rgba(0,0,0,0.08), 2px 0 5px rgba(0,0,0,0.05);
+}
+
+/* Book Back Cover (Inside base) */
+.book-back-cover {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 12px;
+}
+
+/* Table Badge emerging from book */
+.table-badge-glow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 20;
+  transform-style: preserve-3d;
+}

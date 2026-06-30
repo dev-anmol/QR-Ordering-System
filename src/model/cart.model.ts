@@ -21,6 +21,7 @@ export interface CheckoutResponse {
     tableNumber?: number;
     roomNumber?: string;
     hotelName?: string;
+    restaurantMobile?: string;
 }
 
 
