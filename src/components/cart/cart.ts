@@ -33,6 +33,7 @@ export class Cart implements OnInit {
   public error = signal<string | null>(null);
   public showNameModal = signal(false);
   public showHotelModal = signal(false);
+  public isSubscriptionExpired = signal(false);
   public userName = signal(localStorage.getItem('user_name') || '');
   public hotelMobile = signal(localStorage.getItem('hotel_mobile') || '');
   public hotelRoom = signal(localStorage.getItem('hotel_room') || '');
@@ -292,6 +293,15 @@ export class Cart implements OnInit {
         error: (err) => {
           this.isCheckingOut.set(false);
           console.error('Checkout failed:', err);
+
+          const errorMsg = err.error?.message || (typeof err.error === 'string' ? err.error : '');
+          const errorCode = err.error?.errorCode || err.error?.code || err.status;
+
+          if (errorCode === 'SUBSCRIPTION_EXPIRED' || errorMsg.includes('not accepting orders right now')) {
+            this.isSubscriptionExpired.set(true);
+            return;
+          }
+
           const friendlyMsg = this.getFriendlyErrorMessage(err);
           this.error.set(friendlyMsg);
           // Scroll to top to see the error
