@@ -1,0 +1,296 @@
+<div class="my-orders-container max-w-4xl mx-auto px-4 md:px-8 pb-64 min-h-screen relative z-10">
+    <!-- Header -->
+    <div class="pt-8 mb-6 flex flex-col items-center md:items-start text-center md:text-left w-full">
+        <div class="flex w-full justify-between items-start md:items-center mb-4">
+            <div class="inline-flex items-center gap-2 px-3 py-1 bg-[#090A0F]/5 text-[#090A0F] rounded-full w-fit">
+                <span class="w-1.5 h-1.5 rounded-full" [class.bg-yellow-400]="activeTab() === 'active'" [class.animate-pulse]="activeTab() === 'active'" [class.bg-gray-400]="activeTab() !== 'active'"></span>
+                <span class="text-[10px] font-black uppercase tracking-widest">
+                    {{ activeTab() === 'active' ? 'Active Orders' : 'Order History' }}
+                </span>
+            </div>
+            <button (click)="fetchMyOrders(true)" [disabled]="loading()"
+                class="p-2 bg-white/50 hover:bg-white backdrop-blur-md border border-gray-200 rounded-xl shadow-sm transition-all active:scale-95 group disabled:opacity-50 flex items-center justify-center">
+                <span class="material-icons text-gray-700 transition-transform duration-500"
+                    [class.animate-spin]="loading()">refresh</span>
+            </button>
+        </div>
+        <h1 class="text-4xl md:text-8xl font-black text-[#090A0F] tracking-tight leading-[0.9] mb-4">
+            {{ userName ? userName + "'s" : 'My' }} <br class="hidden md:block"> <span
+                class="title-gradient-modern">Orders.</span>
+        </h1>
+        <p class="text-gray-500 font-medium text-sm md:text-lg mb-6 max-w-lg">
+            {{ activeTab() === 'active' ? 'Keep track of your latest cravings and active food preparations.' : 'Review all your past culinary experiences and billing invoices.' }}
+        </p>
+
+        <!-- Dynamic Segmented Tab Toggle -->
+        <div class="flex p-1 bg-gray-100 rounded-2xl mb-4 max-w-sm w-full md:w-auto shadow-inner border border-gray-200/50">
+            <button (click)="setTab('active')" 
+                class="flex-1 py-3 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2"
+                [class.bg-white]="activeTab() === 'active'"
+                [class.text-[#090A0F]]="activeTab() === 'active'"
+                [class.shadow-sm]="activeTab() === 'active'"
+                [class.text-gray-400]="activeTab() !== 'active'"
+                [class.hover:text-gray-600]="activeTab() !== 'active'">
+                <span class="material-icons text-sm">local_fire_department</span>
+                Active
+            </button>
+            <button (click)="setTab('history')" 
+                class="flex-1 py-3 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2"
+                [class.bg-white]="activeTab() === 'history'"
+                [class.text-[#090A0F]]="activeTab() === 'history'"
+                [class.shadow-sm]="activeTab() === 'history'"
+                [class.text-gray-400]="activeTab() !== 'history'"
+                [class.hover:text-gray-600]="activeTab() !== 'history'">
+                <span class="material-icons text-sm">receipt_long</span>
+                History
+            </button>
+        </div>
+    </div>
+
+    <!-- Status States -->
+    @if (loading()) {
+    <div class="flex justify-center p-20 glass-effect rounded-[2rem] border border-gray-100/50 shadow-premium">
+        <span class="loading loading-spinner loading-lg text-[#090A0F]"></span>
+    </div>
+    } @else if (error()) {
+    <div
+        class="glass-effect p-12 text-center rounded-[2rem] border-2 border-red-500/10 max-w-lg mx-auto shadow-premium">
+        <div class="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <span class="material-icons text-3xl">error_outline</span>
+        </div>
+        <p class="text-2xl font-black text-[#090A0F] mb-3">Oops!</p>
+        <p class="text-gray-500 mb-8 font-medium">{{ error() }}</p>
+        <button (click)="fetchMyOrders()"
+            class="bg-[#090A0F] text-white px-8 py-4 rounded-2xl font-bold hover:bg-gray-800 transition-all active:scale-95 shadow-lg shadow-black/10 w-full sm:w-auto">
+            Try Again
+        </button>
+    </div>
+    } @else if (orders().length === 0) {
+    <div
+        class="glass-effect text-center p-12 rounded-[2rem] border border-gray-100 max-w-lg mx-auto shadow-premium transform transition-all hover:scale-[1.02]">
+        <div
+            class="w-20 h-20 bg-gray-50 text-gray-300 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-inner">
+            <span class="material-icons text-4xl">{{ activeTab() === 'active' ? 'local_fire_department' : 'receipt_long' }}</span>
+        </div>
+        <h2 class="text-2xl font-black text-[#090A0F] mb-3">
+            {{ activeTab() === 'active' ? 'No active orders' : 'No order history' }}
+        </h2>
+        <p class="text-gray-500 mb-8 font-medium px-4">
+            {{ activeTab() === 'active' ? 'Looks like you do not have any active preparations right now.' : 'Looks like you haven\'t placed any orders with us during this session.' }}
+        </p>
+        <a routerLink="/menu"
+            class="inline-flex items-center gap-2 bg-[#090A0F] text-white px-8 py-4 rounded-2xl font-bold hover:bg-gray-800 transition-all active:scale-95 shadow-lg shadow-black/10">
+            <span class="material-icons text-base">restaurant_menu</span>
+            Start Ordering
+        </a>
+    </div>
+    } @else {
+    <!-- Active Bill Section -->
+    @if (activeBill()) {
+    <div class="mb-10 animate-in fade-in slide-in-from-top-4 duration-700">
+        <div
+            class="glass-effect-dark p-6 md:p-10 rounded-[3rem] border-2 border-[#090A0F]/5 shadow-2xl relative overflow-hidden group bg-gradient-to-br from-white/80 to-white/50 backdrop-blur-3xl">
+            <!-- Premium Badge -->
+            <div class="absolute -top-1 -right-1">
+                <div
+                    class="bg-[#090A0F] text-white px-6 py-2 rounded-bl-3xl font-black text-[10px] uppercase tracking-[0.3em] flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse"></span>
+                    {{ activeBill().status === 'PAID' ? 'PAID' : 'Pending Payment' }}
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+                <div class="flex-1 w-full">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div
+                            class="w-12 h-12 bg-[#090A0F]/5 rounded-2xl flex items-center justify-center text-[#090A0F]">
+                            <span class="material-icons text-2xl">receipt</span>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-0.5">Invoice
+                                Number</p>
+                            <h2 class="text-xl font-black text-[#090A0F] tracking-tight">{{ activeBill().billId }}</h2>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Itemized List for Bill -->
+                    <div class="mb-8 space-y-3 bg-white/40 p-4 rounded-2xl border border-white/50">
+                        <p class="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-2">Itemized Breakdown
+                        </p>
+                        @for (item of activeBill().items; track $index) {
+                        <div
+                            class="flex justify-between items-start text-xs border-b border-gray-100/30 pb-2 last:border-0 last:pb-0">
+                            <div class="flex gap-2">
+                                <span class="font-black text-gray-400">{{ item.quantity }}x</span>
+                                <div class="flex flex-col">
+                                    <span class="font-bold text-gray-700">{{ item.name || item.menuItemName }}</span>
+                                    @if (item.variantName) {
+                                    <span class="text-[9px] font-black text-orange-500 uppercase tracking-tighter">{{
+                                        item.variantName }}</span>
+                                    }
+                                    @if (item.addonNames && item.addonNames.length > 0) {
+                                    <span class="text-[8px] text-indigo-500 font-medium">+ {{ item.addonNames.join(', ')
+                                        }}</span>
+                                    }
+                                </div>
+                            </div>
+                            <span class="font-bold text-gray-600">₹{{ ((item.unitPrice || 0) * item.quantity).toFixed(2)
+                                }}</span>
+                        </div>
+                        }
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 md:gap-8">
+                        <div>
+                            <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Items Total
+                            </p>
+                            <p class="text-2xl font-black text-[#090A0F]">₹{{ activeBill().baseAmount }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">GST (5%)</p>
+                            <p class="text-2xl font-black text-[#090A0F]">₹{{ activeBill().gstAmount }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full md:w-auto text-center md:text-right flex flex-col items-center md:items-end gap-3">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">Total Payable</p>
+                    <h2 class="text-5xl md:text-7xl font-black text-[#090A0F] tracking-tighter leading-none mb-2">₹{{
+                        activeBill().totalAmount }}</h2>
+
+                    @if (activeBill().status === 'PAID') {
+                    <div
+                        class="flex items-center gap-2 text-emerald-600 bg-emerald-50 px-4 py-2 rounded-xl border border-emerald-100/50">
+                        <span class="material-icons text-sm">verified</span>
+                        <span class="font-black text-xs uppercase tracking-widest">Payment Success</span>
+                    </div>
+                    } @else {
+                    <p class="text-xs font-bold text-gray-400 italic">Please pay at the restaurant counter</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+
+    <!-- Notification Permission Banner -->
+    <app-notification-banner class="block mb-6"></app-notification-banner>
+
+    <!-- Order List -->
+    <div class="space-y-4">
+        @for (order of orders(); track order.orderId; let i = $index) {
+        <div class="block p-5 md:p-6 rounded-[2rem] border border-white bg-white/70 backdrop-blur-xl shadow-premium hover:shadow-2xl transition-all duration-300 group cursor-pointer active:scale-[0.98]"
+            [style.animation-delay]="(i * 100) + 'ms'" (click)="toggleExpandedOrder(order.orderId, $event)">
+
+            <div class="flex items-center justify-between gap-4">
+                <!-- Left: Status Icon + Order Info -->
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-2xl flex items-center justify-center font-bold shadow-sm transition-transform group-hover:scale-105"
+                        [ngClass]="{
+                                    'bg-yellow-400/10 text-yellow-600': order.status === OrderStatus.PENDING || order.status === OrderStatus.CREATED,
+                                    'bg-blue-400/10 text-blue-600': order.status === OrderStatus.PREPARING,
+                                    'bg-emerald-400/10 text-emerald-600': [OrderStatus.PAID, OrderStatus.CLOSED, OrderStatus.PAYMENT_PENDING, OrderStatus.PAYMENT_REQUESTED].includes(order.status),
+                                    'bg-red-400/10 text-red-600': isCancelled(order.status) || isRejected(order.status)
+                                 }">
+                        @if (order.status === OrderStatus.PENDING || order.status === OrderStatus.CREATED) { <span
+                            class="material-icons text-xl">hourglass_bottom</span> }
+                        @if (order.status === OrderStatus.PREPARING) { <span
+                            class="material-icons animate-spin-slow text-xl">restaurant</span> }
+                        @if ([OrderStatus.PAID, OrderStatus.CLOSED, OrderStatus.PAYMENT_PENDING,
+                        OrderStatus.PAYMENT_REQUESTED].includes(order.status)) { <span
+                            class="material-icons text-xl">check_circle</span> }
+                        @if (isCancelled(order.status) || isRejected(order.status)) { <span
+                            class="material-icons text-xl">cancel</span> }
+                    </div>
+
+                    <div>
+                        <h3 class="font-black text-[#090A0F] text-lg leading-tight mb-1">
+                            #{{ order.orderId.substring(0, 8).toUpperCase() }}
+                        </h3>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md"
+                                [ngClass]="{
+                                            'bg-yellow-400/20 text-yellow-700': order.status === OrderStatus.PENDING || order.status === OrderStatus.CREATED,
+                                            'bg-blue-400/20 text-blue-700': order.status === OrderStatus.PREPARING,
+                                            'bg-emerald-400/20 text-emerald-700': [OrderStatus.PAID, OrderStatus.CLOSED, OrderStatus.PAYMENT_PENDING, OrderStatus.PAYMENT_REQUESTED].includes(order.status),
+                                            'bg-red-400/20 text-red-700': isCancelled(order.status) || isRejected(order.status)
+                                          }">
+                                {{ order.status }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Price + Expand Icon -->
+                <div class="flex items-center gap-4">
+                    <div class="text-right">
+                        <p class="font-black text-xl text-[#090A0F]">₹{{ order.totalAmount }}</p>
+                    </div>
+                    <div class="w-10 h-10 bg-gray-50 border border-gray-100 rounded-xl flex items-center justify-center text-gray-300 transition-all"
+                        [class.rotate-90]="expandedOrderId() === order.orderId">
+                        <span class="material-icons text-sm">arrow_forward_ios</span>
+                    </div>
+                </div>
+            </div>
+
+            @if ((isCancelled(order.status) || isRejected(order.status)) && order.reason) {
+            <div class="mt-4 p-3 bg-red-50/50 rounded-xl border border-red-100/50">
+                <p class="text-xs text-red-600 font-medium">
+                    <span class="font-bold uppercase tracking-tight mr-1">Note:</span>
+                    {{ order.reason }}
+                </p>
+            </div>
+            }
+
+            @if (expandedOrderId() === order.orderId) {
+
+            <div class="mt-5 pt-4 border-t border-gray-100/50 animate-in fade-in slide-in-from-top-2 duration-300">
+                @if (order.items && order.items.length > 0) {
+                @for (item of order.items; track item.menuItemId || $index) {
+                <div
+                    class="flex justify-between items-start text-sm md:text-base border-b border-gray-50 pb-3 last:border-0 last:pb-0">
+                    <div class="flex items-start gap-3">
+                        <span class="font-black text-[#090A0F] bg-gray-100 px-2 py-0.5 rounded-md text-[10px] mt-0.5">{{
+                            item.quantity }}x</span>
+                        <div class="flex flex-col">
+                            <span class="font-bold text-gray-800">{{ item.name || item.menuItemName || 'Item' }}</span>
+
+                            @if (item.variantName) {
+                            <span class="text-[10px] font-black text-orange-500 uppercase tracking-tighter mt-0.5">
+                                {{ item.variantName }}
+                            </span>
+                            }
+
+                            @if (item.addonNames && item.addonNames.length > 0) {
+                            <div class="flex flex-wrap gap-1 mt-1">
+                                @for (addon of item.addonNames; track addon) {
+                                <span
+                                    class="text-[9px] bg-indigo-50 text-indigo-500 px-1.5 py-0.5 rounded-md font-bold">
+                                    + {{ addon }}
+                                </span>
+                                }
+                            </div>
+                            }
+                        </div>
+                    </div>
+                    <span class="font-bold text-[#090A0F] whitespace-nowrap ml-4">₹{{ ((item.unitPrice || item.price ||
+                        0) * (item.quantity || 1)).toFixed(2) }}</span>
+                </div>
+                }
+                }
+
+                <a [routerLink]="['/order', order.orderId]" (click)="$event.stopPropagation()"
+                    class="flex items-center justify-center gap-2 w-full py-3 bg-[#090A0F] text-white rounded-2xl font-bold text-sm hover:bg-gray-800 transition-all active:scale-[0.98]">
+                    <span class="material-icons text-sm">bolt</span>
+                    View Live Tracking
+                </a>
+            </div>
+            }
+        </div>
+        }
+    </div>
+    }
+</div>
+
+<!-- Modern Mesh Background matches other pages -->
+<div class="fixed inset-0 mesh-bg -z-10 pointer-events-none"></div>

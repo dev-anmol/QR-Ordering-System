@@ -3,7 +3,6 @@ import {Footer} from "../footer/footer";
 import {Header} from "../header/header";
 import {Hero} from "../hero/hero";
 import {HeroSecondary} from "../hero-secondary/hero-secondary";
-import {PricingComponent} from "../pricing/pricing.component";
 import {TestimonialsComponent} from "../testimonials/testimonials.component";
 
 @Component({
@@ -12,7 +11,6 @@ import {TestimonialsComponent} from "../testimonials/testimonials.component";
         Footer,
         Hero,
         HeroSecondary,
-        PricingComponent,
         TestimonialsComponent
     ],
   templateUrl: './landing-page.html',

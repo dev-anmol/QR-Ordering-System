@@ -1,0 +1,26 @@
+@if (pwaService.isInstallable()) {
+<div class="install-banner-wrapper">
+  <div class="install-banner shadow-premium animate-in slide-in-from-bottom-8 duration-700">
+    <button (click)="onDismiss()" class="close-btn" aria-label="Dismiss">
+      <span class="material-icons">close</span>
+    </button>
+
+    <div class="banner-content">
+      <div class="icon-container">
+        <span class="material-icons install-icon">install_mobile</span>
+      </div>
+
+      <div class="text-container">
+        <h3 class="banner-title">Install DineSphere App</h3>
+        <p class="banner-description">For a better experience & live updates</p>
+      </div>
+
+      <button (click)="onInstall()" class="install-btn">
+        <span>Install</span>
+        <span class="material-icons">bolt</span>
+      </button>
+    </div>
+  </div>
+</div>
+}
+

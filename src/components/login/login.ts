@@ -43,11 +43,9 @@ export class Login {
 
     this.loginService.loginUser(data).subscribe({
       next: (res) => {
-        console.log("Login successful", res);
         this.router.navigateByUrl('/home')
       },
       error: (err) => {
-        console.log("Error in login", err);
       }
     })
   }

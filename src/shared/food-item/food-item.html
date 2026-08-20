@@ -1,39 +1,52 @@
-<div
-  animate.enter="fade-in"
-  class="border-none max-w-sm  bg-white rounded-lg overflow-hidden transition-all duration-300 hover:translate-y-[-4px]">
-  <div class="relative h-48 overflow-hidden p-3">
-    <div class="absolute inset-0 bg-linear-to-t from-black/5 to-transparent z-10"></div>
+<div class="glass-card fade-in-entry max-w-sm rounded-3xl transition-all duration-300 h-full flex flex-col">
 
-    <img
-      animate.enter="fade-in-image"
-      [src]="foodItem.image"
-      alt="{{foodItem.name}}"
-      class="w-full h-full object-cover transition-transform duration-500 hover:scale-105 rounded-lg"
-      style="image-rendering: smooth; transform: translateZ(0);"
-    >
+  <div class="item-image-container h-40 md:h-48 relative shrink-0">
+    <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent z-10 opacity-60"></div>
+    <img [src]="foodItem.image" alt="{{foodItem.name}}" class="item-image w-full h-full object-cover">
+
+    <!-- Floating Add Button / Quantity Selector -->
+    @if (quantity > 0) {
+    <div
+      class="absolute bottom-4 right-4 z-20 flex items-center bg-black/90 backdrop-blur-md text-white rounded-full px-1 py-1 shadow-lg border border-white/20">
+      <button (click)="decreaseQuantity(foodItem)"
+        class="w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded-full transition-colors cursor-pointer">
+        <span class="material-icons text-base">remove</span>
+      </button>
+      <span class="w-6 text-center text-xs font-bold">{{ quantity }}</span>
+      <button (click)="addToCart(foodItem)"
+        class="w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded-full transition-colors cursor-pointer">
+        <span class="material-icons text-base">add</span>
+      </button>
+    </div>
+    } @else {
+    <button (click)="addToCart(foodItem)" class="btn-floating-add absolute bottom-4 right-4 z-20 cursor-pointer">
+      <span class="material-icons text-xl">add</span>
+    </button>
+    }
+
   </div>
 
-
-  <div class="p-5 flex flex-col gap-3">
-    <div class="flex justify-between items-center mb-3">
-      <h3 class="text-lg font-semibold text-gray-800 truncate">{{ foodItem.name }}</h3>
-    </div>
-
-    <div class="flex flex-col md:flex-row justify-between px-1 gap-2">
-      <p class=" text-sm line-clamp-3 pl-1 text-red-500">{{ foodItem.cuisine }}</p>
-      <p class="text-gray-800 text-sm">⭐ {{ foodItem.rating }}</p>
-    </div>
-
-    <div class="flex md:flex-row flex-col items-center justify-between mt-1 gap-1">
-      <p class="text-md text-red-500 pl-3 w-full">₹ {{ foodItem.price }}</p>
-      <div class="w-full">
-        <button
-          (click)="addToCart(foodItem)"
-          class="w-full flex items-center justify-center gap-2 px-4 text-sm text-white bg-yellow-500 p-1 rounded-lg hover:bg-yellow-400">
-          <i class="material-icons">shopping_cart</i>
-        </button>
+  <div class="p-3 md:p-5 flex flex-col flex-grow gap-2">
+    <div class="flex justify-between items-start gap-2">
+      <h3 class="item-name text-sm md:text-base lg:text-lg font-bold leading-tight line-clamp-2 min-h-[40px] md:min-h-[56px] flex-grow">{{ foodItem.name }}</h3>
+      <!-- Veg/Non-Veg Icon -->
+      <div [class]="foodItem.veg ? 'veg-indicator-container' : 'non-veg-indicator-container'" class="mt-1 shrink-0">
+        <div [class]="foodItem.veg ? 'bg-green-600' : 'bg-red-600'" class="w-2 h-2 rounded-full"></div>
       </div>
     </div>
 
+    <p class="text-xs text-gray-400 font-medium leading-relaxed line-clamp-2 min-h-[32px]">
+      {{ foodItem.description }}
+    </p>
+
+    <div class="flex items-center justify-between mt-auto pt-4">
+      <div class="price-container">
+        <span class="text-xs font-normal opacity-70 mr-0.5">₹</span>{{ foodItem.price }}
+      </div>
+      <div class="flex items-center gap-1 opacity-40">
+        <span class="material-icons text-[10px]">timer</span>
+        <span class="text-[9px] font-bold uppercase tracking-widest">15 MIN</span>
+      </div>
+    </div>
   </div>
 </div>

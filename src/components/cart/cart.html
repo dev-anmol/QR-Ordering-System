@@ -1,54 +1,352 @@
-@if (!(foodItem$ | async)?.length) {
-  <section class="flex flex-col justify-center items-center gap-4 w-full h-screen md:mt-[100px] mt-[50px] overflow-hidden ">
-    <div class="flex flex-col container-full container-mobile justify-center items-center">
-      <p class="text-3xl text-gray-600">Cart is empty :(</p>
-    </div>
-  </section>
-} @else {
-  <section class="flex flex-col justify-center items-center gap-4 w-full md:mt-[100px] mt-[50px] overflow-hidden ">
-    <div class="flex flex-row w-full items-center justify-start container-full container-mobile md:pl-36">
-      <p class="max-w-fit p-2 w-full text-lg text-gray-900">Cart</p>
-      <p class="max-w-fit p-2 w-full text-end text-md text-gray-900">{{ (foodItem$ | async)?.length }} items</p>
-    </div>
-    <div
-      class="flex flex-col md:flex-row md:items-center md:justify-center flex-wrap container-full container-mobile gap-4">
-      @for (item of foodItem$ | async; track item.id) {
+@if (isSubscriptionExpired()) {
+<div class="fixed inset-0 z-[200] bg-[#090A0F] flex flex-col items-center justify-center p-6 text-center animate-in fade-in zoom-in duration-500">
+  <div class="w-24 h-24 bg-red-500/10 text-red-500 rounded-[2rem] flex items-center justify-center mb-8">
+    <span class="material-icons text-5xl">storefront</span>
+  </div>
+  <h1 class="text-3xl md:text-5xl font-black text-white mb-4 tracking-tight">Currently Unavailable</h1>
+  <p class="text-gray-400 font-medium text-lg max-w-md mx-auto mb-8">
+    This restaurant is not accepting orders right now.
+  </p>
+  <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/5 rounded-xl border border-white/10 text-gray-400">
+    <span class="material-icons text-sm">info</span>
+    <span class="text-xs font-bold uppercase tracking-widest">Service Paused</span>
+  </div>
+</div>
+}
+
+<div class="cart-container max-w-2xl mx-auto px-4 md:px-6 pb-72">
+
+  <!-- Modern Mesh Background -->
+  <div class="fixed inset-0 mesh-bg -z-10 pointer-events-none"></div>
+
+  <!-- Premium Error Banner -->
+  @if (error()) {
+  <div
+    class="mb-8 p-5 bg-red-50/80 backdrop-blur-md border border-red-100 rounded-[2rem] shadow-premium-subtle animate-in fade-in slide-in-from-top-6 duration-500">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-4">
         <div
-          class="border-none max-w-sm  bg-white rounded-lg overflow-hidden transition-all duration-300 hover:translate-y-[-4px]">
-          <div class="relative h-48 overflow-hidden p-3">
-            <div class="absolute inset-0 bg-linear-to-t from-black/5 to-transparent z-10"></div>
-            <img
-              [src]="item.image"
-              alt="{{item.name}}"
-              class="w-full h-full object-cover transition-transform duration-500 hover:scale-105 rounded-lg"
-              style="image-rendering: smooth; transform: translateZ(0);"
-            >
+          class="w-10 h-10 bg-red-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-red-200">
+          <span class="material-icons text-xl">error_outline</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-[10px] font-black uppercase tracking-widest text-red-400 mb-0.5">Notification</span>
+          <span class="font-bold text-[#090A0F] text-sm leading-tight">{{ error() }}</span>
+        </div>
+      </div>
+      <button (click)="error.set(null)"
+        class="w-8 h-8 flex items-center justify-center text-red-300 hover:text-red-600 hover:bg-red-100/50 rounded-xl transition-all cursor-pointer">
+        <span class="material-icons text-lg">close</span>
+      </button>
+    </div>
+  </div>
+  }
+
+  <!-- Header Section -->
+
+  <header class="pt-8 mb-6 flex flex-row items-center justify-between gap-4">
+    <div class="flex flex-col gap-3">
+      <div class="inline-flex items-center gap-2 px-3 py-1 bg-yellow-400/10 text-yellow-600 rounded-full w-fit">
+        <span class="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse"></span>
+        <span class="text-[10px] font-black uppercase tracking-widest">Your Selections</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <button routerLink="/menu"
+          class="w-10 h-10 flex items-center justify-center bg-white rounded-xl border border-gray-100 shadow-sm active:scale-90 transition-transform">
+          <span class="material-icons text-gray-800">arrow_back</span>
+        </button>
+        <h1 class="text-4xl md:text-8xl font-black text-[#090A0F] tracking-tight leading-[0.9]">
+          My <br class="hidden md:block"> <span class="title-gradient-modern">Cart.</span>
+        </h1>
+      </div>
+      <p class="text-gray-500 font-medium text-sm md:text-lg mt-2 max-w-lg">
+        {{ (displayCart())?.items?.length || 0 }} items · {{ seatingLabel }} #{{ tableId || 'N/A' }}
+      </p>
+    </div>
+
+    <button (click)="loadCart()"
+      class="group h-10 w-10 md:h-12 md:w-12 flex items-center justify-center bg-white rounded-2xl shadow-sm border border-gray-100 hover:bg-black hover:text-white transition-all active:scale-95">
+      <span class="material-icons group-hover:rotate-180 transition-transform duration-500">refresh</span>
+    </button>
+  </header>
+
+  @if (displayCart(); as cart) {
+  @if (cart.items.length > 0) {
+  <!-- Cart Items List -->
+  <div class="space-y-4 mb-12">
+    @for (item of cart.items; track item.cartItemId; let i = $index) {
+    <div
+      class="glass-effect p-4 md:p-6 rounded-[2rem] border border-white bg-white/70 backdrop-blur-xl shadow-premium group item-animate"
+      [style.animation-delay]="(i * 60) + 'ms'">
+      <div class="flex gap-5">
+        <!-- Item Image -->
+        <div class="w-20 h-20 md:w-28 md:h-28 rounded-2xl overflow-hidden shadow-sm flex-shrink-0 bg-gray-50">
+          @if (item.imageUrl) {
+          <img [src]="item.imageUrl" [alt]="item.name"
+            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+          } @else {
+          <div class="w-full h-full flex items-center justify-center text-gray-200">
+            <span class="material-icons text-4xl">fastfood</span>
           </div>
-          <div class="p-5 flex flex-col gap-2">
-            <div class="flex justify-between items-celnter mb-3">
-              <h3 class="text-lg font-semibold text-gray-800 truncate">{{ item.name }}</h3>
+          }
+        </div>
+
+        <!-- Item Content -->
+        <div class="flex flex-col flex-1 min-w-0">
+          <div class="flex justify-between items-start mb-1">
+            <div class="min-w-0">
+              <h3 class="font-black text-[#090A0F] text-lg md:text-xl truncate">{{ item.name }}</h3>
+              @if (item.variant) {
+              <p class="text-[10px] font-black text-yellow-600 uppercase tracking-widest">{{ item.variant.label ||
+                item.variant.variantName }}</p>
+              }
+            </div>
+            <button (click)="removeItem(item)"
+              class="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
+              <span class="material-icons text-xl">close</span>
+            </button>
+          </div>
+
+          <!-- Addons -->
+          @if (item.addons && item.addons.length > 0) {
+          <div class="flex flex-wrap gap-2 mt-2">
+            @for (addon of item.addons; track addon.addonId) {
+            <span class="px-2 py-0.5 bg-gray-50 text-gray-500 text-[10px] font-bold rounded-md">+ {{ addon.name ||
+              addon.addonName }}</span>
+            }
+          </div>
+          }
+
+          <!-- Bottom: Price + Quantity -->
+          <div class="mt-auto flex items-center justify-between pt-4">
+            <div class="flex flex-col">
+              <div class="flex items-baseline gap-0.5">
+                <span class="text-sm font-bold text-gray-400">₹</span>
+                <span class="text-xl font-black text-[#090A0F]">{{ item.unitPrice * item.quantity }}</span>
+              </div>
+              @if (item.gstPrice !== undefined && item.gstPrice > 0) {
+              <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">GST: ₹{{ item.gstPrice | number:'1.2-2' }}</span>
+              }
             </div>
 
-            <div class="flex flex-col md:flex-row justify-between px-1 gap-2">
-              <p class="text-gray-600 text-sm line-clamp-3 pl-1">{{ item.cuisine }}</p>
-              <p class="text-gray-600 text-sm">⭐ {{ item.rating }}</p>
-            </div>
-
-            <div class="flex flex-col gap-4">
-              <button
-                class="flex items-center justify-center gap-2 text-sm w-full text-white bg-yellow-500 p-2 rounded-lg hover:bg-yellow-400">
-                Checkout
+            <div class="flex items-center bg-gray-50 hover:bg-gray-100 rounded-2xl p-1 transition-colors">
+              <button (click)="updateQuantity(item, -1)"
+                class="w-8 h-8 flex items-center justify-center bg-white rounded-xl shadow-sm text-black active:scale-90 transition-transform">
+                <span class="material-icons text-sm">remove</span>
               </button>
-              <button
-                (click)="removeItem(item)"
-                class="flex items-center justify-center gap-2 text-sm w-full text-white bg-yellow-500 p-2 rounded-lg hover:bg-yellow-400">
-                Remove
+              <span class="w-10 text-center font-black text-sm text-[#090A0F]">{{ item.quantity }}</span>
+              <button (click)="updateQuantity(item, 1)"
+                class="w-8 h-8 flex items-center justify-center bg-white rounded-xl shadow-sm text-black active:scale-90 transition-transform">
+                <span class="material-icons text-sm">add</span>
               </button>
             </div>
           </div>
         </div>
-      }
+      </div>
     </div>
-  </section>
+    }
+  </div>
+
+  <!-- Install App Banner (after cart items) -->
+  <app-install-banner class="block mt-4 mb-8 px-2"></app-install-banner>
+
+
+
+  <!-- Sticky Summary Bar -->
+  <div class="summary-card">
+    <div class="summary-inner">
+      <div class="summary-row">
+        <span class="summary-label">Subtotal</span>
+        <span class="summary-value">₹{{ cart.subtotal || 0 }}</span>
+      </div>
+
+      @if (cart.gstPrice && cart.gstPrice > 0) {
+      <div class="summary-row">
+        <span class="summary-label">GST ({{ ((cart.gstPrice / (cart.subtotal || 1)) * 100) | number:'1.0-1' }}%)</span>
+        <span class="summary-value">₹{{ cart.gstPrice | number:'1.2-2' }}</span>
+      </div>
+      }
+
+      <div class="summary-divider"></div>
+
+      <div class="summary-total-row">
+        <div class="summary-total">
+          <span class="total-label">To Pay</span>
+          <span class="total-amount">
+            <span class="total-symbol">₹</span>{{ (cart.subtotal + (cart.gstPrice || 0)) | number:'1.2-2' }}
+          </span>
+        </div>
+
+        <button (click)="checkout()" [disabled]="isCheckingOut()"
+          class="checkout-btn disabled:opacity-50 disabled:cursor-not-allowed">
+          @if (isCheckingOut()) {
+          <span class="flex items-center gap-2">
+            <span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+            Processing...
+          </span>
+          } @else {
+          <span>Place Order</span>
+          <span class="material-icons checkout-arrow">arrow_forward</span>
+          }
+        </button>
+      </div>
+
+      <p class="summary-note">
+        @if (seatingType === 'HOTEL_ROOM') {
+          Food will be delivered to Room {{ hotelRoom() || 'Pending' }}@if (hotelFloor()) { (Floor {{ hotelFloor() }}) }
+        } @else {
+          Food will be served at {{ seatingLabel }} #{{ tableId || 'N/A' }}
+        }
+      </p>
+    </div>
+  </div>
+  } @else {
+  <!-- Install App Banner (top of empty cart) -->
+  <app-install-banner class="block mb-6 px-2"></app-install-banner>
+
+  <!-- Empty State -->
+  <div
+    class="glass-effect text-center p-12 rounded-[2.5rem] border border-white/50 max-w-lg mx-auto shadow-premium transform transition-all hover:scale-[1.02]">
+    <div
+      class="w-24 h-24 bg-gray-50 text-gray-200 rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-inner">
+      <span class="material-icons text-5xl">shopping_cart</span>
+    </div>
+    <h2 class="text-3xl font-black text-[#090A0F] mb-4">Your cart is empty</h2>
+    <p class="text-gray-500 mb-8 font-medium px-4">Hungry? Explore our menu and find your next favorite craving!</p>
+    <a routerLink="/menu"
+      class="inline-flex items-center gap-3 bg-[#090A0F] text-white px-8 py-5 rounded-[1.5rem] font-black hover:bg-gray-800 transition-all active:scale-95 shadow-lg shadow-black/10">
+      <span class="material-icons text-lg">restaurant_menu</span>
+      Explore Menu
+    </a>
+  </div>
+  }
+  }
+
+</div>
+
+<!-- Premium Name Prompt Modal -->
+@if (showNameModal()) {
+<div class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-[#090A0F]/60 backdrop-blur-md animate-in fade-in duration-500"
+    (click)="showNameModal.set(false)"></div>
+
+  <!-- Modal Content -->
+  <div
+    class="bg-white rounded-[2.5rem] p-8 md:p-12 w-full max-w-md relative z-10 shadow-2xl animate-in zoom-in slide-in-from-bottom-8 duration-500">
+    <div class="text-center mb-8">
+      <div
+        class="w-20 h-20 bg-yellow-400/10 text-yellow-600 rounded-[2rem] flex items-center justify-center mx-auto mb-6">
+        <span class="material-icons text-4xl">face</span>
+      </div>
+      <h2 class="text-3xl font-black text-[#090A0F] mb-3 tracking-tight">Who's dining?</h2>
+      <p class="text-gray-500 font-medium leading-relaxed">
+        Just your First Name or Pet Name is perfect!
+      </p>
+    </div>
+
+    <div class="relative mb-8">
+      <input type="text" [value]="userName()" (input)="onNameInput($event)" placeholder="First Name or Nickname"
+        maxlength="15"
+        class="w-full h-16 bg-gray-50 border-2 border-transparent focus:border-[#090A0F] rounded-2xl px-6 font-bold text-lg transition-all outline-none text-center"
+        autofocus />
+    </div>
+
+    <button (click)="confirmName()" [disabled]="userName().trim().length < 2 || isCheckingOut()"
+      class="w-full bg-[#090A0F] text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-black/10 hover:bg-gray-800 transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+      @if (isCheckingOut()) {
+        <span class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+        Processing...
+      } @else {
+        Continue to Checkout
+      }
+    </button>
+
+    <p class="text-center mt-6 text-[10px] font-black uppercase tracking-widest text-gray-400">
+      This helps us identify your orders.
+    </p>
+  </div>
+</div>
 }
 
+<!-- Premium Hotel Details Prompt Modal -->
+@if (showHotelModal()) {
+<div class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-[#090A0F]/60 backdrop-blur-md animate-in fade-in duration-500"
+    (click)="showHotelModal.set(false)"></div>
+
+  <!-- Modal Content -->
+  <div
+    class="bg-white rounded-[2.5rem] p-8 md:p-12 w-full max-w-md relative z-10 shadow-2xl animate-in zoom-in slide-in-from-bottom-8 duration-500">
+    <div class="text-center mb-8">
+      <div
+        class="w-20 h-20 bg-yellow-400/10 text-yellow-600 rounded-[2rem] flex items-center justify-center mx-auto mb-6">
+        <span class="material-icons text-4xl">room_service</span>
+      </div>
+      <h2 class="text-3xl font-black text-[#090A0F] mb-3 tracking-tight">Room Service</h2>
+      <p class="text-gray-500 font-medium leading-relaxed">
+        Please complete details to deliver order to your room.
+      </p>
+    </div>
+
+    @if (error()) {
+    <div class="mb-6 p-4 bg-red-50 text-red-600 rounded-2xl text-sm font-bold border border-red-100 flex items-start gap-3">
+      <span class="material-icons text-red-500">error_outline</span>
+      <span>{{ error() }}</span>
+    </div>
+    }
+
+    <div class="space-y-4 mb-8">
+      <!-- Name Input -->
+      <div class="relative">
+        <span class="material-icons absolute left-5 top-1/2 -translate-y-1/2 text-gray-400">face</span>
+        <input type="text" [value]="userName()" (input)="onNameInput($event)" placeholder="Your Name"
+          maxlength="15"
+          class="w-full h-16 bg-gray-50 border-2 border-transparent focus:border-[#090A0F] rounded-2xl pl-14 pr-6 font-bold text-base transition-all outline-none" />
+      </div>
+
+      <!-- Mobile Number Input -->
+      <div class="relative">
+        <span class="material-icons absolute left-5 top-1/2 -translate-y-1/2 text-gray-400">phone_iphone</span>
+        <input type="tel" [value]="hotelMobile()" (input)="onMobileInput($event)" placeholder="Mobile Number (10 Digits)"
+          maxlength="10"
+          class="w-full h-16 bg-gray-50 border-2 border-transparent focus:border-[#090A0F] rounded-2xl pl-14 pr-6 font-bold text-base transition-all outline-none" />
+      </div>
+
+      <!-- Room & Floor Inputs Grid -->
+      <div class="grid grid-cols-2 gap-4">
+        <!-- Room Input -->
+        <div class="relative">
+          <span class="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">meeting_room</span>
+          <input type="text" [value]="hotelRoom()" (input)="onRoomInput($event)" placeholder="Room No."
+            maxlength="10"
+            class="w-full h-16 bg-gray-50 border-2 border-transparent focus:border-[#090A0F] rounded-2xl pl-12 pr-4 font-bold text-base transition-all outline-none" />
+        </div>
+
+        <!-- Floor Input -->
+        <div class="relative">
+          <span class="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">layers</span>
+          <input type="text" [value]="hotelFloor()" (input)="onFloorInput($event)" placeholder="Floor (Optional)"
+            maxlength="5"
+            class="w-full h-16 bg-gray-50 border-2 border-transparent focus:border-[#090A0F] rounded-2xl pl-12 pr-4 font-bold text-base transition-all outline-none" />
+        </div>
+      </div>
+    </div>
+
+    <button (click)="confirmHotelDetails()" [disabled]="userName().trim().length < 2 || hotelMobile().trim().length !== 10 || hotelRoom().trim().length < 1 || isCheckingOut()"
+      class="w-full bg-[#090A0F] text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-black/10 hover:bg-gray-800 transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+      @if (isCheckingOut()) {
+        <span class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+        Processing...
+      } @else {
+        Confirm & Place Order
+      }
+    </button>
+
+    <p class="text-center mt-6 text-[10px] font-black uppercase tracking-widest text-gray-400">
+      Your details are secure and used only for delivery.
+    </p>
+  </div>
+</div>
+}

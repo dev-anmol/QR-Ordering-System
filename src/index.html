@@ -2,11 +2,101 @@
 <html lang="en">
 
 <head>
+  <!-- Microsoft Clarity -->
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "wy4z7jew32");
+  </script>
+  <script>
+    window.global = window;
+    window.process = {
+      env: { DEBUG: undefined },
+    };
+  </script>
   <meta charset="utf-8">
-  <title>ScanEats</title>
+  <title>DineSphere</title>
   <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#090A0F">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" href="assets/images/logo.png">
+  <script>
+    // Dynamic Favicon Transparency Fix
+    (function () {
+      const img = new Image();
+      img.src = 'assets/images/logo.png';
+      img.crossOrigin = 'Anonymous';
+      img.onload = function () {
+        const canvas = document.createElement('canvas');
+        // Standard high-res favicon size
+        canvas.width = 128;
+        canvas.height = 128;
+        const ctx = canvas.getContext('2d');
+
+        // Use a temporary canvas to detect the bounding box of the non-black content
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = img.width;
+        tempCanvas.height = img.height;
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.drawImage(img, 0, 0);
+
+        const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+        const data = imageData.data;
+
+        // Simple logic to find the 'logo' bounds (non-black pixels)
+        let minX = img.width, minY = img.height, maxX = 0, maxY = 0;
+        let found = false;
+
+        for (let y = 0; y < img.height; y++) {
+          for (let x = 0; x < img.width; x++) {
+            const i = (y * img.width + x) * 4;
+            if (data[i] > 50 || data[i + 1] > 50 || data[i + 2] > 50) {
+              if (x < minX) minX = x;
+              if (x > maxX) maxX = x;
+              if (y < minY) minY = y;
+              if (y > maxY) maxY = y;
+              found = true;
+            }
+          }
+        }
+
+        if (!found) { minX = 0; minY = 0; maxX = img.width; maxY = img.height; }
+
+        // Add a tiny bit of padding
+        const padding = 5;
+        minX = Math.max(0, minX - padding);
+        minY = Math.max(0, minY - padding);
+        maxX = Math.min(img.width, maxX + padding);
+        maxY = Math.min(img.height, maxY + padding);
+
+        const width = maxX - minX;
+        const height = maxY - minY;
+
+        // Draw the cropped/zoomed logo to the final favicon canvas
+        ctx.drawImage(img, minX, minY, width, height, 0, 0, canvas.width, canvas.height);
+
+        // Apply transparency to any remaining dark pixels in the new canvas
+        const finalData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const d = finalData.data;
+        for (let i = 0; i < d.length; i += 4) {
+          if (d[i] < 40 && d[i + 1] < 40 && d[i + 2] < 40) d[i + 3] = 0;
+        }
+        ctx.putImageData(finalData, 0, 0);
+
+        const link = document.querySelector("link[rel*='icon']");
+        if (link) {
+          link.href = canvas.toDataURL('image/png');
+        }
+      };
+    })();
+  </script>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
@@ -14,12 +104,127 @@
     @import url('https://fonts.googleapis.com/css2?family=Cookie&display=swap');
     @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap');
     @import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <script>
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((reg) => console.log('[SW] Registered:', reg.scope))
+          .catch((err) => console.error('[SW] Registration failed:', err));
+      });
+    }
+
+    // Capture beforeinstallprompt EARLY (before Angular boots)
+    // Store it on window so PwaService can pick it up
+    window.__pwaInstallPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      window.__pwaInstallPrompt = e;
+      console.log('[PWA] beforeinstallprompt captured early (before Angular)');
+    });
+  </script>
 </head>
 
-<body class="mat-typography">
-  <app-root></app-root>
+<body class="mat-typography" style="background-color: #fafafa; margin: 0;">
+  <app-root>
+    <style>
+      .initial-loader-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background-color: #fafafa;
+        font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
+        color: #090A0F;
+        text-align: center;
+      }
+      .initial-loader-radar {
+        position: relative;
+        width: 112px;
+        height: 112px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 24px;
+      }
+      .initial-loader-circle {
+        position: absolute;
+        inset: 0;
+        border: 1px solid rgba(9, 10, 15, 0.1);
+        border-radius: 50%;
+        animation: initial-ping 1.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+      }
+      .initial-loader-circle:nth-child(2) {
+        animation-delay: 0.3s;
+      }
+      .initial-loader-circle:nth-child(3) {
+        animation-delay: 0.6s;
+      }
+      .initial-loader-center {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background-color: rgba(9, 10, 15, 0.04);
+        border: 1px solid rgba(9, 10, 15, 0.08);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .initial-loader-spinner {
+        position: absolute;
+        inset: 0;
+        border: 4px dashed rgba(9, 10, 15, 0.15);
+        border-radius: 50%;
+        animation: initial-spin 15s linear infinite;
+      }
+      @keyframes initial-ping {
+        75%, 100% {
+          transform: scale(2);
+          opacity: 0;
+        }
+      }
+      @keyframes initial-spin {
+        to { transform: rotate(360deg); }
+      }
+      .initial-loader-title {
+        font-size: 30px;
+        font-weight: 900;
+        letter-spacing: -0.025em;
+        margin: 0 0 8px 0;
+        background: linear-gradient(135deg, #090A0F 0%, #2B1E5A 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .initial-loader-subtitle {
+        font-size: 14px;
+        color: rgba(9, 10, 15, 0.6);
+        font-weight: 500;
+        margin: 0;
+      }
+    </style>
+    <div class="initial-loader-container">
+      <div class="initial-loader-radar">
+        <div class="initial-loader-circle"></div>
+        <div class="initial-loader-circle"></div>
+        <div class="initial-loader-circle"></div>
+        <div class="initial-loader-spinner"></div>
+        <div class="initial-loader-center">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#090A0F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.7;">
+            <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+            <rect width="6" height="6" x="7" y="7"/>
+            <rect width="6" height="6" x="7" y="11" style="display:none;"/>
+            <path d="M7 17h.01M17 7h.01M12 12h.01M17 12h.01M12 17h.01M17 17h.01"/>
+          </svg>
+        </div>
+      </div>
+      <h2 class="initial-loader-title">DineSphere</h2>
+      <p class="initial-loader-subtitle">Securing table connection...</p>
+    </div>
+  </app-root>
 </body>
-
 </html>

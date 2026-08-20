@@ -16,8 +16,7 @@ export class LoginService {
   private http = inject(HttpClient);
   headers = new HttpHeaders().set('Content-Type', 'application/json');
 
-  loginUser(payload: LoginPayload) : Observable<any> {
-    // return this.http.post(`${environment.apiUrl}/login`, payload, {headers: this.headers})
-    return new Observable(observer => observer.next(true)); // just for testing
+  loginUser(payload: LoginPayload): Observable<any> {
+    return this.http.post(`${environment.authUrl}/login`, payload, { headers: this.headers });
   }
 }
